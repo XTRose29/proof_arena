@@ -50,7 +50,7 @@ body {
 }
 
 .hero {
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 1fr;
   align-items: start;
 }
 
@@ -104,7 +104,6 @@ h3 {
   line-height: 1.55;
 }
 
-.summary-card,
 .card,
 .panel {
   background: rgba(255, 250, 242, 0.88);
@@ -113,16 +112,10 @@ h3 {
   backdrop-filter: blur(8px);
 }
 
-.summary-card,
 .card,
 .panel {
   border-radius: 20px;
   padding: 20px;
-}
-
-.summary-card ul {
-  padding-left: 18px;
-  margin-bottom: 0;
 }
 
 .section-heading {

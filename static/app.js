@@ -79,19 +79,6 @@ function setStatus(message, isError = false) {
   el.style.color = isError ? "var(--warn)" : "var(--muted)";
 }
 
-function buildSummary(summary) {
-  const card = document.getElementById("summaryCard");
-  const topQuestions = summary.questions
-    .slice(0, 5)
-    .map((question) => `<li>${question.title} (${question.proof_count} proofs)</li>`)
-    .join("");
-  card.innerHTML = `
-    <h2>Dataset Snapshot</h2>
-    <p>${summary.counts.questions} questions, ${summary.counts.proofs} proofs, ${summary.counts.nodes} nodes, ${summary.counts.evaluations} saved evaluations.</p>
-    <ul>${topQuestions}</ul>
-  `;
-}
-
 function escapeHtml(text) {
   return text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 }
@@ -286,11 +273,6 @@ async function handleAuthSubmit(event, mode) {
   setStatus(mode === "login" ? "Logged in." : "Account created.");
 }
 
-async function loadSummary() {
-  const summary = await fetchJson("/api/summary");
-  buildSummary(summary);
-}
-
 async function loadComparison() {
   setStatus("Loading randomized comparison...");
   const comparison = await fetchJson("/api/comparison");
@@ -326,7 +308,6 @@ async function submitEvaluation() {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(buildEvaluationPayload()),
   });
-  await loadSummary();
   await loadComparison();
   document.getElementById("generalComment").value = "";
   setStatus(`Saved evaluation #${result.sessionId}. Loaded a new random pair.`);
@@ -344,7 +325,6 @@ async function main() {
 
   try {
     await restoreSession();
-    await loadSummary();
     await loadComparison();
   } catch (error) {
     setStatus(error.message, true);
