@@ -151,10 +151,7 @@ function createCodeLine(line) {
 }
 
 function panelMeta(entity) {
-  if (entity.kind === "proof") {
-    return entity.question_title;
-  }
-  return entity.question_title;
+  return "";
 }
 
 function renderPanel(sideLabel, entity) {
@@ -162,7 +159,10 @@ function renderPanel(sideLabel, entity) {
   const panel = template.content.firstElementChild.cloneNode(true);
   panel.querySelector(".panel-side").textContent = sideLabel;
   panel.querySelector(".panel-title").textContent = entity.kind === "proof" ? entity.title : entity.name;
-  panel.querySelector(".panel-meta").textContent = panelMeta(entity);
+  const metaEl = panel.querySelector(".panel-meta");
+  const metaText = panelMeta(entity);
+  metaEl.textContent = metaText;
+  metaEl.classList.toggle("hidden", !metaText);
 
   const codeViewer = panel.querySelector(".code-viewer");
   entity.lines.forEach((line) => {
