@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: proof_arena
+      POSTGRES_USER: proof_arena
+      POSTGRES_PASSWORD: proof_arena_dev_password
+    volumes:
+      - proof_arena_pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  web:
+    build:
+      context: ..
+      dockerfile: proof_arena/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      PROOF_ARENA_DATABASE_URL: postgresql+psycopg://proof_arena:proof_arena_dev_password@db:5432/proof_arena
+      PROOF_ARENA_HOST: 0.0.0.0
+      PROOF_ARENA_PORT: 8000
+      PROOF_ARENA_AUTO_SEED: "true"
+      PROOF_ARENA_CORS_ORIGINS: "*"
+    ports:
+      - "8000:8000"
+
+volumes:
+  proof_arena_pgdata:

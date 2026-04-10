@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lean Proof Arena</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Autoformalization Benchmark</p>
+          <h1>Lean Proof Arena</h1>
+          <p class="hero-copy">
+            Compare full proofs or proof nodes, score both sides with the same rubric,
+            and save evaluator feedback directly into a local database.
+          </p>
+        </div>
+        <div class="summary-card" id="summaryCard">
+          <p>Loading dataset summary...</p>
+        </div>
+      </section>
+
+      <section class="control-bar">
+        <label>
+          Comparison mode
+          <select id="modeSelect">
+            <option value="option1">Option 1: Two complete proofs of the same question</option>
+            <option value="option2">Option 2: Two complete proofs of different questions</option>
+            <option value="option3">Option 3: The same node of the same question</option>
+            <option value="option4">Option 4: Two random nodes of the same kind</option>
+          </select>
+        </label>
+        <button id="loadButton" class="primary-button">Load Comparison</button>
+        <div id="statusText" class="status-text"></div>
+      </section>
+
+      <section class="arena-grid" id="arenaGrid">
+        <article class="panel loading-panel">Load a comparison to begin.</article>
+      </section>
+    </main>
+
+    <template id="panelTemplate">
+      <article class="panel">
+        <header class="panel-header">
+          <div>
+            <p class="panel-side"></p>
+            <h2 class="panel-title"></h2>
+            <p class="panel-meta"></p>
+          </div>
+          <div class="selected-line-box">
+            <span class="selected-line-label">Selected line</span>
+            <span class="selected-line-value">None</span>
+          </div>
+        </header>
+
+        <section class="card code-card">
+          <div class="code-card-top">
+            <div>
+              <h3>Code</h3>
+              <p class="minor-text">Click any line to attach a line-specific comment.</p>
+            </div>
+          </div>
+          <pre class="code-viewer"></pre>
+        </section>
+
+        <section class="card rubric-card">
+          <h3>Rubric</h3>
+          <div class="rubric-grid">
+            <label>Clarity<select data-score="clarity"></select></label>
+            <label>Conciseness<select data-score="conciseness"></select></label>
+            <label>Idiomatic Structure<select data-score="idiomaticStructure"></select></label>
+            <label>Fidelity to NL Proof<select data-score="fidelityToNl"></select></label>
+            <label>Overall<select data-score="overall"></select></label>
+          </div>
+        </section>
+
+        <section class="card comments-card">
+          <h3>General comment</h3>
+          <textarea data-role="general-comment" rows="4" placeholder="High-level evaluation for this side"></textarea>
+          <h3>Line comment</h3>
+          <textarea data-role="line-comment" rows="3" placeholder="Comment for the currently selected line"></textarea>
+          <button class="secondary-button" data-action="add-line-comment">Add Line Comment</button>
+          <ul class="line-comment-list"></ul>
+        </section>
+      </article>
+    </template>
+
+    <template id="lineCommentTemplate">
+      <li class="line-comment-item">
+        <div>
+          <strong class="comment-line"></strong>
+          <p class="comment-snippet"></p>
+          <p class="comment-text"></p>
+        </div>
+        <button class="ghost-button" data-action="remove-line-comment">Remove</button>
+      </li>
+    </template>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
