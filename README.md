@@ -58,8 +58,8 @@ Lean files in `question_sets/` are not read directly by the webpage at request t
 
 Instead:
 
-1. The import script parses files from `question_sets/`
-2. Parsed records are inserted into PostgreSQL
+1. The sync script parses files from `question_sets/`
+2. Parsed records are inserted or updated in PostgreSQL
 3. The frontend reads dataset information through the API
 4. The API serves randomized A/B comparisons from the database
 
@@ -131,9 +131,9 @@ Then open:
 http://127.0.0.1:8000
 ```
 
-## Importing Question Sets
+## Syncing Question Sets
 
-To load `question_sets/` into PostgreSQL:
+To sync `question_sets/` into PostgreSQL:
 
 ```bash
 python3 -m scripts.import_question_sets
@@ -143,8 +143,10 @@ This command:
 
 - creates tables if needed
 - parses Lean files under `question_sets/`
-- replaces existing question/proof/node records
-- clears previously saved evaluations before re-import
+- adds new questions/proofs/nodes
+- updates changed questions/proofs/nodes
+- removes dataset records that no longer exist locally
+- preserves saved user evaluations and votes
 
 Use it when:
 

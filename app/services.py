@@ -127,28 +127,79 @@ def auth_user_from_token(session: Session, raw_token: str | None) -> User:
 def init_database(session: Session) -> None:
     if session.execute(select(func.count(Proof.id))).scalar_one() > 0:
         return
-    import_question_sets(session, replace_existing=False)
+    sync_question_sets(session)
 
 
-def import_question_sets(session: Session, replace_existing: bool = True) -> dict[str, int]:
-    if replace_existing:
-        session.query(PreferenceVote).delete()
-        session.query(PreferenceEvaluation).delete()
-        session.query(Node).delete()
-        session.query(Proof).delete()
-        session.query(Question).delete()
-        session.flush()
+def _sync_nodes_for_proof(session: Session, proof: Proof, parsed_nodes: list[Any]) -> int:
+    existing_nodes = session.execute(select(Node).where(Node.proof_id == proof.id)).scalars().all()
+    existing_by_ordinal = {node.ordinal: node for node in existing_nodes}
+    desired_ordinals = {node.ordinal for node in parsed_nodes}
 
-    question_ids: dict[str, int] = {}
-    proof_count = 0
-    node_count = 0
+    for parsed_node in parsed_nodes:
+        existing = existing_by_ordinal.get(parsed_node.ordinal)
+        if existing is None:
+            session.add(
+                Node(
+                    proof_id=proof.id,
+                    question_id=proof.question_id,
+                    ordinal=parsed_node.ordinal,
+                    name=parsed_node.name,
+                    node_type=parsed_node.node_type,
+                    declaration_kind=parsed_node.declaration_kind,
+                    declaration_name=parsed_node.declaration_name,
+                    inputs_json=json.dumps(parsed_node.inputs),
+                    natural_language=parsed_node.natural,
+                    nl_proof=parsed_node.nl_proof,
+                    code=parsed_node.code,
+                    start_line=parsed_node.start_line,
+                    end_line=parsed_node.end_line,
+                    created_at=utc_now(),
+                )
+            )
+            continue
+
+        existing.question_id = proof.question_id
+        existing.name = parsed_node.name
+        existing.node_type = parsed_node.node_type
+        existing.declaration_kind = parsed_node.declaration_kind
+        existing.declaration_name = parsed_node.declaration_name
+        existing.inputs_json = json.dumps(parsed_node.inputs)
+        existing.natural_language = parsed_node.natural
+        existing.nl_proof = parsed_node.nl_proof
+        existing.code = parsed_node.code
+        existing.start_line = parsed_node.start_line
+        existing.end_line = parsed_node.end_line
+
+    for existing in existing_nodes:
+        if existing.ordinal not in desired_ordinals:
+            session.delete(existing)
+
+    return len(parsed_nodes)
+
+
+def sync_question_sets(session: Session) -> dict[str, int]:
+    desired_questions: set[str] = set()
+    desired_paths: set[str] = set()
+
+    existing_questions = {
+        question.canonical_key: question
+        for question in session.execute(select(Question)).scalars().all()
+    }
+    existing_proofs = {
+        proof.source_path: proof
+        for proof in session.execute(select(Proof)).scalars().all()
+    }
 
     for path in source_lean_files():
-        rel_path = path.relative_to(REPO_ROOT)
+        rel_path = str(path.relative_to(REPO_ROOT))
+        desired_paths.add(rel_path)
+
         content = path.read_text(encoding="utf-8")
-        nodes = parse_nodes(content)
+        parsed_nodes = parse_nodes(content)
         canonical_key = question_key_for_path(path)
-        question = session.execute(select(Question).where(Question.canonical_key == canonical_key)).scalar_one_or_none()
+        desired_questions.add(canonical_key)
+
+        question = existing_questions.get(canonical_key)
         if question is None:
             question = Question(
                 canonical_key=canonical_key,
@@ -158,45 +209,61 @@ def import_question_sets(session: Session, replace_existing: bool = True) -> dic
             )
             session.add(question)
             session.flush()
-        question_ids[canonical_key] = question.id
+            existing_questions[canonical_key] = question
+        else:
+            question.title = humanize_slug(canonical_key)
+            question.slug = canonical_key
 
-        proof = Proof(
-            question_id=question.id,
-            title=path.stem,
-            label=str(rel_path),
-            author=guess_author(path),
-            source_path=str(rel_path),
-            content=content,
-            line_count=len(content.splitlines()),
-            node_count=len(nodes),
-            created_at=utc_now(),
-        )
-        session.add(proof)
-        session.flush()
-        proof_count += 1
-
-        for node in nodes:
-            session.add(
-                Node(
-                    proof_id=proof.id,
-                    question_id=question.id,
-                    ordinal=node.ordinal,
-                    name=node.name,
-                    node_type=node.node_type,
-                    declaration_kind=node.declaration_kind,
-                    declaration_name=node.declaration_name,
-                    inputs_json=json.dumps(node.inputs),
-                    natural_language=node.natural,
-                    nl_proof=node.nl_proof,
-                    code=node.code,
-                    start_line=node.start_line,
-                    end_line=node.end_line,
-                    created_at=utc_now(),
-                )
+        proof = existing_proofs.get(rel_path)
+        if proof is None:
+            proof = Proof(
+                question_id=question.id,
+                title=path.stem,
+                label=rel_path,
+                author=guess_author(path),
+                source_path=rel_path,
+                content=content,
+                line_count=len(content.splitlines()),
+                node_count=len(parsed_nodes),
+                created_at=utc_now(),
             )
-            node_count += 1
+            session.add(proof)
+            session.flush()
+            existing_proofs[rel_path] = proof
+        else:
+            proof.question_id = question.id
+            proof.title = path.stem
+            proof.label = rel_path
+            proof.author = guess_author(path)
+            proof.content = content
+            proof.line_count = len(content.splitlines())
+            proof.node_count = len(parsed_nodes)
+
+        proof.node_count = _sync_nodes_for_proof(session, proof, parsed_nodes)
+
+    for source_path, proof in list(existing_proofs.items()):
+        if source_path not in desired_paths:
+            for node in session.execute(select(Node).where(Node.proof_id == proof.id)).scalars().all():
+                session.delete(node)
+            session.delete(proof)
+
+    session.flush()
+
+    for canonical_key, question in list(existing_questions.items()):
+        if canonical_key not in desired_questions:
+            remaining_proof_count = session.execute(
+                select(func.count(Proof.id)).where(Proof.question_id == question.id)
+            ).scalar_one()
+            if remaining_proof_count == 0:
+                session.delete(question)
+
     session.commit()
-    return {"questions": len(question_ids), "proofs": proof_count, "nodes": node_count}
+
+    return {
+        "questions": session.execute(select(func.count(Question.id))).scalar_one(),
+        "proofs": session.execute(select(func.count(Proof.id))).scalar_one(),
+        "nodes": session.execute(select(func.count(Node.id))).scalar_one(),
+    }
 
 
 def serialize_lines(text_value: str, start_at: int = 1) -> list[dict[str, Any]]:

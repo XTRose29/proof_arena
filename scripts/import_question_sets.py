@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from app.database import Base, SessionLocal, engine, ensure_models_imported
-from app.services import import_question_sets
+from app.services import sync_question_sets
 
 
 def main() -> None:
@@ -9,11 +9,11 @@ def main() -> None:
     Base.metadata.create_all(bind=engine)
     session = SessionLocal()
     try:
-        stats = import_question_sets(session, replace_existing=True)
+        stats = sync_question_sets(session)
     finally:
         session.close()
     print(
-        "Imported question sets: "
+        "Synchronized question sets: "
         f"{stats['questions']} questions, {stats['proofs']} proofs, {stats['nodes']} nodes"
     )
 
