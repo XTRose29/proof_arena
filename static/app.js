@@ -157,8 +157,8 @@ function panelMeta(entity) {
 function renderPanel(sideLabel, entity) {
   const template = document.getElementById("panelTemplate");
   const panel = template.content.firstElementChild.cloneNode(true);
-  panel.querySelector(".panel-side").textContent = sideLabel;
-  panel.querySelector(".panel-title").textContent = entity.kind === "proof" ? entity.title : entity.name;
+  panel.querySelector(".panel-side").classList.add("hidden");
+  panel.querySelector(".panel-title").textContent = sideLabel;
   const metaEl = panel.querySelector(".panel-meta");
   const metaText = panelMeta(entity);
   metaEl.textContent = metaText;
