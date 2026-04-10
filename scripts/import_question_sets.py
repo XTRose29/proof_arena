@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from proof_arena.app.database import Base, SessionLocal, engine
-from proof_arena.app.services import import_question_sets
+from app.database import Base, SessionLocal, engine
+from app.services import import_question_sets
 
 
 def main() -> None:
