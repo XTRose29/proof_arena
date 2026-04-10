@@ -165,9 +165,9 @@ function createCodeLine(line) {
 
 function panelMeta(entity) {
   if (entity.kind === "proof") {
-    return `${entity.question_title}${entity.author ? ` | ${entity.author}` : ""}`;
+    return entity.question_title;
   }
-  return `${entity.question_title} | ${entity.name} | ${entity.node_type}${entity.author ? ` | ${entity.author}` : ""}`;
+  return entity.question_title;
 }
 
 function renderPanel(sideLabel, entity) {
@@ -191,9 +191,6 @@ function renderComparison(comparison) {
   arena.appendChild(renderPanel("A", comparison.a));
   arena.appendChild(renderPanel("B", comparison.b));
   document.getElementById("comparisonModeLabel").textContent = comparison.modeLabel;
-  document.getElementById("comparisonQuestionLabel").textContent = comparison.a.question_title === comparison.b.question_title
-    ? comparison.a.question_title
-    : `${comparison.a.question_title} vs ${comparison.b.question_title}`;
 }
 
 function renderScoreMatrix() {
@@ -254,9 +251,12 @@ function setCurrentUser(user, token) {
     <span>${user.email}</span>
     <span>${user.affiliation || "No affiliation set"}</span>
   `;
-  document.getElementById("metaDisplayName").value = user.displayName || "";
-  document.getElementById("metaAffiliation").value = user.affiliation || "";
-  document.getElementById("metaExperience").value = user.experienceLevel || "";
+  document.getElementById("greetingHeading").textContent = `Hi ${user.displayName}`;
+  document.getElementById("accountSummary").innerHTML = `
+    <div><strong>Name</strong><span>${user.displayName}</span></div>
+    <div><strong>Affiliation</strong><span>${user.affiliation || "Not provided"}</span></div>
+    <div><strong>Experience</strong><span>${user.experienceLevel || "Not provided"}</span></div>
+  `;
 }
 
 async function restoreSession() {
@@ -301,11 +301,6 @@ async function loadComparison() {
 function buildEvaluationPayload() {
   return {
     mode: state.comparison.mode,
-    meta: {
-      displayName: document.getElementById("metaDisplayName").value.trim(),
-      affiliation: document.getElementById("metaAffiliation").value.trim(),
-      experienceLevel: document.getElementById("metaExperience").value.trim(),
-    },
     a: {
       kind: state.comparison.a.kind,
       entityId: state.comparison.a.entityId,
@@ -315,6 +310,7 @@ function buildEvaluationPayload() {
       entityId: state.comparison.b.entityId,
     },
     preferences: state.preferences,
+    generalComment: document.getElementById("generalComment").value.trim(),
   };
 }
 
@@ -325,9 +321,6 @@ async function submitEvaluation() {
   if (!state.comparison) {
     throw new Error("No comparison loaded.");
   }
-  if (!document.getElementById("metaDisplayName").value.trim()) {
-    throw new Error("Display name is required.");
-  }
   const result = await fetchJson("/api/evaluations", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -335,6 +328,7 @@ async function submitEvaluation() {
   });
   await loadSummary();
   await loadComparison();
+  document.getElementById("generalComment").value = "";
   setStatus(`Saved evaluation #${result.sessionId}. Loaded a new random pair.`);
 }
 

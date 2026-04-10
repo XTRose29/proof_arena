@@ -435,9 +435,10 @@ def save_preference_evaluation(session: Session, user: User, payload: Preference
         entity_b_proof_id=b_proof_id,
         entity_a_node_id=a_node_id,
         entity_b_node_id=b_node_id,
-        evaluator_display_name=payload.meta.displayName.strip(),
-        evaluator_affiliation=payload.meta.affiliation.strip(),
-        evaluator_experience_level=payload.meta.experienceLevel.strip(),
+        evaluator_display_name=user.display_name.strip(),
+        evaluator_affiliation=user.affiliation.strip(),
+        evaluator_experience_level=user.experience_level.strip(),
+        general_comment=payload.generalComment.strip(),
         created_at=utc_now(),
     )
     session.add(record)

@@ -185,11 +185,13 @@ label {
 }
 
 input,
+textarea,
 button {
   font: inherit;
 }
 
-input {
+input,
+textarea {
   width: 100%;
   border-radius: 12px;
   border: 1px solid var(--line);
@@ -198,14 +200,9 @@ input {
   color: var(--ink);
 }
 
-.auth-form,
-.meta-grid {
+.auth-form {
   display: grid;
   gap: 12px;
-}
-
-.meta-grid {
-  grid-template-columns: repeat(3, minmax(160px, 1fr));
 }
 
 .account-info {
@@ -217,9 +214,31 @@ input {
   border-top: 1px solid rgba(99, 86, 70, 0.16);
 }
 
+.account-summary {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, minmax(140px, 1fr));
+  margin-bottom: 16px;
+}
+
+.account-summary div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1px solid rgba(99, 86, 70, 0.16);
+  border-radius: 14px;
+  background: #fffdf9;
+}
+
+.account-summary p {
+  margin: 0;
+  color: var(--muted);
+}
+
 .comparison-brief {
   display: grid;
-  grid-template-columns: repeat(2, minmax(180px, 1fr));
+  grid-template-columns: minmax(180px, 1fr);
   gap: 12px;
   margin-top: 16px;
 }
@@ -243,6 +262,7 @@ input {
 .score-matrix {
   display: grid;
   gap: 10px;
+  margin-bottom: 18px;
 }
 
 .matrix-row {
@@ -286,6 +306,15 @@ input {
   flex-direction: column;
   gap: 16px;
   min-height: 70vh;
+}
+
+.comment-block {
+  display: grid;
+  gap: 8px;
+}
+
+.comment-block label {
+  font-weight: 800;
 }
 
 .panel-side {
@@ -396,7 +425,7 @@ input {
     display: none;
   }
 
-  .meta-grid,
+  .account-summary,
   .comparison-brief {
     grid-template-columns: 1fr;
   }

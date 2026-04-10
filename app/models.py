@@ -105,6 +105,7 @@ class PreferenceEvaluation(Base):
     evaluator_display_name: Mapped[str] = mapped_column(Text, nullable=False)
     evaluator_affiliation: Mapped[str] = mapped_column(Text, nullable=False)
     evaluator_experience_level: Mapped[str] = mapped_column(Text, nullable=False)
+    general_comment: Mapped[str] = mapped_column(Text, nullable=False, default="")
     created_at: Mapped[str] = mapped_column(Text, nullable=False)
 
 

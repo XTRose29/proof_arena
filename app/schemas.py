@@ -54,7 +54,7 @@ class PreferenceScoresIn(BaseModel):
 
 class PreferenceEvaluationCreate(BaseModel):
     mode: str
-    meta: EvaluationMetaIn
     a: ComparisonEntityRef
     b: ComparisonEntityRef
     preferences: PreferenceScoresIn
+    generalComment: str = Field(default="", max_length=5000)

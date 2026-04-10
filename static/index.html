@@ -13,8 +13,11 @@
           <p class="eyebrow">Autoformalization Benchmark</p>
           <h1>Lean Proof Arena</h1>
           <p class="hero-copy">
-            Review randomized proof pairs, log in with a lightweight account, record
-            evaluator metadata, and submit A/B preference judgments directly to PostgreSQL.
+            Welcome to Lean Proof Arena. This interface presents randomized pairs of
+            Lean proofs or proof fragments and asks you to judge which version reads
+            better across a small set of comparison criteria. Your account stores
+            your evaluator profile, and each submission is saved to the database for
+            later analysis.
           </p>
         </div>
         <div class="summary-card" id="summaryCard">
@@ -57,23 +60,17 @@
           <div class="section-heading">
             <div>
               <p class="eyebrow small">Evaluator</p>
-              <h2>Meta Information</h2>
+              <h2 id="greetingHeading">Hi there</h2>
             </div>
             <button id="loadButton" class="secondary-button" type="button">Next Random Comparison</button>
           </div>
-          <div class="meta-grid">
-            <label>Display Name<input id="metaDisplayName" type="text" /></label>
-            <label>Affiliation<input id="metaAffiliation" type="text" /></label>
-            <label>Experience Level<input id="metaExperience" type="text" /></label>
+          <div class="account-summary" id="accountSummary">
+            <p>Log in to load your evaluator profile.</p>
           </div>
           <div class="comparison-brief">
             <div>
               <span class="minor-label">Current Pair</span>
               <strong id="comparisonModeLabel">Loading...</strong>
-            </div>
-            <div>
-              <span class="minor-label">Question Context</span>
-              <strong id="comparisonQuestionLabel">Loading...</strong>
             </div>
           </div>
           <div id="statusText" class="status-text"></div>
@@ -89,6 +86,10 @@
           <button id="submitButton" class="submit-button" type="button">Submit Preference</button>
         </div>
         <div id="scoreMatrix" class="score-matrix"></div>
+        <div class="comment-block">
+          <label for="generalComment">Comments</label>
+          <textarea id="generalComment" rows="4" placeholder="Optional overall comments about this pair."></textarea>
+        </div>
       </section>
 
       <section class="arena-grid" id="arenaGrid">
