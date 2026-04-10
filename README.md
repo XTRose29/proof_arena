@@ -1,26 +1,36 @@
 # Proof Arena
 
-Proof Arena is now structured as a deployable `FastAPI + PostgreSQL` app that serves the existing static frontend and stores both question data and evaluator responses in the backend database.
+Proof Arena is a deployable `FastAPI + PostgreSQL` app for comparing Lean proofs or proof nodes, collecting evaluator feedback, and storing both the dataset and submitted responses in the backend database.
 
-## What Changed
+The current production deployment uses:
 
-- Replaced the prototype `http.server` backend with FastAPI.
-- Added SQLAlchemy-backed persistence with PostgreSQL support.
-- Kept the current API surface:
-  - `GET /api/health`
-  - `GET /api/summary`
-  - `GET /api/comparison?mode=option1|option2|option3|option4`
-  - `POST /api/evaluations`
-  - `GET /api/evaluations?limit=50`
-- Kept `proof_arena/question_sets/` as the source format for import, but the deployed app now reads from the database after import/seed.
+- Vercel for the web app and API
+- Neon PostgreSQL for persistent storage
 
-## Layout
+## What The App Does
+
+- Parses Lean files from `question_sets/`
+- Stores parsed questions, proofs, and nodes in PostgreSQL
+- Serves the frontend and API from the same FastAPI app
+- Loads comparison pairs from the database
+- Saves evaluator submissions into the database
+
+Current API surface:
+
+- `GET /api/health`
+- `GET /api/summary`
+- `GET /api/comparison?mode=option1|option2|option3|option4`
+- `POST /api/evaluations`
+- `GET /api/evaluations?limit=50`
+
+## Repository Layout
 
 ```text
 proof_arena/
   app/
-    main.py
+    config.py
     database.py
+    main.py
     models.py
     parsing.py
     schemas.py
@@ -29,28 +39,84 @@ proof_arena/
   scripts/
     import_question_sets.py
   static/
-  Dockerfile
+  .env.example
   docker-compose.yml
+  Dockerfile
   requirements.txt
   server.py
+  vercel.json
 ```
+
+## Data Flow
+
+### Question data
+
+Lean files in `question_sets/` are not read directly by the webpage at request time.
+
+Instead:
+
+1. The import script parses files from `question_sets/`
+2. Parsed records are inserted into PostgreSQL
+3. The frontend reads dataset information through the API
+4. The API serves comparisons from the database
+
+### User submissions
+
+When a user submits an evaluation:
+
+1. The frontend sends `POST /api/evaluations`
+2. FastAPI validates the payload
+3. The backend writes to:
+   - `evaluation_sessions`
+   - `side_evaluations`
+   - `line_comments`
+
+So evaluator responses are stored in PostgreSQL, not in local files.
+
+## Environment Variables
+
+Required:
+
+- `PROOF_ARENA_DATABASE_URL`
+  - Example:
+    `postgresql+psycopg://user:password@host:5432/dbname?sslmode=require`
+
+Optional:
+
+- `PROOF_ARENA_HOST`
+  - Default: `127.0.0.1`
+- `PROOF_ARENA_PORT`
+  - Default: `8000`
+- `PROOF_ARENA_AUTO_SEED`
+  - Default: `false`
+- `PROOF_ARENA_CORS_ORIGINS`
+  - Default: `*`
+
+See [`.env.example`](/Users/xutianruo/Documents/proof_arena/.env.example).
 
 ## Local Development
 
-### 1. Install dependencies
+### 1. Create a virtual environment
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r proof_arena/requirements.txt
+pip install -r requirements.txt
 ```
 
-### 2. Run with local SQLite
+### 2. Set environment variables
 
-This is useful for development only.
+For local PostgreSQL:
 
 ```bash
-python3 -m proof_arena.server
+export PROOF_ARENA_DATABASE_URL='postgresql+psycopg://proof_arena:password@localhost:5432/proof_arena'
+export PROOF_ARENA_AUTO_SEED=false
+```
+
+### 3. Run the app
+
+```bash
+python3 -m server
 ```
 
 Then open:
@@ -59,81 +125,63 @@ Then open:
 http://127.0.0.1:8000
 ```
 
-### 3. Run with PostgreSQL
-
-Set:
-
-```bash
-export PROOF_ARENA_DATABASE_URL='postgresql+psycopg://proof_arena:password@localhost:5432/proof_arena'
-python3 -m proof_arena.server
-```
-
-## Docker Compose
-
-This starts both PostgreSQL and the web app:
-
-```bash
-docker compose -f proof_arena/docker-compose.yml up --build
-```
-
-The app will be available at:
-
-```text
-http://127.0.0.1:8000
-```
-
 ## Importing Question Sets
 
-The app auto-seeds the database on startup when it finds an empty database and `PROOF_ARENA_AUTO_SEED=true`.
-
-You can also re-import manually:
+To load `question_sets/` into PostgreSQL:
 
 ```bash
-python3 -m proof_arena.scripts.import_question_sets
+python3 -m scripts.import_question_sets
 ```
 
-That command replaces existing questions, proofs, nodes, and saved evaluations with a fresh import from:
+This command:
 
-```text
-proof_arena/question_sets/
-```
+- creates tables if needed
+- parses Lean files under `question_sets/`
+- replaces existing question/proof/node records
+- clears previously saved evaluations before re-import
 
-## Environment Variables
+Use it when:
+
+- setting up a new database
+- refreshing the dataset after editing `question_sets/`
+
+## Deployment
+
+### Vercel
+
+This repo is configured for Vercel with [vercel.json](/Users/xutianruo/Documents/proof_arena/vercel.json) and a root-level [server.py](/Users/xutianruo/Documents/proof_arena/server.py) entrypoint.
+
+For Vercel, set these environment variables in Project Settings:
 
 - `PROOF_ARENA_DATABASE_URL`
-  - Example: `postgresql+psycopg://proof_arena:password@db:5432/proof_arena`
-- `PROOF_ARENA_HOST`
-  - Default: `127.0.0.1`
-- `PROOF_ARENA_PORT`
-  - Default: `8000`
-- `PROOF_ARENA_AUTO_SEED`
-  - Default: `true`
+- `PROOF_ARENA_AUTO_SEED=false`
 - `PROOF_ARENA_CORS_ORIGINS`
-  - Comma-separated origins, default `*`
 
-See [`.env.example`](/Users/xutianruo/Documents/autoformalization_benchmark/proof_arena/.env.example).
+Recommended:
 
-## Remote Deployment
+- keep `PROOF_ARENA_AUTO_SEED=false` in production
+- run imports intentionally instead of during cold start
 
-For a public deployment you need four pieces:
+### Neon PostgreSQL
 
-1. An app host for the FastAPI server.
-2. A managed PostgreSQL database.
-3. Environment variables for the database URL and allowed origins.
-4. A reverse proxy or managed platform that exposes HTTPS.
+Use a Neon connection string in SQLAlchemy form:
 
-The simplest production path is:
+```text
+postgresql+psycopg://user:password@host/dbname?sslmode=require
+```
 
-1. Put this repo on GitHub.
-2. Deploy the app container to Railway, Render, Fly.io, or a VPS with Docker.
-3. Create a managed PostgreSQL instance on the same platform.
-4. Set `PROOF_ARENA_DATABASE_URL` to the managed database connection string.
-5. Set `PROOF_ARENA_CORS_ORIGINS` to your deployed frontend domain.
-6. Run the import once if auto-seed is disabled or if you want a controlled refresh.
+If you use a pooled Neon connection string, keep the parameters Neon provides.
 
-## Production Notes
+## Current Production Behavior
 
-- Do not expose Postgres directly to the public internet unless you have a good reason.
-- Put the FastAPI app behind HTTPS.
-- Add authentication before collecting real user data from external users.
-- If you expect schema evolution, add Alembic next rather than editing tables manually.
+- The website reads dataset snapshots and comparison data from PostgreSQL
+- Submitted evaluations are saved into PostgreSQL
+- If the database is empty, the site will show `0 questions, 0 proofs, 0 nodes`
+- After importing `question_sets/`, the UI will start serving real comparisons
+
+## Notes
+
+- Do not commit `.env`
+- Do not expose PostgreSQL directly to the public internet unless necessary
+- If you expect schema changes, add Alembic migrations instead of hand-editing tables
+- If this will be used by external evaluators, add authentication before relying on it for real collection
