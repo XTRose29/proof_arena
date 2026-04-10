@@ -1,19 +1,38 @@
 from __future__ import annotations
 
+import base64
+import hashlib
+import hmac
 import json
 import random
 import re
+import secrets
 from datetime import datetime, timezone
-from pathlib import Path
 from typing import Any
 
 from sqlalchemy import func, select, text
 from sqlalchemy.orm import Session
 
 from .config import REPO_ROOT
-from .models import EvaluationSession, LineComment, Node, Proof, Question, SideEvaluation
+from .models import (
+    AuthToken,
+    Node,
+    PreferenceEvaluation,
+    PreferenceVote,
+    Proof,
+    Question,
+    User,
+)
 from .parsing import guess_author, humanize_slug, parse_nodes, question_key_for_path, source_lean_files
-from .schemas import EvaluationCreate
+from .schemas import LoginRequest, PreferenceEvaluationCreate, RegisterRequest, UserPayload
+
+
+MODE_LABELS = {
+    "option1": "Two complete proofs of the same question",
+    "option2": "Two complete proofs of different questions",
+    "option3": "The same node of the same question",
+    "option4": "Two random nodes of the same kind",
+}
 
 
 def utc_now() -> str:
@@ -30,6 +49,81 @@ def fetch_all_dicts(session: Session, query: str, params: dict[str, Any] | None 
     return [dict(row) for row in result]
 
 
+def _hash_password(password: str, salt: str) -> str:
+    derived = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt.encode("utf-8"), 120000)
+    return base64.b64encode(derived).decode("ascii")
+
+
+def _new_salt() -> str:
+    return secrets.token_hex(16)
+
+
+def serialize_user(user: User) -> dict[str, Any]:
+    payload = UserPayload(
+        id=user.id,
+        email=user.email,
+        displayName=user.display_name,
+        affiliation=user.affiliation,
+        experienceLevel=user.experience_level,
+    )
+    return payload.model_dump()
+
+
+def create_user(session: Session, payload: RegisterRequest) -> tuple[str, dict[str, Any]]:
+    existing = session.execute(select(User).where(User.email == payload.email.lower())).scalar_one_or_none()
+    if existing is not None:
+        raise ValueError("An account with this email already exists.")
+
+    salt = _new_salt()
+    user = User(
+        email=payload.email.lower(),
+        display_name=payload.displayName.strip(),
+        affiliation=payload.affiliation.strip(),
+        experience_level=payload.experienceLevel.strip(),
+        password_hash=_hash_password(payload.password, salt),
+        password_salt=salt,
+        created_at=utc_now(),
+    )
+    session.add(user)
+    session.flush()
+
+    token = AuthToken(user_id=user.id, token=secrets.token_urlsafe(32), created_at=utc_now())
+    session.add(token)
+    session.commit()
+    return token.token, serialize_user(user)
+
+
+def login_user(session: Session, payload: LoginRequest) -> tuple[str, dict[str, Any]]:
+    user = session.execute(select(User).where(User.email == payload.email.lower())).scalar_one_or_none()
+    if user is None:
+        raise ValueError("Invalid email or password.")
+
+    candidate_hash = _hash_password(payload.password, user.password_salt)
+    if not hmac.compare_digest(candidate_hash, user.password_hash):
+        raise ValueError("Invalid email or password.")
+
+    token = AuthToken(user_id=user.id, token=secrets.token_urlsafe(32), created_at=utc_now())
+    session.add(token)
+    session.commit()
+    return token.token, serialize_user(user)
+
+
+def auth_user_from_token(session: Session, raw_token: str | None) -> User:
+    if not raw_token:
+        raise PermissionError("Authentication required.")
+    token_value = raw_token.removeprefix("Bearer ").strip()
+    if not token_value:
+        raise PermissionError("Authentication required.")
+    user = session.execute(
+        select(User)
+        .join(AuthToken, AuthToken.user_id == User.id)
+        .where(AuthToken.token == token_value)
+    ).scalar_one_or_none()
+    if user is None:
+        raise PermissionError("Invalid or expired token.")
+    return user
+
+
 def init_database(session: Session) -> None:
     if session.execute(select(func.count(Proof.id))).scalar_one() > 0:
         return
@@ -38,9 +132,8 @@ def init_database(session: Session) -> None:
 
 def import_question_sets(session: Session, replace_existing: bool = True) -> dict[str, int]:
     if replace_existing:
-        session.query(LineComment).delete()
-        session.query(SideEvaluation).delete()
-        session.query(EvaluationSession).delete()
+        session.query(PreferenceVote).delete()
+        session.query(PreferenceEvaluation).delete()
         session.query(Node).delete()
         session.query(Proof).delete()
         session.query(Question).delete()
@@ -103,11 +196,7 @@ def import_question_sets(session: Session, replace_existing: bool = True) -> dic
             )
             node_count += 1
     session.commit()
-    return {
-        "questions": len(question_ids),
-        "proofs": proof_count,
-        "nodes": node_count,
-    }
+    return {"questions": len(question_ids), "proofs": proof_count, "nodes": node_count}
 
 
 def serialize_lines(text_value: str, start_at: int = 1) -> list[dict[str, Any]]:
@@ -141,7 +230,7 @@ def node_payload(session: Session, node_id: int) -> dict[str, Any]:
     node = fetch_one_dict(
         session,
         """
-        SELECT n.*, p.label AS proof_label, p.author, p.source_path, q.title AS question_title, q.slug AS question_slug
+        SELECT n.*, p.author, p.source_path, q.title AS question_title, q.slug AS question_slug
         FROM nodes n
         JOIN proofs p ON p.id = n.proof_id
         JOIN questions q ON q.id = n.question_id
@@ -300,91 +389,76 @@ def random_pair_same_kind(session: Session) -> tuple[int, int] | None:
     return pair["left_id"], pair["right_id"]
 
 
-def build_comparison(session: Session, mode: str) -> dict[str, Any]:
-    if mode == "option1":
-        pair = random_pair_same_question(session)
-        if pair is None:
-            raise LookupError("No same-question proof pairs available.")
-        left_id, right_id = pair
-        left = proof_payload(session, left_id)
-        right = proof_payload(session, right_id)
-    elif mode == "option2":
-        pair = random_pair_different_questions(session)
-        if pair is None:
-            raise LookupError("No different-question proof pairs available.")
-        left_id, right_id = pair
-        left = proof_payload(session, left_id)
-        right = proof_payload(session, right_id)
-    elif mode == "option3":
-        pair = random_pair_same_node_same_question(session)
-        if pair is None:
-            raise LookupError("No same-node same-question pairs available across different files.")
-        left_id, right_id = pair
-        left = node_payload(session, left_id)
-        right = node_payload(session, right_id)
-    elif mode == "option4":
-        pair = random_pair_same_kind(session)
-        if pair is None:
-            raise LookupError("No same-kind node pairs available.")
-        left_id, right_id = pair
-        left = node_payload(session, left_id)
-        right = node_payload(session, right_id)
-    else:
-        raise ValueError("Unknown mode")
-    return {"mode": mode, "left": left, "right": right}
+def _entity_fields(kind: str, entity_id: int) -> tuple[int | None, int | None]:
+    if kind == "proof":
+        return entity_id, None
+    return None, entity_id
 
 
-def save_evaluation(session: Session, payload: EvaluationCreate) -> int:
-    def entity_fields(side_payload: Any) -> tuple[str, int | None, int | None]:
-        if side_payload.kind == "proof":
-            return "proof", int(side_payload.entityId), None
-        return "node", None, int(side_payload.entityId)
+def build_random_comparison(session: Session) -> dict[str, Any]:
+    candidates: list[tuple[str, tuple[int, int], str]] = []
 
-    left_kind, left_proof_id, left_node_id = entity_fields(payload.left)
-    right_kind, right_proof_id, right_node_id = entity_fields(payload.right)
+    for mode, label, pair_fn in (
+        ("option1", MODE_LABELS["option1"], random_pair_same_question),
+        ("option2", MODE_LABELS["option2"], random_pair_different_questions),
+        ("option3", MODE_LABELS["option3"], random_pair_same_node_same_question),
+        ("option4", MODE_LABELS["option4"], random_pair_same_kind),
+    ):
+        pair = pair_fn(session)
+        if pair is not None:
+            candidates.append((mode, pair, label))
 
-    record = EvaluationSession(
+    if not candidates:
+        raise LookupError("No comparison pairs available.")
+
+    mode, pair, label = random.choice(candidates)
+    a_id, b_id = pair
+    a_payload = proof_payload(session, a_id) if mode in {"option1", "option2"} else node_payload(session, a_id)
+    b_payload = proof_payload(session, b_id) if mode in {"option1", "option2"} else node_payload(session, b_id)
+
+    if random.choice([True, False]):
+        a_payload, b_payload = b_payload, a_payload
+
+    return {"mode": mode, "modeLabel": label, "a": a_payload, "b": b_payload}
+
+
+def save_preference_evaluation(session: Session, user: User, payload: PreferenceEvaluationCreate) -> int:
+    a_proof_id, a_node_id = _entity_fields(payload.a.kind, payload.a.entityId)
+    b_proof_id, b_node_id = _entity_fields(payload.b.kind, payload.b.entityId)
+
+    record = PreferenceEvaluation(
+        user_id=user.id,
         mode=payload.mode,
-        left_kind=left_kind,
-        right_kind=right_kind,
-        left_proof_id=left_proof_id,
-        right_proof_id=right_proof_id,
-        left_node_id=left_node_id,
-        right_node_id=right_node_id,
+        entity_a_kind=payload.a.kind,
+        entity_b_kind=payload.b.kind,
+        entity_a_proof_id=a_proof_id,
+        entity_b_proof_id=b_proof_id,
+        entity_a_node_id=a_node_id,
+        entity_b_node_id=b_node_id,
+        evaluator_display_name=payload.meta.displayName.strip(),
+        evaluator_affiliation=payload.meta.affiliation.strip(),
+        evaluator_experience_level=payload.meta.experienceLevel.strip(),
         created_at=utc_now(),
     )
     session.add(record)
     session.flush()
 
-    for side_name, side_payload in (("left", payload.left), ("right", payload.right)):
-        scores = side_payload.scores
-        side_record = SideEvaluation(
-            session_id=record.id,
-            side=side_name,
-            clarity=scores.clarity,
-            conciseness=scores.conciseness,
-            idiomatic_structure=scores.idiomaticStructure,
-            fidelity_to_nl=scores.fidelityToNl,
-            overall_score=scores.overall,
-            general_comment=side_payload.generalComment.strip(),
-            created_at=utc_now(),
-        )
-        session.add(side_record)
-        session.flush()
-
-        for comment in side_payload.lineComments:
-            text_value = comment.comment.strip()
-            if not text_value:
-                continue
-            session.add(
-                LineComment(
-                    side_evaluation_id=side_record.id,
-                    line_number=comment.lineNumber,
-                    selected_text=comment.selectedText,
-                    comment_text=text_value,
-                    created_at=utc_now(),
-                )
+    votes = {
+        "clarity": payload.preferences.clarity,
+        "conciseness": payload.preferences.conciseness,
+        "idiomatic_structure": payload.preferences.idiomaticStructure,
+        "overall": payload.preferences.overall,
+    }
+    for criterion, preference in votes.items():
+        session.add(
+            PreferenceVote(
+                evaluation_id=record.id,
+                criterion=criterion,
+                preference=preference,
+                created_at=utc_now(),
             )
+        )
+
     session.commit()
     return record.id
 
@@ -394,7 +468,7 @@ def summary_payload(session: Session) -> dict[str, Any]:
         "questions": session.execute(select(func.count(Question.id))).scalar_one(),
         "proofs": session.execute(select(func.count(Proof.id))).scalar_one(),
         "nodes": session.execute(select(func.count(Node.id))).scalar_one(),
-        "evaluations": session.execute(select(func.count(EvaluationSession.id))).scalar_one(),
+        "evaluations": session.execute(select(func.count(PreferenceEvaluation.id))).scalar_one(),
     }
     questions = fetch_all_dicts(
         session,
@@ -414,54 +488,31 @@ def evaluations_payload(session: Session, limit: int = 100) -> dict[str, Any]:
         session,
         """
         SELECT
-          s.id,
-          s.mode,
-          s.left_kind,
-          s.right_kind,
-          s.created_at,
-          lp.source_path AS left_proof_path,
-          rp.source_path AS right_proof_path,
-          ln.name AS left_node_name,
-          rn.name AS right_node_name,
-          ql.title AS left_question_title,
-          qr.title AS right_question_title
-        FROM evaluation_sessions s
-        LEFT JOIN proofs lp ON lp.id = s.left_proof_id
-        LEFT JOIN proofs rp ON rp.id = s.right_proof_id
-        LEFT JOIN nodes ln ON ln.id = s.left_node_id
-        LEFT JOIN nodes rn ON rn.id = s.right_node_id
-        LEFT JOIN questions ql ON ql.id = COALESCE(lp.question_id, ln.question_id)
-        LEFT JOIN questions qr ON qr.id = COALESCE(rp.question_id, rn.question_id)
-        ORDER BY s.id DESC
+          e.id,
+          e.mode,
+          e.entity_a_kind,
+          e.entity_b_kind,
+          e.evaluator_display_name,
+          e.evaluator_affiliation,
+          e.evaluator_experience_level,
+          e.created_at,
+          u.email AS user_email
+        FROM preference_evaluations e
+        JOIN users u ON u.id = e.user_id
+        ORDER BY e.id DESC
         LIMIT :limit_value
         """,
         {"limit_value": limit},
     )
-    sessions: list[dict[str, Any]] = []
     for row in rows:
-        side_rows = fetch_all_dicts(
+        row["votes"] = fetch_all_dicts(
             session,
             """
-            SELECT id, side, clarity, conciseness, idiomatic_structure,
-                   fidelity_to_nl, overall_score, general_comment, created_at
-            FROM side_evaluations
-            WHERE session_id = :session_id
-            ORDER BY side ASC
+            SELECT criterion, preference, created_at
+            FROM preference_votes
+            WHERE evaluation_id = :evaluation_id
+            ORDER BY id ASC
             """,
-            {"session_id": row["id"]},
+            {"evaluation_id": row["id"]},
         )
-        for side_row in side_rows:
-            comments = fetch_all_dicts(
-                session,
-                """
-                SELECT line_number, selected_text, comment_text, created_at
-                FROM line_comments
-                WHERE side_evaluation_id = :side_evaluation_id
-                ORDER BY id ASC
-                """,
-                {"side_evaluation_id": side_row["id"]},
-            )
-            side_row["line_comments"] = comments
-        row["side_evaluations"] = side_rows
-        sessions.append(row)
-    return {"evaluations": sessions}
+    return {"evaluations": rows}

@@ -13,8 +13,8 @@
           <p class="eyebrow">Autoformalization Benchmark</p>
           <h1>Lean Proof Arena</h1>
           <p class="hero-copy">
-            Compare full proofs or proof nodes, score both sides with the same rubric,
-            and save evaluator feedback directly into a local database.
+            Review randomized proof pairs, log in with a lightweight account, record
+            evaluator metadata, and submit A/B preference judgments directly to PostgreSQL.
           </p>
         </div>
         <div class="summary-card" id="summaryCard">
@@ -22,22 +22,77 @@
         </div>
       </section>
 
-      <section class="control-bar">
-        <label>
-          Comparison mode
-          <select id="modeSelect">
-            <option value="option1">Option 1: Two complete proofs of the same question</option>
-            <option value="option2">Option 2: Two complete proofs of different questions</option>
-            <option value="option3">Option 3: The same node of the same question</option>
-            <option value="option4">Option 4: Two random nodes of the same kind</option>
-          </select>
-        </label>
-        <button id="loadButton" class="primary-button">Load Comparison</button>
-        <div id="statusText" class="status-text"></div>
+      <section class="top-grid">
+        <article class="card auth-card">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow small">Account</p>
+              <h2>Login Or Create Account</h2>
+            </div>
+            <div class="auth-tabs">
+              <button id="loginTab" class="tab-button active">Login</button>
+              <button id="registerTab" class="tab-button">Create Account</button>
+            </div>
+          </div>
+
+          <form id="loginForm" class="auth-form">
+            <label>Email<input type="email" name="email" required /></label>
+            <label>Password<input type="password" name="password" required /></label>
+            <button class="primary-button" type="submit">Login</button>
+          </form>
+
+          <form id="registerForm" class="auth-form hidden">
+            <label>Email<input type="email" name="email" required /></label>
+            <label>Password<input type="password" name="password" minlength="8" required /></label>
+            <label>Display Name<input type="text" name="displayName" required /></label>
+            <label>Affiliation<input type="text" name="affiliation" /></label>
+            <label>Experience Level<input type="text" name="experienceLevel" placeholder="e.g. Undergraduate / PhD / Researcher" /></label>
+            <button class="primary-button" type="submit">Create Account</button>
+          </form>
+
+          <div id="accountInfo" class="account-info hidden"></div>
+        </article>
+
+        <article class="card meta-card">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow small">Evaluator</p>
+              <h2>Meta Information</h2>
+            </div>
+            <button id="loadButton" class="secondary-button" type="button">Next Random Comparison</button>
+          </div>
+          <div class="meta-grid">
+            <label>Display Name<input id="metaDisplayName" type="text" /></label>
+            <label>Affiliation<input id="metaAffiliation" type="text" /></label>
+            <label>Experience Level<input id="metaExperience" type="text" /></label>
+          </div>
+          <div class="comparison-brief">
+            <div>
+              <span class="minor-label">Current Pair</span>
+              <strong id="comparisonModeLabel">Loading...</strong>
+            </div>
+            <div>
+              <span class="minor-label">Question Context</span>
+              <strong id="comparisonQuestionLabel">Loading...</strong>
+            </div>
+          </div>
+          <div id="statusText" class="status-text"></div>
+        </article>
+      </section>
+
+      <section class="card scoring-card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow small">Preference Matrix</p>
+            <h2>Scoring</h2>
+          </div>
+          <button id="submitButton" class="submit-button" type="button">Submit Preference</button>
+        </div>
+        <div id="scoreMatrix" class="score-matrix"></div>
       </section>
 
       <section class="arena-grid" id="arenaGrid">
-        <article class="panel loading-panel">Load a comparison to begin.</article>
+        <article class="panel loading-panel">Loading randomized comparison...</article>
       </section>
     </main>
 
@@ -49,53 +104,17 @@
             <h2 class="panel-title"></h2>
             <p class="panel-meta"></p>
           </div>
-          <div class="selected-line-box">
-            <span class="selected-line-label">Selected line</span>
-            <span class="selected-line-value">None</span>
-          </div>
         </header>
 
         <section class="card code-card">
           <div class="code-card-top">
             <div>
               <h3>Code</h3>
-              <p class="minor-text">Click any line to attach a line-specific comment.</p>
             </div>
           </div>
           <pre class="code-viewer"></pre>
         </section>
-
-        <section class="card rubric-card">
-          <h3>Rubric</h3>
-          <div class="rubric-grid">
-            <label>Clarity<select data-score="clarity"></select></label>
-            <label>Conciseness<select data-score="conciseness"></select></label>
-            <label>Idiomatic Structure<select data-score="idiomaticStructure"></select></label>
-            <label>Fidelity to NL Proof<select data-score="fidelityToNl"></select></label>
-            <label>Overall<select data-score="overall"></select></label>
-          </div>
-        </section>
-
-        <section class="card comments-card">
-          <h3>General comment</h3>
-          <textarea data-role="general-comment" rows="4" placeholder="High-level evaluation for this side"></textarea>
-          <h3>Line comment</h3>
-          <textarea data-role="line-comment" rows="3" placeholder="Comment for the currently selected line"></textarea>
-          <button class="secondary-button" data-action="add-line-comment">Add Line Comment</button>
-          <ul class="line-comment-list"></ul>
-        </section>
       </article>
-    </template>
-
-    <template id="lineCommentTemplate">
-      <li class="line-comment-item">
-        <div>
-          <strong class="comment-line"></strong>
-          <p class="comment-snippet"></p>
-          <p class="comment-text"></p>
-        </div>
-        <button class="ghost-button" data-action="remove-line-comment">Remove</button>
-      </li>
     </template>
 
     <script src="/app.js"></script>

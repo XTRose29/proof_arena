@@ -2,18 +2,27 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from fastapi import Depends, FastAPI, HTTPException, Query, Request
+from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
 from .config import STATIC_DIR, auto_seed_enabled, cors_origins
-from .database import Base, SessionLocal, engine, get_db
-from .schemas import EvaluationCreate
-from .services import build_comparison, evaluations_payload, init_database, save_evaluation, summary_payload
+from .database import Base, SessionLocal, engine, ensure_models_imported, get_db
+from .schemas import LoginRequest, PreferenceEvaluationCreate, RegisterRequest
+from .services import (
+    auth_user_from_token,
+    build_random_comparison,
+    create_user,
+    evaluations_payload,
+    init_database,
+    login_user,
+    save_preference_evaluation,
+    serialize_user,
+    summary_payload,
+)
 
 
 app = FastAPI(title="Proof Arena API")
@@ -38,6 +47,7 @@ async def validation_exception_handler(_: Request, exc: RequestValidationError) 
 
 @app.on_event("startup")
 def on_startup() -> None:
+    ensure_models_imported()
     Base.metadata.create_all(bind=engine)
     if auto_seed_enabled():
         session = SessionLocal()
@@ -50,6 +60,36 @@ def on_startup() -> None:
 @app.get("/api/health")
 def healthcheck() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.post("/api/auth/register", status_code=201)
+def register(payload: RegisterRequest, db: Session = Depends(get_db)) -> dict:
+    try:
+        token, user = create_user(db, payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return {"token": token, "user": user}
+
+
+@app.post("/api/auth/login")
+def login(payload: LoginRequest, db: Session = Depends(get_db)) -> dict:
+    try:
+        token, user = login_user(db, payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return {"token": token, "user": user}
+
+
+@app.get("/api/me")
+def get_me(
+    authorization: str | None = Header(default=None),
+    db: Session = Depends(get_db),
+) -> dict:
+    try:
+        user = auth_user_from_token(db, authorization)
+    except PermissionError as exc:
+        raise HTTPException(status_code=401, detail=str(exc)) from exc
+    return {"user": serialize_user(user)}
 
 
 @app.get("/api/summary")
@@ -66,20 +106,24 @@ def get_evaluations(
 
 
 @app.get("/api/comparison")
-def get_comparison(
-    mode: str = Query(default="option1"),
-    db: Session = Depends(get_db),
-) -> dict:
+def get_comparison(db: Session = Depends(get_db)) -> dict:
     try:
-        return build_comparison(db, mode)
+        return build_random_comparison(db)
     except (LookupError, ValueError) as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
 @app.post("/api/evaluations", status_code=201)
-def create_evaluation(payload: EvaluationCreate, db: Session = Depends(get_db)) -> dict[str, int | bool]:
+def create_evaluation(
+    payload: PreferenceEvaluationCreate,
+    authorization: str | None = Header(default=None),
+    db: Session = Depends(get_db),
+) -> dict[str, int | bool]:
     try:
-        session_id = save_evaluation(db, payload)
+        user = auth_user_from_token(db, authorization)
+        session_id = save_preference_evaluation(db, user, payload)
+    except PermissionError as exc:
+        raise HTTPException(status_code=401, detail=str(exc)) from exc
     except (KeyError, TypeError, ValueError) as exc:
         raise HTTPException(status_code=400, detail=f"Invalid request: {exc}") from exc
     return {"ok": True, "sessionId": session_id}

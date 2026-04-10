@@ -16,6 +16,10 @@ SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, futu
 Base = declarative_base()
 
 
+def ensure_models_imported() -> None:
+    from . import models  # noqa: F401
+
+
 def get_db() -> Generator[Session, None, None]:
     session = SessionLocal()
     try:

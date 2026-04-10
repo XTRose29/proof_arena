@@ -1,6 +1,6 @@
 # Proof Arena
 
-Proof Arena is a deployable `FastAPI + PostgreSQL` app for comparing Lean proofs or proof nodes, collecting evaluator feedback, and storing both the dataset and submitted responses in the backend database.
+Proof Arena is a deployable `FastAPI + PostgreSQL` app for randomized A/B comparison of Lean proofs or proof nodes, lightweight evaluator login, and persistent storage of both the dataset and submitted preferences.
 
 The current production deployment uses:
 
@@ -12,14 +12,17 @@ The current production deployment uses:
 - Parses Lean files from `question_sets/`
 - Stores parsed questions, proofs, and nodes in PostgreSQL
 - Serves the frontend and API from the same FastAPI app
-- Loads comparison pairs from the database
-- Saves evaluator submissions into the database
+- Loads randomized comparison pairs from the database
+- Saves evaluator metadata and A/B preference submissions into the database
 
 Current API surface:
 
 - `GET /api/health`
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `GET /api/me`
 - `GET /api/summary`
-- `GET /api/comparison?mode=option1|option2|option3|option4`
+- `GET /api/comparison`
 - `POST /api/evaluations`
 - `GET /api/evaluations?limit=50`
 
@@ -58,20 +61,23 @@ Instead:
 1. The import script parses files from `question_sets/`
 2. Parsed records are inserted into PostgreSQL
 3. The frontend reads dataset information through the API
-4. The API serves comparisons from the database
+4. The API serves randomized A/B comparisons from the database
 
 ### User submissions
 
 When a user submits an evaluation:
 
-1. The frontend sends `POST /api/evaluations`
-2. FastAPI validates the payload
-3. The backend writes to:
-   - `evaluation_sessions`
-   - `side_evaluations`
-   - `line_comments`
+1. The evaluator logs in or creates an account
+2. The frontend collects evaluator metadata at the top of the page
+3. The evaluator scores each criterion using A/B preference choices
+4. The frontend sends `POST /api/evaluations`
+5. The backend writes to:
+   - `users`
+   - `auth_tokens`
+   - `preference_evaluations`
+   - `preference_votes`
 
-So evaluator responses are stored in PostgreSQL, not in local files.
+So evaluator metadata, A/B assignments, and preference scores are stored in PostgreSQL, not in local files.
 
 ## Environment Variables
 
@@ -174,8 +180,8 @@ If you use a pooled Neon connection string, keep the parameters Neon provides.
 
 ## Current Production Behavior
 
-- The website reads dataset snapshots and comparison data from PostgreSQL
-- Submitted evaluations are saved into PostgreSQL
+- The website reads dataset snapshots and randomized comparison data from PostgreSQL
+- Submitted evaluations are saved into PostgreSQL with evaluator identity and metadata
 - If the database is empty, the site will show `0 questions, 0 proofs, 0 nodes`
 - After importing `question_sets/`, the UI will start serving real comparisons
 

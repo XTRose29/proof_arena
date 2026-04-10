@@ -65,46 +65,69 @@ class Node(Base):
     question: Mapped[Question] = relationship(back_populates="nodes")
 
 
-class EvaluationSession(Base):
-    __tablename__ = "evaluation_sessions"
+class User(Base):
+    __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    mode: Mapped[str] = mapped_column(Text, nullable=False)
-    left_kind: Mapped[str] = mapped_column(Text, nullable=False)
-    right_kind: Mapped[str] = mapped_column(Text, nullable=False)
-    left_proof_id: Mapped[int | None] = mapped_column(ForeignKey("proofs.id", ondelete="SET NULL"))
-    right_proof_id: Mapped[int | None] = mapped_column(ForeignKey("proofs.id", ondelete="SET NULL"))
-    left_node_id: Mapped[int | None] = mapped_column(ForeignKey("nodes.id", ondelete="SET NULL"))
-    right_node_id: Mapped[int | None] = mapped_column(ForeignKey("nodes.id", ondelete="SET NULL"))
+    email: Mapped[str] = mapped_column(Text, unique=True, nullable=False)
+    display_name: Mapped[str] = mapped_column(Text, nullable=False)
+    affiliation: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    experience_level: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    password_hash: Mapped[str] = mapped_column(Text, nullable=False)
+    password_salt: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[str] = mapped_column(Text, nullable=False)
 
 
-class SideEvaluation(Base):
-    __tablename__ = "side_evaluations"
+class AuthToken(Base):
+    __tablename__ = "auth_tokens"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    token: Mapped[str] = mapped_column(Text, unique=True, nullable=False)
+    created_at: Mapped[str] = mapped_column(Text, nullable=False)
+
+
+class PreferenceEvaluation(Base):
+    __tablename__ = "preference_evaluations"
     __table_args__ = (
-        CheckConstraint("side IN ('left', 'right')", name="ck_side_evaluations_side"),
+        Index("idx_preference_evaluations_user_id", "user_id"),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    session_id: Mapped[int] = mapped_column(ForeignKey("evaluation_sessions.id", ondelete="CASCADE"), nullable=False)
-    side: Mapped[str] = mapped_column(Text, nullable=False)
-    clarity: Mapped[int] = mapped_column(Integer, nullable=False)
-    conciseness: Mapped[int] = mapped_column(Integer, nullable=False)
-    idiomatic_structure: Mapped[int] = mapped_column(Integer, nullable=False)
-    fidelity_to_nl: Mapped[int] = mapped_column(Integer, nullable=False)
-    overall_score: Mapped[int] = mapped_column(Integer, nullable=False)
-    general_comment: Mapped[str] = mapped_column(Text, nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    mode: Mapped[str] = mapped_column(Text, nullable=False)
+    entity_a_kind: Mapped[str] = mapped_column(Text, nullable=False)
+    entity_b_kind: Mapped[str] = mapped_column(Text, nullable=False)
+    entity_a_proof_id: Mapped[int | None] = mapped_column(ForeignKey("proofs.id", ondelete="SET NULL"))
+    entity_b_proof_id: Mapped[int | None] = mapped_column(ForeignKey("proofs.id", ondelete="SET NULL"))
+    entity_a_node_id: Mapped[int | None] = mapped_column(ForeignKey("nodes.id", ondelete="SET NULL"))
+    entity_b_node_id: Mapped[int | None] = mapped_column(ForeignKey("nodes.id", ondelete="SET NULL"))
+    evaluator_display_name: Mapped[str] = mapped_column(Text, nullable=False)
+    evaluator_affiliation: Mapped[str] = mapped_column(Text, nullable=False)
+    evaluator_experience_level: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[str] = mapped_column(Text, nullable=False)
 
 
-class LineComment(Base):
-    __tablename__ = "line_comments"
+class PreferenceVote(Base):
+    __tablename__ = "preference_votes"
+    __table_args__ = (
+        CheckConstraint(
+            "criterion IN ('clarity', 'conciseness', 'idiomatic_structure', 'overall')",
+            name="ck_preference_votes_criterion",
+        ),
+        CheckConstraint(
+            "preference IN ('a_way_better', 'a_better', 'no_difference', 'b_better', 'b_way_better')",
+            name="ck_preference_votes_preference",
+        ),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    side_evaluation_id: Mapped[int] = mapped_column(ForeignKey("side_evaluations.id", ondelete="CASCADE"), nullable=False)
-    line_number: Mapped[int] = mapped_column(Integer, nullable=False)
-    selected_text: Mapped[str] = mapped_column(Text, nullable=False)
-    comment_text: Mapped[str] = mapped_column(Text, nullable=False)
+    evaluation_id: Mapped[int] = mapped_column(
+        ForeignKey("preference_evaluations.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    criterion: Mapped[str] = mapped_column(Text, nullable=False)
+    preference: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[str] = mapped_column(Text, nullable=False)
 
 

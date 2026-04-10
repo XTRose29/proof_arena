@@ -1,31 +1,60 @@
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import BaseModel, Field
 
 
-class ScoresIn(BaseModel):
-    clarity: int = Field(ge=1, le=5)
-    conciseness: int = Field(ge=1, le=5)
-    idiomaticStructure: int = Field(ge=1, le=5)
-    fidelityToNl: int = Field(ge=1, le=5)
-    overall: int = Field(ge=1, le=5)
+PreferenceValue = Literal["a_way_better", "a_better", "no_difference", "b_better", "b_way_better"]
 
 
-class LineCommentIn(BaseModel):
-    lineNumber: int
-    selectedText: str = ""
-    comment: str
+class RegisterRequest(BaseModel):
+    email: str = Field(min_length=3, max_length=320)
+    password: str = Field(min_length=8, max_length=200)
+    displayName: str = Field(min_length=1, max_length=200)
+    affiliation: str = Field(default="", max_length=200)
+    experienceLevel: str = Field(default="", max_length=200)
 
 
-class EvaluationSideIn(BaseModel):
-    kind: str
+class LoginRequest(BaseModel):
+    email: str = Field(min_length=3, max_length=320)
+    password: str = Field(min_length=1, max_length=200)
+
+
+class UserPayload(BaseModel):
+    id: int
+    email: str
+    displayName: str
+    affiliation: str
+    experienceLevel: str
+
+
+class AuthResponse(BaseModel):
+    token: str
+    user: UserPayload
+
+
+class EvaluationMetaIn(BaseModel):
+    displayName: str = Field(min_length=1, max_length=200)
+    affiliation: str = Field(default="", max_length=200)
+    experienceLevel: str = Field(default="", max_length=200)
+
+
+class ComparisonEntityRef(BaseModel):
+    kind: Literal["proof", "node"]
     entityId: int
-    scores: ScoresIn
-    generalComment: str = ""
-    lineComments: list[LineCommentIn] = Field(default_factory=list)
 
 
-class EvaluationCreate(BaseModel):
+class PreferenceScoresIn(BaseModel):
+    clarity: PreferenceValue
+    conciseness: PreferenceValue
+    idiomaticStructure: PreferenceValue
+    overall: PreferenceValue
+
+
+class PreferenceEvaluationCreate(BaseModel):
     mode: str
-    left: EvaluationSideIn
-    right: EvaluationSideIn
+    meta: EvaluationMetaIn
+    a: ComparisonEntityRef
+    b: ComparisonEntityRef
+    preferences: PreferenceScoresIn

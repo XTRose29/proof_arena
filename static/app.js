@@ -1,16 +1,29 @@
+const AUTH_TOKEN_KEY = "proofArenaAuthToken";
+
 const state = {
   comparison: null,
-  panels: {
-    left: null,
-    right: null,
+  authToken: localStorage.getItem(AUTH_TOKEN_KEY),
+  currentUser: null,
+  preferences: {
+    clarity: "no_difference",
+    conciseness: "no_difference",
+    idiomaticStructure: "no_difference",
+    overall: "no_difference",
   },
 };
 
-const scoreFields = [
+const preferenceChoices = [
+  ["a_way_better", "A way better"],
+  ["a_better", "A better"],
+  ["no_difference", "No difference"],
+  ["b_better", "B better"],
+  ["b_way_better", "B way better"],
+];
+
+const criteria = [
   ["clarity", "Clarity"],
   ["conciseness", "Conciseness"],
   ["idiomaticStructure", "Idiomatic Structure"],
-  ["fidelityToNl", "Fidelity to NL Proof"],
   ["overall", "Overall"],
 ];
 
@@ -44,42 +57,15 @@ const leanKeywords = new Set([
   "where",
 ]);
 
-const leanBuiltins = new Set([
-  "Prop",
-  "Set",
-  "Type",
-  "True",
-  "False",
-  "Nat",
-  "Int",
-  "String",
-  "Fin",
-  "MetricSpace",
-]);
-
-const leanTactics = new Set([
-  "aesop",
-  "apply",
-  "assumption",
-  "calc",
-  "constructor",
-  "exact",
-  "have",
-  "induction",
-  "intro",
-  "omega",
-  "rcases",
-  "refine",
-  "repeat",
-  "ring",
-  "rw",
-  "rfl",
-  "simp",
-  "simpa",
-]);
+const leanBuiltins = new Set(["Prop", "Set", "Type", "True", "False", "Nat", "Int", "String", "Fin", "MetricSpace"]);
+const leanTactics = new Set(["aesop", "apply", "assumption", "calc", "constructor", "exact", "have", "induction", "intro", "omega", "rcases", "refine", "repeat", "ring", "rw", "rfl", "simp", "simpa"]);
 
 async function fetchJson(url, options = {}) {
-  const response = await fetch(url, options);
+  const headers = new Headers(options.headers || {});
+  if (state.authToken) {
+    headers.set("Authorization", `Bearer ${state.authToken}`);
+  }
+  const response = await fetch(url, { ...options, headers });
   const data = await response.json();
   if (!response.ok) {
     throw new Error(data.error || "Request failed");
@@ -106,23 +92,8 @@ function buildSummary(summary) {
   `;
 }
 
-function makeScoreOptions(select) {
-  for (let value = 1; value <= 5; value += 1) {
-    const option = document.createElement("option");
-    option.value = String(value);
-    option.textContent = `${value} / 5`;
-    if (value === 3) {
-      option.selected = true;
-    }
-    select.appendChild(option);
-  }
-}
-
 function escapeHtml(text) {
-  return text
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;");
+  return text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 }
 
 function highlightToken(token) {
@@ -176,10 +147,9 @@ function highlightLeanCode(text) {
   return `${working}<span class="tok-comment">${commentPart}</span>`;
 }
 
-function createCodeLine(line, sideState, selectedValueEl) {
+function createCodeLine(line) {
   const row = document.createElement("div");
   row.className = "code-line";
-  row.dataset.lineNumber = String(line.lineNumber);
 
   const num = document.createElement("span");
   num.className = "code-line-number";
@@ -190,148 +160,130 @@ function createCodeLine(line, sideState, selectedValueEl) {
   text.innerHTML = highlightLeanCode(line.text || " ");
 
   row.append(num, text);
-  row.addEventListener("click", () => {
-    sideState.selectedLine = {
-      lineNumber: line.lineNumber,
-      selectedText: line.text,
-    };
-    selectedValueEl.textContent = String(line.lineNumber);
-    row.parentElement.querySelectorAll(".code-line").forEach((node) => {
-      node.classList.toggle("selected", node === row);
-    });
-  });
   return row;
-}
-
-function renderLineComments(listEl, sideState) {
-  const template = document.getElementById("lineCommentTemplate");
-  listEl.innerHTML = "";
-  sideState.lineComments.forEach((entry, index) => {
-    const node = template.content.firstElementChild.cloneNode(true);
-    node.querySelector(".comment-line").textContent = `Line ${entry.lineNumber}`;
-    node.querySelector(".comment-snippet").textContent = entry.selectedText;
-    node.querySelector(".comment-text").textContent = entry.comment;
-    node.querySelector("[data-action='remove-line-comment']").addEventListener("click", () => {
-      sideState.lineComments.splice(index, 1);
-      renderLineComments(listEl, sideState);
-    });
-    listEl.appendChild(node);
-  });
 }
 
 function panelMeta(entity) {
   if (entity.kind === "proof") {
-    return `${entity.question_title} | ${entity.source_path}${entity.author ? ` | ${entity.author}` : ""}`;
+    return `${entity.question_title}${entity.author ? ` | ${entity.author}` : ""}`;
   }
-  return `${entity.question_title} | ${entity.name} | ${entity.node_type} | ${entity.source_path}${entity.author ? ` | ${entity.author}` : ""}`;
+  return `${entity.question_title} | ${entity.name} | ${entity.node_type}${entity.author ? ` | ${entity.author}` : ""}`;
 }
 
-function renderPanel(side, entity) {
+function renderPanel(sideLabel, entity) {
   const template = document.getElementById("panelTemplate");
   const panel = template.content.firstElementChild.cloneNode(true);
-  const sideState = {
-    entity,
-    selectedLine: null,
-    lineComments: [],
-  };
-  state.panels[side] = sideState;
-
-  panel.querySelector(".panel-side").textContent = side;
+  panel.querySelector(".panel-side").textContent = sideLabel;
   panel.querySelector(".panel-title").textContent = entity.kind === "proof" ? entity.title : entity.name;
   panel.querySelector(".panel-meta").textContent = panelMeta(entity);
 
-  const selectedLineValue = panel.querySelector(".selected-line-value");
   const codeViewer = panel.querySelector(".code-viewer");
   entity.lines.forEach((line) => {
-    codeViewer.appendChild(createCodeLine(line, sideState, selectedLineValue));
+    codeViewer.appendChild(createCodeLine(line));
   });
-
-  panel.querySelectorAll("select[data-score]").forEach(makeScoreOptions);
-
-  const lineCommentTextarea = panel.querySelector("[data-role='line-comment']");
-  const lineCommentList = panel.querySelector(".line-comment-list");
-  panel.querySelector("[data-action='add-line-comment']").addEventListener("click", () => {
-    if (!sideState.selectedLine) {
-      setStatus(`Select a ${entity.kind} line before adding a line comment.`, true);
-      return;
-    }
-    const comment = lineCommentTextarea.value.trim();
-    if (!comment) {
-      setStatus("Write a line comment before adding it.", true);
-      return;
-    }
-    sideState.lineComments.push({
-      lineNumber: sideState.selectedLine.lineNumber,
-      selectedText: sideState.selectedLine.selectedText,
-      comment,
-    });
-    lineCommentTextarea.value = "";
-    renderLineComments(lineCommentList, sideState);
-    setStatus(`Added a line comment on ${side} line ${sideState.selectedLine.lineNumber}.`);
-  });
-
   return panel;
-}
-
-function collectSidePayload(side, panelEl) {
-  const sideState = state.panels[side];
-  const scores = {};
-  panelEl.querySelectorAll("select[data-score]").forEach((select) => {
-    scores[select.dataset.score] = Number(select.value);
-  });
-  return {
-    kind: sideState.entity.kind,
-    entityId: sideState.entity.id,
-    scores,
-    generalComment: panelEl.querySelector("[data-role='general-comment']").value.trim(),
-    lineComments: sideState.lineComments,
-  };
-}
-
-async function submitEvaluation() {
-  const arena = document.getElementById("arenaGrid");
-  const panels = [...arena.querySelectorAll(".panel")].filter((panel) => !panel.classList.contains("loading-panel"));
-  if (panels.length !== 2) {
-    setStatus("Load a comparison before submitting.", true);
-    return;
-  }
-  const [leftPanel, rightPanel] = panels;
-  const payload = {
-    mode: state.comparison.mode,
-    left: collectSidePayload("left", leftPanel),
-    right: collectSidePayload("right", rightPanel),
-  };
-  const result = await fetchJson("/api/evaluations", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-  await loadSummary();
-  await loadComparison();
-  setStatus(`Saved evaluation #${result.sessionId}. Loaded a new pair.`);
 }
 
 function renderComparison(comparison) {
   state.comparison = comparison;
   const arena = document.getElementById("arenaGrid");
   arena.innerHTML = "";
-  arena.appendChild(renderPanel("left", comparison.left));
-  arena.appendChild(renderPanel("right", comparison.right));
+  arena.appendChild(renderPanel("A", comparison.a));
+  arena.appendChild(renderPanel("B", comparison.b));
+  document.getElementById("comparisonModeLabel").textContent = comparison.modeLabel;
+  document.getElementById("comparisonQuestionLabel").textContent = comparison.a.question_title === comparison.b.question_title
+    ? comparison.a.question_title
+    : `${comparison.a.question_title} vs ${comparison.b.question_title}`;
+}
 
-  const submitWrap = document.createElement("div");
-  submitWrap.className = "submit-wrap";
-  const button = document.createElement("button");
-  button.className = "submit-button";
-  button.textContent = "Submit Evaluation";
-  button.addEventListener("click", async () => {
-    try {
-      await submitEvaluation();
-    } catch (error) {
-      setStatus(error.message, true);
-    }
+function renderScoreMatrix() {
+  const matrix = document.getElementById("scoreMatrix");
+  matrix.innerHTML = "";
+
+  const header = document.createElement("div");
+  header.className = "matrix-row matrix-header";
+  header.innerHTML = `
+    <div>Criterion</div>
+    ${preferenceChoices.map(([, label]) => `<div>${label}</div>`).join("")}
+  `;
+  matrix.appendChild(header);
+
+  criteria.forEach(([key, label]) => {
+    const row = document.createElement("div");
+    row.className = "matrix-row";
+    row.appendChild(Object.assign(document.createElement("div"), { className: "matrix-criterion", textContent: label }));
+    preferenceChoices.forEach(([value, choiceLabel]) => {
+      const wrapper = document.createElement("label");
+      wrapper.className = "matrix-choice";
+      const input = document.createElement("input");
+      input.type = "radio";
+      input.name = `criterion-${key}`;
+      input.value = value;
+      input.checked = state.preferences[key] === value;
+      input.addEventListener("change", () => {
+        state.preferences[key] = value;
+      });
+      const span = document.createElement("span");
+      span.textContent = choiceLabel;
+      wrapper.append(input, span);
+      row.appendChild(wrapper);
+    });
+    matrix.appendChild(row);
   });
-  submitWrap.appendChild(button);
-  arena.appendChild(submitWrap);
+}
+
+function setAuthMode(mode) {
+  const loginForm = document.getElementById("loginForm");
+  const registerForm = document.getElementById("registerForm");
+  document.getElementById("loginTab").classList.toggle("active", mode === "login");
+  document.getElementById("registerTab").classList.toggle("active", mode === "register");
+  loginForm.classList.toggle("hidden", mode !== "login");
+  registerForm.classList.toggle("hidden", mode !== "register");
+}
+
+function setCurrentUser(user, token) {
+  state.currentUser = user;
+  if (token) {
+    state.authToken = token;
+    localStorage.setItem(AUTH_TOKEN_KEY, token);
+  }
+  const accountInfo = document.getElementById("accountInfo");
+  accountInfo.classList.remove("hidden");
+  accountInfo.innerHTML = `
+    <strong>${user.displayName}</strong>
+    <span>${user.email}</span>
+    <span>${user.affiliation || "No affiliation set"}</span>
+  `;
+  document.getElementById("metaDisplayName").value = user.displayName || "";
+  document.getElementById("metaAffiliation").value = user.affiliation || "";
+  document.getElementById("metaExperience").value = user.experienceLevel || "";
+}
+
+async function restoreSession() {
+  if (!state.authToken) {
+    return;
+  }
+  try {
+    const result = await fetchJson("/api/me");
+    setCurrentUser(result.user);
+  } catch {
+    localStorage.removeItem(AUTH_TOKEN_KEY);
+    state.authToken = null;
+  }
+}
+
+async function handleAuthSubmit(event, mode) {
+  event.preventDefault();
+  const formData = new FormData(event.currentTarget);
+  const payload = Object.fromEntries(formData.entries());
+  const endpoint = mode === "login" ? "/api/auth/login" : "/api/auth/register";
+  const result = await fetchJson(endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  setCurrentUser(result.user, result.token);
+  setStatus(mode === "login" ? "Logged in." : "Account created.");
 }
 
 async function loadSummary() {
@@ -340,23 +292,64 @@ async function loadSummary() {
 }
 
 async function loadComparison() {
-  const mode = document.getElementById("modeSelect").value;
-  setStatus("Loading comparison...");
-  const comparison = await fetchJson(`/api/comparison?mode=${encodeURIComponent(mode)}`);
+  setStatus("Loading randomized comparison...");
+  const comparison = await fetchJson("/api/comparison");
   renderComparison(comparison);
-  setStatus("Comparison loaded.");
+  setStatus("Random comparison loaded.");
+}
+
+function buildEvaluationPayload() {
+  return {
+    mode: state.comparison.mode,
+    meta: {
+      displayName: document.getElementById("metaDisplayName").value.trim(),
+      affiliation: document.getElementById("metaAffiliation").value.trim(),
+      experienceLevel: document.getElementById("metaExperience").value.trim(),
+    },
+    a: {
+      kind: state.comparison.a.kind,
+      entityId: state.comparison.a.entityId,
+    },
+    b: {
+      kind: state.comparison.b.kind,
+      entityId: state.comparison.b.entityId,
+    },
+    preferences: state.preferences,
+  };
+}
+
+async function submitEvaluation() {
+  if (!state.authToken || !state.currentUser) {
+    throw new Error("Login or create an account before submitting.");
+  }
+  if (!state.comparison) {
+    throw new Error("No comparison loaded.");
+  }
+  if (!document.getElementById("metaDisplayName").value.trim()) {
+    throw new Error("Display name is required.");
+  }
+  const result = await fetchJson("/api/evaluations", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(buildEvaluationPayload()),
+  });
+  await loadSummary();
+  await loadComparison();
+  setStatus(`Saved evaluation #${result.sessionId}. Loaded a new random pair.`);
 }
 
 async function main() {
-  document.getElementById("loadButton").addEventListener("click", async () => {
-    try {
-      await loadComparison();
-    } catch (error) {
-      setStatus(error.message, true);
-    }
-  });
+  renderScoreMatrix();
+  setAuthMode("login");
+  document.getElementById("loginTab").addEventListener("click", () => setAuthMode("login"));
+  document.getElementById("registerTab").addEventListener("click", () => setAuthMode("register"));
+  document.getElementById("loginForm").addEventListener("submit", (event) => handleAuthSubmit(event, "login").catch((error) => setStatus(error.message, true)));
+  document.getElementById("registerForm").addEventListener("submit", (event) => handleAuthSubmit(event, "register").catch((error) => setStatus(error.message, true)));
+  document.getElementById("loadButton").addEventListener("click", () => loadComparison().catch((error) => setStatus(error.message, true)));
+  document.getElementById("submitButton").addEventListener("click", () => submitEvaluation().catch((error) => setStatus(error.message, true)));
 
   try {
+    await restoreSession();
     await loadSummary();
     await loadComparison();
   } catch (error) {
