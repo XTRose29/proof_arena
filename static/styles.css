@@ -402,6 +402,22 @@ textarea {
   font-weight: 800;
 }
 
+.page-note {
+  margin-top: 20px;
+  padding: 0 6px;
+  color: rgba(106, 99, 92, 0.9);
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+
+.page-note p {
+  margin: 0 0 6px;
+}
+
+.page-note a {
+  color: inherit;
+}
+
 .profile-dialog {
   width: min(560px, calc(100vw - 32px));
   border: 1px solid rgba(99, 86, 70, 0.16);
