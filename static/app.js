@@ -150,20 +150,12 @@ function createCodeLine(line) {
   return row;
 }
 
-function panelMeta(entity) {
-  const parts = [entity.author, entity.source_path].filter(Boolean);
-  return parts.join(" · ");
-}
-
 function renderPanel(sideLabel, entity) {
   const template = document.getElementById("panelTemplate");
   const panel = template.content.firstElementChild.cloneNode(true);
   panel.querySelector(".panel-side").textContent = sideLabel;
-  panel.querySelector(".panel-title").textContent = entity.title || sideLabel;
-  const metaEl = panel.querySelector(".panel-meta");
-  const metaText = panelMeta(entity);
-  metaEl.textContent = metaText;
-  metaEl.classList.toggle("hidden", !metaText);
+  panel.querySelector(".panel-title").textContent = sideLabel;
+  panel.querySelector(".panel-meta").remove();
 
   const codeViewer = panel.querySelector(".code-viewer");
   entity.lines.forEach((line) => {
