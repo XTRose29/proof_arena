@@ -9,15 +9,16 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
-from .config import STATIC_DIR, auto_seed_enabled, cors_origins
+from .config import STATIC_DIR, auto_seed_enabled, cors_origins, google_client_id
 from .database import Base, SessionLocal, engine, ensure_models_imported, get_db
-from .schemas import LoginRequest, PreferenceEvaluationCreate, RegisterRequest
+from .schemas import GoogleAuthRequest, LoginRequest, PreferenceEvaluationCreate, RegisterRequest
 from .services import (
     auth_user_from_token,
     build_random_comparison,
     create_user,
     evaluations_payload,
     init_database,
+    login_user_with_google,
     login_user,
     save_preference_evaluation,
     serialize_user,
@@ -80,6 +81,15 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)) -> dict:
     return {"token": token, "user": user}
 
 
+@app.post("/api/auth/google")
+def google_login(payload: GoogleAuthRequest, db: Session = Depends(get_db)) -> dict:
+    try:
+        token, user = login_user_with_google(db, payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return {"token": token, "user": user}
+
+
 @app.get("/api/me")
 def get_me(
     authorization: str | None = Header(default=None),
@@ -90,6 +100,11 @@ def get_me(
     except PermissionError as exc:
         raise HTTPException(status_code=401, detail=str(exc)) from exc
     return {"user": serialize_user(user)}
+
+
+@app.get("/api/auth/config")
+def auth_config() -> dict[str, str]:
+    return {"googleClientId": google_client_id()}
 
 
 @app.get("/api/summary")

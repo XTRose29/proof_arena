@@ -22,3 +22,7 @@ def cors_origins() -> list[str]:
 
 def auto_seed_enabled() -> bool:
     return os.environ.get("PROOF_ARENA_AUTO_SEED", "true").lower() in {"1", "true", "yes", "on"}
+
+
+def google_client_id() -> str:
+    return os.environ.get("PROOF_ARENA_GOOGLE_CLIENT_ID", "").strip()

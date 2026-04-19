@@ -1,17 +1,5 @@
 const AUTH_TOKEN_KEY = "proofArenaAuthToken";
 
-const state = {
-  comparison: null,
-  authToken: localStorage.getItem(AUTH_TOKEN_KEY),
-  currentUser: null,
-  preferences: {
-    clarity: "no_difference",
-    conciseness: "no_difference",
-    idiomaticStructure: "no_difference",
-    overall: "no_difference",
-  },
-};
-
 const preferenceChoices = [
   ["a_way_better", "A way better"],
   ["a_better", "A better"],
@@ -26,6 +14,18 @@ const criteria = [
   ["idiomaticStructure", "Idiomatic Structure"],
   ["overall", "Overall"],
 ];
+
+const defaultPreferences = Object.fromEntries(criteria.map(([key]) => [key, "no_difference"]));
+
+const state = {
+  comparison: null,
+  authToken: localStorage.getItem(AUTH_TOKEN_KEY),
+  currentUser: null,
+  preferences: { ...defaultPreferences },
+  activeCriterionIndex: 0,
+  googleReady: false,
+  googleInitAttempts: 0,
+};
 
 const leanKeywords = new Set([
   "abbrev",
@@ -151,14 +151,15 @@ function createCodeLine(line) {
 }
 
 function panelMeta(entity) {
-  return "";
+  const parts = [entity.author, entity.source_path].filter(Boolean);
+  return parts.join(" · ");
 }
 
 function renderPanel(sideLabel, entity) {
   const template = document.getElementById("panelTemplate");
   const panel = template.content.firstElementChild.cloneNode(true);
-  panel.querySelector(".panel-side").classList.add("hidden");
-  panel.querySelector(".panel-title").textContent = sideLabel;
+  panel.querySelector(".panel-side").textContent = sideLabel;
+  panel.querySelector(".panel-title").textContent = entity.title || sideLabel;
   const metaEl = panel.querySelector(".panel-meta");
   const metaText = panelMeta(entity);
   metaEl.textContent = metaText;
@@ -171,58 +172,73 @@ function renderPanel(sideLabel, entity) {
   return panel;
 }
 
-function renderComparison(comparison) {
-  state.comparison = comparison;
-  const arena = document.getElementById("arenaGrid");
-  arena.innerHTML = "";
-  arena.appendChild(renderPanel("A", comparison.a));
-  arena.appendChild(renderPanel("B", comparison.b));
-  document.getElementById("comparisonModeLabel").textContent = comparison.modeLabel;
+function updateCriterionUi() {
+  const [criterionKey, criterionLabel] = criteria[state.activeCriterionIndex];
+  const choiceIndex = preferenceChoices.findIndex(([value]) => value === state.preferences[criterionKey]);
+  document.getElementById("criterionTitle").textContent = criterionLabel;
+  document.getElementById("criterionProgress").textContent = `${state.activeCriterionIndex + 1} / ${criteria.length}`;
+  document.getElementById("criterionHint").textContent =
+    state.activeCriterionIndex === criteria.length - 1
+      ? "Use Left/Right to adjust the final row. Press Enter to submit this evaluation and load the next pair."
+      : "Use Left/Right to choose how strongly you lean toward A or B. Press Enter to confirm this row.";
+
+  const matrix = document.getElementById("scoreMatrix");
+  matrix.querySelectorAll(".matrix-choice").forEach((choiceEl, index) => {
+    choiceEl.classList.toggle("selected", index === choiceIndex);
+  });
 }
 
 function renderScoreMatrix() {
   const matrix = document.getElementById("scoreMatrix");
   matrix.innerHTML = "";
 
-  const header = document.createElement("div");
-  header.className = "matrix-row matrix-header";
-  header.innerHTML = `
-    <div>Criterion</div>
-    ${preferenceChoices.map(([, label]) => `<div>${label}</div>`).join("")}
-  `;
-  matrix.appendChild(header);
+  const [criterionKey, criterionLabel] = criteria[state.activeCriterionIndex];
+  const row = document.createElement("div");
+  row.className = "matrix-row matrix-row-single";
 
-  criteria.forEach(([key, label]) => {
-    const row = document.createElement("div");
-    row.className = "matrix-row";
-    row.appendChild(Object.assign(document.createElement("div"), { className: "matrix-criterion", textContent: label }));
-    preferenceChoices.forEach(([value, choiceLabel]) => {
-      const wrapper = document.createElement("label");
-      wrapper.className = "matrix-choice";
-      const input = document.createElement("input");
-      input.type = "radio";
-      input.name = `criterion-${key}`;
-      input.value = value;
-      input.checked = state.preferences[key] === value;
-      input.addEventListener("change", () => {
-        state.preferences[key] = value;
-      });
-      const span = document.createElement("span");
-      span.textContent = choiceLabel;
-      wrapper.append(input, span);
-      row.appendChild(wrapper);
+  const criterion = document.createElement("div");
+  criterion.className = "matrix-criterion matrix-criterion-single";
+  criterion.innerHTML = `<span class="minor-label">Criterion</span><strong>${criterionLabel}</strong>`;
+  row.appendChild(criterion);
+
+  preferenceChoices.forEach(([value, label], index) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "matrix-choice";
+    button.dataset.index = String(index);
+    button.dataset.value = value;
+    button.innerHTML = `
+      <span class="matrix-choice-key">${index + 1}</span>
+      <span class="matrix-choice-label">${label}</span>
+    `;
+    button.addEventListener("click", () => {
+      state.preferences[criterionKey] = value;
+      updateCriterionUi();
     });
-    matrix.appendChild(row);
+    row.appendChild(button);
   });
+
+  matrix.appendChild(row);
+  updateCriterionUi();
 }
 
-function setAuthMode(mode) {
-  const loginForm = document.getElementById("loginForm");
-  const registerForm = document.getElementById("registerForm");
-  document.getElementById("loginTab").classList.toggle("active", mode === "login");
-  document.getElementById("registerTab").classList.toggle("active", mode === "register");
-  loginForm.classList.toggle("hidden", mode !== "login");
-  registerForm.classList.toggle("hidden", mode !== "register");
+function resetEvaluationForm() {
+  state.preferences = { ...defaultPreferences };
+  state.activeCriterionIndex = 0;
+  document.getElementById("generalComment").value = "";
+  renderScoreMatrix();
+}
+
+function renderComparison(comparison) {
+  state.comparison = comparison;
+  resetEvaluationForm();
+
+  const arena = document.getElementById("arenaGrid");
+  arena.innerHTML = "";
+  arena.appendChild(renderPanel("A", comparison.a));
+  arena.appendChild(renderPanel("B", comparison.b));
+  document.getElementById("comparisonModeLabel").textContent = comparison.modeLabel;
+  document.getElementById("questionTitleLabel").textContent = comparison.a.question_title || comparison.b.question_title || "Unknown question";
 }
 
 function setCurrentUser(user, token) {
@@ -236,12 +252,12 @@ function setCurrentUser(user, token) {
   accountInfo.innerHTML = `
     <strong>${user.displayName}</strong>
     <span>${user.email}</span>
-    <span>${user.affiliation || "No affiliation set"}</span>
+    <span>${user.affiliation || "Google account login"}</span>
   `;
   document.getElementById("greetingHeading").textContent = `Hi ${user.displayName}`;
   document.getElementById("accountSummary").innerHTML = `
     <div><strong>Name</strong><span>${user.displayName}</span></div>
-    <div><strong>Affiliation</strong><span>${user.affiliation || "Not provided"}</span></div>
+    <div><strong>Email</strong><span>${user.email}</span></div>
     <div><strong>Experience</strong><span>${user.experienceLevel || "Not provided"}</span></div>
   `;
 }
@@ -259,25 +275,53 @@ async function restoreSession() {
   }
 }
 
-async function handleAuthSubmit(event, mode) {
-  event.preventDefault();
-  const formData = new FormData(event.currentTarget);
-  const payload = Object.fromEntries(formData.entries());
-  const endpoint = mode === "login" ? "/api/auth/login" : "/api/auth/register";
-  const result = await fetchJson(endpoint, {
+async function handleGoogleCredentialResponse(response) {
+  const result = await fetchJson("/api/auth/google", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({ credential: response.credential }),
   });
   setCurrentUser(result.user, result.token);
-  setStatus(mode === "login" ? "Logged in." : "Account created.");
+  setStatus("Logged in with Google.");
+}
+
+function initializeGoogleLogin() {
+  if (!window.google?.accounts?.id) {
+    state.googleInitAttempts += 1;
+    if (state.googleInitAttempts <= 20) {
+      window.setTimeout(initializeGoogleLogin, 250);
+    } else {
+      setStatus("Google Sign-In failed to load.", true);
+    }
+    return;
+  }
+  const clientId = document.body.dataset.googleClientId;
+  if (!clientId) {
+    setStatus("Google Sign-In is not configured.", true);
+    return;
+  }
+
+  window.google.accounts.id.initialize({
+    client_id: clientId,
+    callback: (response) => {
+      handleGoogleCredentialResponse(response).catch((error) => setStatus(error.message, true));
+    },
+  });
+  window.google.accounts.id.renderButton(document.getElementById("googleLoginMount"), {
+    theme: "outline",
+    size: "large",
+    shape: "pill",
+    text: "signin_with",
+    width: 280,
+  });
+  state.googleReady = true;
 }
 
 async function loadComparison() {
-  setStatus("Loading randomized comparison...");
+  setStatus("Loading comparison...");
   const comparison = await fetchJson("/api/comparison");
   renderComparison(comparison);
-  setStatus("Random comparison loaded.");
+  setStatus("Comparison loaded.");
 }
 
 function buildEvaluationPayload() {
@@ -298,7 +342,7 @@ function buildEvaluationPayload() {
 
 async function submitEvaluation() {
   if (!state.authToken || !state.currentUser) {
-    throw new Error("Login or create an account before submitting.");
+    throw new Error("Log in with Google before submitting.");
   }
   if (!state.comparison) {
     throw new Error("No comparison loaded.");
@@ -309,21 +353,62 @@ async function submitEvaluation() {
     body: JSON.stringify(buildEvaluationPayload()),
   });
   await loadComparison();
-  document.getElementById("generalComment").value = "";
-  setStatus(`Saved evaluation #${result.sessionId}. Loaded a new random pair.`);
+  setStatus(`Saved evaluation #${result.sessionId}. Loaded a new pair.`);
+}
+
+function shiftChoice(direction) {
+  const [criterionKey] = criteria[state.activeCriterionIndex];
+  const currentIndex = preferenceChoices.findIndex(([value]) => value === state.preferences[criterionKey]);
+  const nextIndex = Math.max(0, Math.min(preferenceChoices.length - 1, currentIndex + direction));
+  state.preferences[criterionKey] = preferenceChoices[nextIndex][0];
+  updateCriterionUi();
+}
+
+async function advanceCriterion() {
+  if (state.activeCriterionIndex < criteria.length - 1) {
+    state.activeCriterionIndex += 1;
+    renderScoreMatrix();
+    return;
+  }
+  await submitEvaluation();
+}
+
+function handleKeyboardShortcuts(event) {
+  const tagName = document.activeElement?.tagName;
+  if (tagName === "TEXTAREA" || tagName === "INPUT") {
+    return;
+  }
+  if (!state.comparison) {
+    return;
+  }
+
+  if (event.key === "ArrowLeft") {
+    event.preventDefault();
+    shiftChoice(-1);
+  } else if (event.key === "ArrowRight") {
+    event.preventDefault();
+    shiftChoice(1);
+  } else if (event.key === "Enter") {
+    event.preventDefault();
+    advanceCriterion().catch((error) => setStatus(error.message, true));
+  } else if (/^[1-5]$/.test(event.key)) {
+    const [criterionKey] = criteria[state.activeCriterionIndex];
+    state.preferences[criterionKey] = preferenceChoices[Number(event.key) - 1][0];
+    updateCriterionUi();
+  }
 }
 
 async function main() {
+  document.body.dataset.googleClientId = "";
   renderScoreMatrix();
-  setAuthMode("login");
-  document.getElementById("loginTab").addEventListener("click", () => setAuthMode("login"));
-  document.getElementById("registerTab").addEventListener("click", () => setAuthMode("register"));
-  document.getElementById("loginForm").addEventListener("submit", (event) => handleAuthSubmit(event, "login").catch((error) => setStatus(error.message, true)));
-  document.getElementById("registerForm").addEventListener("submit", (event) => handleAuthSubmit(event, "register").catch((error) => setStatus(error.message, true)));
   document.getElementById("loadButton").addEventListener("click", () => loadComparison().catch((error) => setStatus(error.message, true)));
   document.getElementById("submitButton").addEventListener("click", () => submitEvaluation().catch((error) => setStatus(error.message, true)));
+  window.addEventListener("keydown", handleKeyboardShortcuts);
 
   try {
+    const config = await fetchJson("/api/auth/config");
+    document.body.dataset.googleClientId = config.googleClientId || "";
+    initializeGoogleLogin();
     await restoreSession();
     await loadComparison();
   } catch (error) {

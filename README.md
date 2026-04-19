@@ -1,6 +1,6 @@
 # Proof Arena
 
-Proof Arena is a deployable `FastAPI + PostgreSQL` app for randomized A/B comparison of Lean proofs or proof nodes, lightweight evaluator login, and persistent storage of both the dataset and submitted preferences.
+Proof Arena is a deployable `FastAPI + PostgreSQL` app for randomized A/B comparison of Lean proofs for the same question, Google-based evaluator login, and persistent storage of both the dataset and submitted preferences.
 
 The current production deployment uses:
 
@@ -12,7 +12,7 @@ The current production deployment uses:
 - Parses Lean files from `question_sets/`
 - Stores parsed questions, proofs, and nodes in PostgreSQL
 - Serves the frontend and API from the same FastAPI app
-- Loads randomized comparison pairs from the database
+- Loads randomized same-question proof pairs from the database
 - Saves evaluator metadata and A/B preference submissions into the database
 
 Current API surface:
@@ -20,6 +20,8 @@ Current API surface:
 - `GET /api/health`
 - `POST /api/auth/register`
 - `POST /api/auth/login`
+- `POST /api/auth/google`
+- `GET /api/auth/config`
 - `GET /api/me`
 - `GET /api/summary`
 - `GET /api/comparison`
@@ -67,7 +69,7 @@ Instead:
 
 When a user submits an evaluation:
 
-1. The evaluator logs in or creates an account
+1. The evaluator logs in with Google
 2. The frontend collects evaluator metadata at the top of the page
 3. The evaluator scores each criterion using A/B preference choices
 4. The frontend sends `POST /api/evaluations`
@@ -97,6 +99,8 @@ Optional:
   - Default: `false`
 - `PROOF_ARENA_CORS_ORIGINS`
   - Default: `*`
+- `PROOF_ARENA_GOOGLE_CLIENT_ID`
+  - Google OAuth web client ID used by the frontend sign-in button and backend ID token verification
 
 See [`.env.example`](/Users/xutianruo/Documents/proof_arena/.env.example).
 
@@ -117,6 +121,7 @@ For local PostgreSQL:
 ```bash
 export PROOF_ARENA_DATABASE_URL='postgresql+psycopg://proof_arena:password@localhost:5432/proof_arena'
 export PROOF_ARENA_AUTO_SEED=false
+export PROOF_ARENA_GOOGLE_CLIENT_ID='your-google-web-client-id.apps.googleusercontent.com'
 ```
 
 ### 3. Run the app
@@ -164,6 +169,7 @@ For Vercel, set these environment variables in Project Settings:
 - `PROOF_ARENA_DATABASE_URL`
 - `PROOF_ARENA_AUTO_SEED=false`
 - `PROOF_ARENA_CORS_ORIGINS`
+- `PROOF_ARENA_GOOGLE_CLIENT_ID`
 
 Recommended:
 
@@ -192,4 +198,4 @@ If you use a pooled Neon connection string, keep the parameters Neon provides.
 - Do not commit `.env`
 - Do not expose PostgreSQL directly to the public internet unless necessary
 - If you expect schema changes, add Alembic migrations instead of hand-editing tables
-- If this will be used by external evaluators, add authentication before relying on it for real collection
+- Google Sign-In must be configured before evaluators can submit preferences

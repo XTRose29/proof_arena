@@ -10,10 +10,12 @@ import secrets
 from datetime import datetime, timezone
 from typing import Any
 
+from google.auth.transport import requests as google_requests
+from google.oauth2 import id_token
 from sqlalchemy import func, select, text
 from sqlalchemy.orm import Session
 
-from .config import REPO_ROOT
+from .config import REPO_ROOT, google_client_id
 from .models import (
     AuthToken,
     Node,
@@ -24,14 +26,11 @@ from .models import (
     User,
 )
 from .parsing import guess_author, humanize_slug, parse_nodes, question_key_for_path, source_lean_files
-from .schemas import LoginRequest, PreferenceEvaluationCreate, RegisterRequest, UserPayload
+from .schemas import GoogleAuthRequest, LoginRequest, PreferenceEvaluationCreate, RegisterRequest, UserPayload
 
 
 MODE_LABELS = {
-    "option1": "Two complete proofs of the same question",
-    "option2": "Two complete proofs of different questions",
-    "option3": "The same node of the same question",
-    "option4": "Two random nodes of the same kind",
+    "same_question_proofs": "Two complete proofs of the same question",
 }
 
 
@@ -101,6 +100,50 @@ def login_user(session: Session, payload: LoginRequest) -> tuple[str, dict[str, 
     candidate_hash = _hash_password(payload.password, user.password_salt)
     if not hmac.compare_digest(candidate_hash, user.password_hash):
         raise ValueError("Invalid email or password.")
+
+    token = AuthToken(user_id=user.id, token=secrets.token_urlsafe(32), created_at=utc_now())
+    session.add(token)
+    session.commit()
+    return token.token, serialize_user(user)
+
+
+def login_user_with_google(session: Session, payload: GoogleAuthRequest) -> tuple[str, dict[str, Any]]:
+    client_id = google_client_id()
+    if not client_id:
+        raise ValueError("Google login is not configured.")
+
+    try:
+        token_payload = id_token.verify_oauth2_token(
+            payload.credential,
+            google_requests.Request(),
+            client_id,
+        )
+    except ValueError as exc:
+        raise ValueError("Google authentication failed.") from exc
+
+    if not token_payload.get("email_verified"):
+        raise ValueError("Google account email must be verified.")
+
+    email = str(token_payload.get("email", "")).strip().lower()
+    display_name = str(token_payload.get("name", "")).strip() or email.split("@")[0]
+    if not email:
+        raise ValueError("Google account did not provide an email address.")
+
+    user = session.execute(select(User).where(User.email == email)).scalar_one_or_none()
+    if user is None:
+        user = User(
+            email=email,
+            display_name=display_name,
+            affiliation="",
+            experience_level="",
+            password_hash="google_oauth",
+            password_salt="google_oauth",
+            created_at=utc_now(),
+        )
+        session.add(user)
+        session.flush()
+    elif not user.display_name.strip():
+        user.display_name = display_name
 
     token = AuthToken(user_id=user.id, token=secrets.token_urlsafe(32), created_at=utc_now())
     session.add(token)
@@ -463,25 +506,15 @@ def _entity_fields(kind: str, entity_id: int) -> tuple[int | None, int | None]:
 
 
 def build_random_comparison(session: Session) -> dict[str, Any]:
-    candidates: list[tuple[str, tuple[int, int], str]] = []
-
-    for mode, label, pair_fn in (
-        ("option1", MODE_LABELS["option1"], random_pair_same_question),
-        ("option2", MODE_LABELS["option2"], random_pair_different_questions),
-        ("option3", MODE_LABELS["option3"], random_pair_same_node_same_question),
-        ("option4", MODE_LABELS["option4"], random_pair_same_kind),
-    ):
-        pair = pair_fn(session)
-        if pair is not None:
-            candidates.append((mode, pair, label))
-
-    if not candidates:
+    pair = random_pair_same_question(session)
+    if pair is None:
         raise LookupError("No comparison pairs available.")
 
-    mode, pair, label = random.choice(candidates)
+    mode = "same_question_proofs"
+    label = MODE_LABELS[mode]
     a_id, b_id = pair
-    a_payload = proof_payload(session, a_id) if mode in {"option1", "option2"} else node_payload(session, a_id)
-    b_payload = proof_payload(session, b_id) if mode in {"option1", "option2"} else node_payload(session, b_id)
+    a_payload = proof_payload(session, a_id)
+    b_payload = proof_payload(session, b_id)
 
     if random.choice([True, False]):
         a_payload, b_payload = b_payload, a_payload

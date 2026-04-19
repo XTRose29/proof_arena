@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lean Proof Arena</title>
     <link rel="stylesheet" href="/styles.css" />
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
   </head>
   <body>
     <main class="page-shell">
@@ -13,11 +14,10 @@
           <p class="eyebrow">Autoformalization Benchmark</p>
           <h1>Lean Proof Arena</h1>
           <p class="hero-copy">
-            Welcome to Lean Proof Arena. This interface presents randomized pairs of
-            Lean proofs or proof fragments and asks you to judge which version reads
-            better across a small set of comparison criteria. Your account stores
-            your evaluator profile, and each submission is saved to the database for
-            later analysis.
+            This interface presents two complete Lean proofs for the same question.
+            Score one comparison criterion at a time, use the arrow keys to move
+            toward A or B, press Enter to confirm, and optionally leave a comment
+            under the code before the next pair loads.
           </p>
         </div>
       </section>
@@ -27,29 +27,15 @@
           <div class="section-heading">
             <div>
               <p class="eyebrow small">Account</p>
-              <h2>Login Or Create Account</h2>
-            </div>
-            <div class="auth-tabs">
-              <button id="loginTab" class="tab-button active">Login</button>
-              <button id="registerTab" class="tab-button">Create Account</button>
+              <h2>Google Login</h2>
             </div>
           </div>
 
-          <form id="loginForm" class="auth-form">
-            <label>Email<input type="email" name="email" required /></label>
-            <label>Password<input type="password" name="password" required /></label>
-            <button class="primary-button" type="submit">Login</button>
-          </form>
-
-          <form id="registerForm" class="auth-form hidden">
-            <label>Email<input type="email" name="email" required /></label>
-            <label>Password<input type="password" name="password" minlength="8" required /></label>
-            <label>Display Name<input type="text" name="displayName" required /></label>
-            <label>Affiliation<input type="text" name="affiliation" /></label>
-            <label>Experience Level<input type="text" name="experienceLevel" placeholder="e.g. Undergraduate / PhD / Researcher" /></label>
-            <button class="primary-button" type="submit">Create Account</button>
-          </form>
-
+          <p class="auth-copy">
+            Sign in with a Google account to load comparisons and save your
+            evaluations.
+          </p>
+          <div id="googleLoginMount" class="google-login-mount"></div>
           <div id="accountInfo" class="account-info hidden"></div>
         </article>
 
@@ -62,9 +48,13 @@
             <button id="loadButton" class="secondary-button" type="button">Next Random Comparison</button>
           </div>
           <div class="account-summary" id="accountSummary">
-            <p>Log in to load your evaluator profile.</p>
+            <p>Log in with Google to load your evaluator profile.</p>
           </div>
           <div class="comparison-brief">
+            <div>
+              <span class="minor-label">Question</span>
+              <strong id="questionTitleLabel">Loading...</strong>
+            </div>
             <div>
               <span class="minor-label">Current Pair</span>
               <strong id="comparisonModeLabel">Loading...</strong>
@@ -74,23 +64,30 @@
         </article>
       </section>
 
-      <section class="card scoring-card">
+      <section class="card scoring-card workspace-card">
         <div class="section-heading">
           <div>
             <p class="eyebrow small">Preference Matrix</p>
-            <h2>Scoring</h2>
+            <h2 id="criterionTitle">Clarity</h2>
           </div>
-          <button id="submitButton" class="submit-button" type="button">Submit Preference</button>
+          <div class="matrix-progress-block">
+            <div id="criterionProgress" class="matrix-progress">1 / 4</div>
+            <button id="submitButton" class="submit-button" type="button">Submit Preference</button>
+          </div>
         </div>
+        <p id="criterionHint" class="criterion-hint">
+          Use Left/Right to choose how strongly you lean toward A or B. Press Enter to confirm this row.
+        </p>
         <div id="scoreMatrix" class="score-matrix"></div>
-        <div class="comment-block">
+
+        <section class="arena-grid" id="arenaGrid">
+          <article class="panel loading-panel">Loading randomized comparison...</article>
+        </section>
+
+        <div class="comment-block comment-under-code">
           <label for="generalComment">Comments</label>
           <textarea id="generalComment" rows="4" placeholder="Optional overall comments about this pair."></textarea>
         </div>
-      </section>
-
-      <section class="arena-grid" id="arenaGrid">
-        <article class="panel loading-panel">Loading randomized comparison...</article>
       </section>
     </main>
 

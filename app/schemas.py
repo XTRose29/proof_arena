@@ -21,6 +21,10 @@ class LoginRequest(BaseModel):
     password: str = Field(min_length=1, max_length=200)
 
 
+class GoogleAuthRequest(BaseModel):
+    credential: str = Field(min_length=1, max_length=8000)
+
+
 class UserPayload(BaseModel):
     id: int
     email: str
