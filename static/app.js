@@ -305,7 +305,6 @@ async function saveProfile(event) {
   });
   setCurrentUser(result.user);
   closeProfileDialog();
-  setStatus("Personal info updated.");
 }
 
 async function restoreSession() {

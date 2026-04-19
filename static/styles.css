@@ -239,9 +239,10 @@ textarea {
 
 .comparison-brief {
   display: grid;
-  grid-template-columns: repeat(2, minmax(180px, 1fr));
+  grid-template-columns: minmax(180px, auto) minmax(260px, 1fr);
   gap: 12px;
   margin-top: 8px;
+  align-items: end;
 }
 
 .minor-label {
