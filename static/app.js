@@ -285,7 +285,7 @@ function logout() {
     closeProfileDialog();
   }
   clearCurrentUser();
-  setStatus("Logged out.");
+  setStatus("");
 }
 
 async function saveProfile(event) {
@@ -326,7 +326,7 @@ async function handleGoogleCredentialResponse(response) {
     body: JSON.stringify({ credential: response.credential }),
   });
   setCurrentUser(result.user, result.token);
-  setStatus("Logged in with Google.");
+  setStatus("");
 }
 
 function initializeGoogleLogin() {
@@ -362,10 +362,9 @@ function initializeGoogleLogin() {
 }
 
 async function loadComparison() {
-  setStatus("Loading comparison...");
   const comparison = await fetchJson("/api/comparison");
   renderComparison(comparison);
-  setStatus("Comparison loaded.");
+  setStatus("");
 }
 
 function buildEvaluationPayload() {
@@ -397,7 +396,7 @@ async function submitEvaluation() {
     body: JSON.stringify(buildEvaluationPayload()),
   });
   await loadComparison();
-  setStatus(`Saved evaluation #${result.sessionId}. Loaded a new pair.`);
+  setStatus("");
 }
 
 function shiftChoice(direction) {
