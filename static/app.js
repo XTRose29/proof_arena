@@ -76,6 +76,9 @@ async function fetchJson(url, options = {}) {
 
 function setStatus(message, isError = false) {
   const el = document.getElementById("statusText");
+  if (!el) {
+    return;
+  }
   el.textContent = message;
   el.style.color = isError ? "var(--warn)" : "var(--muted)";
 }
@@ -231,8 +234,6 @@ function renderComparison(comparison) {
   arena.innerHTML = "";
   arena.appendChild(renderPanel("A", comparison.a));
   arena.appendChild(renderPanel("B", comparison.b));
-  document.getElementById("comparisonModeLabel").textContent = comparison.modeLabel;
-  document.getElementById("questionTitleLabel").textContent = comparison.a.question_title || comparison.b.question_title || "Unknown question";
 }
 
 function setCurrentUser(user, token) {

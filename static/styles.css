@@ -43,7 +43,6 @@ body {
 }
 
 .hero,
-.top-grid,
 .arena-grid {
   display: grid;
   gap: 20px;
@@ -52,11 +51,6 @@ body {
 .hero {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: start;
-}
-
-.top-grid {
-  margin-top: 24px;
-  grid-template-columns: 1fr;
 }
 
 .arena-grid {
@@ -233,28 +227,10 @@ textarea {
   border-top: 1px solid rgba(99, 86, 70, 0.16);
 }
 
-.meta-card {
-  padding: 16px 18px;
-}
-
-.comparison-brief {
-  display: grid;
-  grid-template-columns: minmax(180px, auto) minmax(260px, 1fr);
-  gap: 12px;
-  margin-top: 8px;
-  align-items: end;
-}
-
 .minor-label {
   display: block;
   font-size: 0.8rem;
   margin-bottom: 4px;
-}
-
-.status-text {
-  min-height: 22px;
-  font-weight: 600;
-  margin-top: 8px;
 }
 
 .matrix-progress-block {
@@ -494,10 +470,8 @@ textarea {
 }
 
 @media (max-width: 1200px) {
-  .top-grid,
   .arena-grid,
-  .matrix-row-single,
-  .comparison-brief {
+  .matrix-row-single {
     grid-template-columns: 1fr;
   }
 
