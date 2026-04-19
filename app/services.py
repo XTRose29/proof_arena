@@ -10,8 +10,6 @@ import secrets
 from datetime import datetime, timezone
 from typing import Any
 
-from google.auth.transport import requests as google_requests
-from google.oauth2 import id_token
 from sqlalchemy import func, select, text
 from sqlalchemy.orm import Session
 
@@ -113,11 +111,16 @@ def login_user_with_google(session: Session, payload: GoogleAuthRequest) -> tupl
         raise ValueError("Google login is not configured.")
 
     try:
+        from google.auth.transport import requests as google_requests
+        from google.oauth2 import id_token
+
         token_payload = id_token.verify_oauth2_token(
             payload.credential,
             google_requests.Request(),
             client_id,
         )
+    except ImportError as exc:
+        raise ValueError("Google authentication dependency is not installed.") from exc
     except ValueError as exc:
         raise ValueError("Google authentication failed.") from exc
 
