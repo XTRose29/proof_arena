@@ -155,7 +155,7 @@ function renderPanel(sideLabel, entity) {
   const template = document.getElementById("panelTemplate");
   const panel = template.content.firstElementChild.cloneNode(true);
   panel.querySelector(".panel-side").textContent = sideLabel;
-  panel.querySelector(".panel-title").textContent = sideLabel;
+  panel.querySelector(".panel-title").remove();
   panel.querySelector(".panel-meta").remove();
 
   const codeViewer = panel.querySelector(".code-viewer");
@@ -249,6 +249,15 @@ function setCurrentUser(user, token) {
   populateProfileForm(user);
 }
 
+function clearCurrentUser() {
+  state.currentUser = null;
+  state.authToken = null;
+  localStorage.removeItem(AUTH_TOKEN_KEY);
+  document.getElementById("accountCardTitle").textContent = "Google Login";
+  document.getElementById("googleLoginMount").classList.remove("hidden");
+  document.getElementById("accountCompact").classList.add("hidden");
+}
+
 function populateProfileForm(user) {
   document.getElementById("profileEmail").value = user.email || "";
   document.getElementById("profileDisplayName").value = user.displayName || "";
@@ -269,6 +278,14 @@ function openProfileDialog() {
 function closeProfileDialog() {
   document.getElementById("profileDialog").close();
   state.profileDialogOpen = false;
+}
+
+function logout() {
+  if (state.profileDialogOpen) {
+    closeProfileDialog();
+  }
+  clearCurrentUser();
+  setStatus("Logged out.");
 }
 
 async function saveProfile(event) {
@@ -299,8 +316,7 @@ async function restoreSession() {
     const result = await fetchJson("/api/me");
     setCurrentUser(result.user);
   } catch {
-    localStorage.removeItem(AUTH_TOKEN_KEY);
-    state.authToken = null;
+    clearCurrentUser();
   }
 }
 
@@ -448,6 +464,7 @@ async function main() {
   document.getElementById("submitButton").addEventListener("click", () => submitEvaluation().catch((error) => setStatus(error.message, true)));
   document.getElementById("prevCriterionButton").addEventListener("click", goToPreviousCriterion);
   document.getElementById("openProfileButton").addEventListener("click", openProfileDialog);
+  document.getElementById("logoutButton").addEventListener("click", logout);
   document.getElementById("closeProfileButton").addEventListener("click", closeProfileDialog);
   document.getElementById("profileForm").addEventListener("submit", (event) => saveProfile(event).catch((error) => setStatus(error.message, true)));
   document.getElementById("profileDialog").addEventListener("close", () => {

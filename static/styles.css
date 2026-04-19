@@ -185,11 +185,11 @@ textarea {
 
 .hero-login-card {
   min-width: 260px;
-  padding: 14px 16px;
+  padding: 12px 14px;
 }
 
 .hero-login-head {
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .google-login-mount {
@@ -201,7 +201,7 @@ textarea {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-top: 8px;
+  margin-top: 6px;
 }
 
 .account-compact strong,
@@ -209,8 +209,19 @@ textarea {
   display: block;
 }
 
+.account-actions {
+  display: flex;
+  gap: 8px;
+}
+
 .compact-button {
-  padding: 9px 14px;
+  padding: 8px 12px;
+}
+
+.ghost-button {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid rgba(99, 86, 70, 0.18);
 }
 
 .account-info {
@@ -222,11 +233,15 @@ textarea {
   border-top: 1px solid rgba(99, 86, 70, 0.16);
 }
 
+.meta-card {
+  padding: 16px 18px;
+}
+
 .comparison-brief {
   display: grid;
   grid-template-columns: repeat(2, minmax(180px, 1fr));
   gap: 12px;
-  margin-top: 16px;
+  margin-top: 8px;
 }
 
 .minor-label {
@@ -238,7 +253,7 @@ textarea {
 .status-text {
   min-height: 22px;
   font-weight: 600;
-  margin-top: 10px;
+  margin-top: 8px;
 }
 
 .matrix-progress-block {
@@ -319,23 +334,19 @@ textarea {
 .panel {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
   min-height: 52vh;
-  padding: 18px;
+  padding: 14px;
 }
 
 .panel-side {
-  margin: 0 0 2px;
+  margin: 0;
   color: var(--accent);
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  font-size: 0.76rem;
-}
-
-.panel-title {
-  margin: 0;
-  font-size: 1.2rem;
+  font-size: 1.05rem;
+  line-height: 1;
 }
 
 .panel-header {
@@ -487,6 +498,7 @@ textarea {
   }
 
   .account-compact,
+  .account-actions,
   .profile-dialog-head {
     flex-direction: column;
     align-items: stretch;
