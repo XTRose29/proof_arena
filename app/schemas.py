@@ -25,6 +25,12 @@ class GoogleAuthRequest(BaseModel):
     credential: str = Field(min_length=1, max_length=8000)
 
 
+class UpdateProfileRequest(BaseModel):
+    displayName: str = Field(min_length=1, max_length=200)
+    affiliation: str = Field(default="", max_length=200)
+    experienceLevel: str = Field(default="", max_length=200)
+
+
 class UserPayload(BaseModel):
     id: int
     email: str

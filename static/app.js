@@ -25,6 +25,7 @@ const state = {
   activeCriterionIndex: 0,
   googleReady: false,
   googleInitAttempts: 0,
+  profileDialogOpen: false,
 };
 
 const leanKeywords = new Set([
@@ -178,6 +179,7 @@ function updateCriterionUi() {
   matrix.querySelectorAll(".matrix-choice").forEach((choiceEl, index) => {
     choiceEl.classList.toggle("selected", index === choiceIndex);
   });
+  document.getElementById("prevCriterionButton").disabled = state.activeCriterionIndex === 0;
 }
 
 function renderScoreMatrix() {
@@ -239,19 +241,54 @@ function setCurrentUser(user, token) {
     state.authToken = token;
     localStorage.setItem(AUTH_TOKEN_KEY, token);
   }
-  const accountInfo = document.getElementById("accountInfo");
-  accountInfo.classList.remove("hidden");
-  accountInfo.innerHTML = `
-    <strong>${user.displayName}</strong>
-    <span>${user.email}</span>
-    <span>${user.affiliation || "Google account login"}</span>
-  `;
-  document.getElementById("greetingHeading").textContent = `Hi ${user.displayName}`;
-  document.getElementById("accountSummary").innerHTML = `
-    <div><strong>Name</strong><span>${user.displayName}</span></div>
-    <div><strong>Email</strong><span>${user.email}</span></div>
-    <div><strong>Experience</strong><span>${user.experienceLevel || "Not provided"}</span></div>
-  `;
+  document.getElementById("accountCardTitle").textContent = "Account";
+  document.getElementById("googleLoginMount").classList.add("hidden");
+  document.getElementById("accountCompactName").textContent = user.displayName;
+  document.getElementById("accountCompactEmail").textContent = user.email;
+  document.getElementById("accountCompact").classList.remove("hidden");
+  populateProfileForm(user);
+}
+
+function populateProfileForm(user) {
+  document.getElementById("profileEmail").value = user.email || "";
+  document.getElementById("profileDisplayName").value = user.displayName || "";
+  document.getElementById("profileAffiliation").value = user.affiliation || "";
+  document.getElementById("profileExperienceLevel").value = user.experienceLevel || "";
+}
+
+function openProfileDialog() {
+  if (!state.currentUser) {
+    setStatus("Log in with Google first.", true);
+    return;
+  }
+  populateProfileForm(state.currentUser);
+  document.getElementById("profileDialog").showModal();
+  state.profileDialogOpen = true;
+}
+
+function closeProfileDialog() {
+  document.getElementById("profileDialog").close();
+  state.profileDialogOpen = false;
+}
+
+async function saveProfile(event) {
+  event.preventDefault();
+  if (!state.currentUser) {
+    throw new Error("Log in with Google first.");
+  }
+  const payload = {
+    displayName: document.getElementById("profileDisplayName").value.trim(),
+    affiliation: document.getElementById("profileAffiliation").value.trim(),
+    experienceLevel: document.getElementById("profileExperienceLevel").value.trim(),
+  };
+  const result = await fetchJson("/api/me", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  setCurrentUser(result.user);
+  closeProfileDialog();
+  setStatus("Personal info updated.");
 }
 
 async function restoreSession() {
@@ -301,10 +338,10 @@ function initializeGoogleLogin() {
   });
   window.google.accounts.id.renderButton(document.getElementById("googleLoginMount"), {
     theme: "outline",
-    size: "large",
+    size: "medium",
     shape: "pill",
     text: "signin_with",
-    width: 280,
+    width: 220,
   });
   state.googleReady = true;
 }
@@ -365,7 +402,18 @@ async function advanceCriterion() {
   await submitEvaluation();
 }
 
+function goToPreviousCriterion() {
+  if (state.activeCriterionIndex === 0) {
+    return;
+  }
+  state.activeCriterionIndex -= 1;
+  renderScoreMatrix();
+}
+
 function handleKeyboardShortcuts(event) {
+  if (state.profileDialogOpen) {
+    return;
+  }
   const tagName = document.activeElement?.tagName;
   if (tagName === "TEXTAREA" || tagName === "INPUT") {
     return;
@@ -383,6 +431,9 @@ function handleKeyboardShortcuts(event) {
   } else if (event.key === "Enter") {
     event.preventDefault();
     advanceCriterion().catch((error) => setStatus(error.message, true));
+  } else if (event.key === "Backspace") {
+    event.preventDefault();
+    goToPreviousCriterion();
   } else if (/^[1-5]$/.test(event.key)) {
     const [criterionKey] = criteria[state.activeCriterionIndex];
     state.preferences[criterionKey] = preferenceChoices[Number(event.key) - 1][0];
@@ -395,6 +446,13 @@ async function main() {
   renderScoreMatrix();
   document.getElementById("loadButton").addEventListener("click", () => loadComparison().catch((error) => setStatus(error.message, true)));
   document.getElementById("submitButton").addEventListener("click", () => submitEvaluation().catch((error) => setStatus(error.message, true)));
+  document.getElementById("prevCriterionButton").addEventListener("click", goToPreviousCriterion);
+  document.getElementById("openProfileButton").addEventListener("click", openProfileDialog);
+  document.getElementById("closeProfileButton").addEventListener("click", closeProfileDialog);
+  document.getElementById("profileForm").addEventListener("submit", (event) => saveProfile(event).catch((error) => setStatus(error.message, true)));
+  document.getElementById("profileDialog").addEventListener("close", () => {
+    state.profileDialogOpen = false;
+  });
   window.addEventListener("keydown", handleKeyboardShortcuts);
 
   try {

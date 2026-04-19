@@ -24,7 +24,7 @@ from .models import (
     User,
 )
 from .parsing import guess_author, humanize_slug, parse_nodes, question_key_for_path, source_lean_files
-from .schemas import GoogleAuthRequest, LoginRequest, PreferenceEvaluationCreate, RegisterRequest, UserPayload
+from .schemas import GoogleAuthRequest, LoginRequest, PreferenceEvaluationCreate, RegisterRequest, UpdateProfileRequest, UserPayload
 
 
 MODE_LABELS = {
@@ -168,6 +168,14 @@ def auth_user_from_token(session: Session, raw_token: str | None) -> User:
     if user is None:
         raise PermissionError("Invalid or expired token.")
     return user
+
+
+def update_user_profile(session: Session, user: User, payload: UpdateProfileRequest) -> dict[str, Any]:
+    user.display_name = payload.displayName.strip()
+    user.affiliation = payload.affiliation.strip()
+    user.experience_level = payload.experienceLevel.strip()
+    session.commit()
+    return serialize_user(user)
 
 
 def init_database(session: Session) -> None:

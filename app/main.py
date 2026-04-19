@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 
 from .config import STATIC_DIR, auto_seed_enabled, cors_origins, google_client_id
 from .database import Base, SessionLocal, engine, ensure_models_imported, get_db
-from .schemas import GoogleAuthRequest, LoginRequest, PreferenceEvaluationCreate, RegisterRequest
+from .schemas import GoogleAuthRequest, LoginRequest, PreferenceEvaluationCreate, RegisterRequest, UpdateProfileRequest
 from .services import (
     auth_user_from_token,
     build_random_comparison,
@@ -23,6 +23,7 @@ from .services import (
     save_preference_evaluation,
     serialize_user,
     summary_payload,
+    update_user_profile,
 )
 
 
@@ -100,6 +101,22 @@ def get_me(
     except PermissionError as exc:
         raise HTTPException(status_code=401, detail=str(exc)) from exc
     return {"user": serialize_user(user)}
+
+
+@app.put("/api/me")
+def put_me(
+    payload: UpdateProfileRequest,
+    authorization: str | None = Header(default=None),
+    db: Session = Depends(get_db),
+) -> dict:
+    try:
+        user = auth_user_from_token(db, authorization)
+        updated_user = update_user_profile(db, user, payload)
+    except PermissionError as exc:
+        raise HTTPException(status_code=401, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return {"user": updated_user}
 
 
 @app.get("/api/auth/config")

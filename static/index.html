@@ -24,11 +24,17 @@
           <div class="hero-login-head">
             <div>
               <p class="eyebrow small">Account</p>
-              <h2>Google Login</h2>
+              <h2 id="accountCardTitle">Google Login</h2>
             </div>
           </div>
           <div id="googleLoginMount" class="google-login-mount"></div>
-          <div id="accountInfo" class="account-info hidden"></div>
+          <div id="accountCompact" class="account-compact hidden">
+            <div>
+              <strong id="accountCompactName"></strong>
+              <span id="accountCompactEmail"></span>
+            </div>
+            <button id="openProfileButton" class="secondary-button compact-button" type="button">Personal Info</button>
+          </div>
         </article>
       </section>
 
@@ -36,13 +42,10 @@
         <article class="card meta-card">
           <div class="section-heading">
             <div>
-              <p class="eyebrow small">Evaluator</p>
-              <h2 id="greetingHeading">Hi there</h2>
+              <p class="eyebrow small">Session</p>
+              <h2>Current Comparison</h2>
             </div>
             <button id="loadButton" class="secondary-button" type="button">Next Random Comparison</button>
-          </div>
-          <div class="account-summary" id="accountSummary">
-            <p>Log in with Google to load your evaluator profile.</p>
           </div>
           <div class="comparison-brief">
             <div>
@@ -65,6 +68,7 @@
             <h2 id="criterionTitle">Clarity</h2>
           </div>
           <div class="matrix-progress-block">
+            <button id="prevCriterionButton" class="secondary-button compact-button" type="button">Previous</button>
             <div id="criterionProgress" class="matrix-progress">1 / 4</div>
             <button id="submitButton" class="submit-button" type="button">Submit Preference</button>
           </div>
@@ -84,6 +88,25 @@
         </div>
       </section>
     </main>
+
+    <dialog id="profileDialog" class="profile-dialog">
+      <form id="profileForm" class="profile-form" method="dialog">
+        <div class="profile-dialog-head">
+          <div>
+            <p class="eyebrow small">Account</p>
+            <h2>Personal Info</h2>
+          </div>
+          <button id="closeProfileButton" class="secondary-button compact-button" type="button">Close</button>
+        </div>
+        <label>Email<input id="profileEmail" name="email" type="email" readonly /></label>
+        <label>Display Name<input id="profileDisplayName" name="displayName" type="text" required /></label>
+        <label>Affiliation<input id="profileAffiliation" name="affiliation" type="text" /></label>
+        <label>Experience Level<input id="profileExperienceLevel" name="experienceLevel" type="text" placeholder="e.g. Undergraduate / PhD / Researcher" /></label>
+        <div class="profile-actions">
+          <button id="saveProfileButton" class="submit-button" type="submit">Save</button>
+        </div>
+      </form>
+    </dialog>
 
     <template id="panelTemplate">
       <article class="panel">

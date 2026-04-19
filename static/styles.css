@@ -184,16 +184,33 @@ textarea {
 }
 
 .hero-login-card {
-  min-width: 320px;
-  padding: 16px 18px;
+  min-width: 260px;
+  padding: 14px 16px;
 }
 
 .hero-login-head {
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .google-login-mount {
   min-height: 44px;
+}
+
+.account-compact {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.account-compact strong,
+.account-compact span {
+  display: block;
+}
+
+.compact-button {
+  padding: 9px 14px;
 }
 
 .account-info {
@@ -203,27 +220,6 @@ textarea {
   margin-top: 14px;
   padding-top: 14px;
   border-top: 1px solid rgba(99, 86, 70, 0.16);
-}
-
-.account-summary {
-  display: grid;
-  gap: 10px;
-  grid-template-columns: repeat(3, minmax(140px, 1fr));
-  margin-bottom: 16px;
-}
-
-.account-summary div {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 12px 14px;
-  border: 1px solid rgba(99, 86, 70, 0.16);
-  border-radius: 14px;
-  background: #fffdf9;
-}
-
-.account-summary p {
-  margin: 0;
 }
 
 .comparison-brief {
@@ -242,13 +238,14 @@ textarea {
 .status-text {
   min-height: 22px;
   font-weight: 600;
-  margin-top: 14px;
+  margin-top: 10px;
 }
 
 .matrix-progress-block {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 .matrix-progress {
@@ -394,6 +391,37 @@ textarea {
   font-weight: 800;
 }
 
+.profile-dialog {
+  width: min(560px, calc(100vw - 32px));
+  border: 1px solid rgba(99, 86, 70, 0.16);
+  border-radius: 22px;
+  padding: 0;
+  background: rgba(255, 250, 242, 0.98);
+  box-shadow: var(--shadow);
+}
+
+.profile-dialog::backdrop {
+  background: rgba(29, 26, 22, 0.28);
+}
+
+.profile-form {
+  display: grid;
+  gap: 14px;
+  padding: 22px;
+}
+
+.profile-dialog-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 16px;
+}
+
+.profile-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .tok-keyword {
   color: var(--tok-keyword);
   font-weight: 700;
@@ -441,8 +469,7 @@ textarea {
   .top-grid,
   .arena-grid,
   .matrix-row-single,
-  .comparison-brief,
-  .account-summary {
+  .comparison-brief {
     grid-template-columns: 1fr;
   }
 
@@ -457,5 +484,11 @@ textarea {
   .matrix-progress-block {
     width: 100%;
     justify-content: space-between;
+  }
+
+  .account-compact,
+  .profile-dialog-head {
+    flex-direction: column;
+    align-items: stretch;
   }
 }
