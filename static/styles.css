@@ -313,7 +313,7 @@ textarea {
   flex-direction: column;
   gap: 6px;
   min-height: 52vh;
-  padding: 14px;
+  padding: 12px;
 }
 
 .panel-side {
@@ -335,7 +335,7 @@ textarea {
   background: linear-gradient(180deg, var(--code-bg) 0%, var(--code-bg-2) 100%);
   color: var(--code-ink);
   border-radius: 16px;
-  padding: 12px 0;
+  padding: 10px 0;
   overflow: auto;
   max-height: 64vh;
   font-family: var(--mono);
@@ -347,9 +347,9 @@ textarea {
 
 .code-line {
   display: grid;
-  grid-template-columns: 58px 1fr;
-  gap: 14px;
-  padding: 0 14px;
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: 10px;
+  padding: 0 10px 0 8px;
 }
 
 .code-line-number {

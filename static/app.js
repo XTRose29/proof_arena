@@ -100,14 +100,10 @@ function highlightToken(token) {
   return token;
 }
 
-function highlightLeanCode(text) {
+function highlightLeanCodeSegment(text) {
   const escaped = escapeHtml(text);
-  const commentIndex = escaped.indexOf("--");
-  const codePart = commentIndex >= 0 ? escaped.slice(0, commentIndex) : escaped;
-  const commentPart = commentIndex >= 0 ? escaped.slice(commentIndex) : "";
-
   const placeholders = [];
-  let working = codePart.replace(/"([^"\\]|\\.)*"/g, (match) => {
+  let working = escaped.replace(/"([^"\\]|\\.)*"/g, (match) => {
     const key = `__STRING_${placeholders.length}__`;
     placeholders.push(`<span class="tok-string">${match}</span>`);
     return key;
@@ -132,13 +128,106 @@ function highlightLeanCode(text) {
     working = working.replace(`__STRING_${index}__`, value);
   });
 
-  if (!commentPart) {
-    return working || " ";
-  }
-  return `${working}<span class="tok-comment">${commentPart}</span>`;
+  return working;
 }
 
-function createCodeLine(line) {
+function highlightLeanLine(text, syntaxState) {
+  const parts = [];
+  let codeStart = 0;
+  let index = 0;
+  let blockCommentDepth = syntaxState.blockCommentDepth;
+
+  const flushCode = (end) => {
+    if (end <= codeStart) {
+      return;
+    }
+    parts.push(highlightLeanCodeSegment(text.slice(codeStart, end)));
+  };
+
+  const pushComment = (start, end) => {
+    parts.push(`<span class="tok-comment">${escapeHtml(text.slice(start, end))}</span>`);
+  };
+
+  while (index < text.length) {
+    if (blockCommentDepth > 0) {
+      const commentStart = index;
+      while (index < text.length && blockCommentDepth > 0) {
+        if (text.startsWith("/-", index)) {
+          blockCommentDepth += 1;
+          index += 2;
+          continue;
+        }
+        if (text.startsWith("-/", index)) {
+          blockCommentDepth -= 1;
+          index += 2;
+          continue;
+        }
+        index += 1;
+      }
+      pushComment(commentStart, index);
+      codeStart = index;
+      continue;
+    }
+
+    if (text[index] === "\"") {
+      index += 1;
+      while (index < text.length) {
+        if (text[index] === "\\") {
+          index += 2;
+          continue;
+        }
+        if (text[index] === "\"") {
+          index += 1;
+          break;
+        }
+        index += 1;
+      }
+      continue;
+    }
+
+    if (text.startsWith("--", index)) {
+      flushCode(index);
+      pushComment(index, text.length);
+      return {
+        html: parts.join("") || " ",
+        blockCommentDepth,
+      };
+    }
+
+    if (text.startsWith("/-", index)) {
+      flushCode(index);
+      blockCommentDepth = 1;
+      const commentStart = index;
+      index += 2;
+      while (index < text.length && blockCommentDepth > 0) {
+        if (text.startsWith("/-", index)) {
+          blockCommentDepth += 1;
+          index += 2;
+          continue;
+        }
+        if (text.startsWith("-/", index)) {
+          blockCommentDepth -= 1;
+          index += 2;
+          continue;
+        }
+        index += 1;
+      }
+      pushComment(commentStart, index);
+      codeStart = index;
+      continue;
+    }
+
+    index += 1;
+  }
+
+  flushCode(text.length);
+  return {
+    html: parts.join("") || " ",
+    blockCommentDepth,
+  };
+}
+
+function createCodeLine(line, syntaxState) {
   const row = document.createElement("div");
   row.className = "code-line";
 
@@ -148,7 +237,9 @@ function createCodeLine(line) {
 
   const text = document.createElement("span");
   text.className = "code-line-text";
-  text.innerHTML = highlightLeanCode(line.text || " ");
+  const highlighted = highlightLeanLine(line.text || " ", syntaxState);
+  text.innerHTML = highlighted.html;
+  syntaxState.blockCommentDepth = highlighted.blockCommentDepth;
 
   row.append(num, text);
   return row;
@@ -162,8 +253,9 @@ function renderPanel(sideLabel, entity) {
   panel.querySelector(".panel-meta").remove();
 
   const codeViewer = panel.querySelector(".code-viewer");
+  const syntaxState = { blockCommentDepth: 0 };
   entity.lines.forEach((line) => {
-    codeViewer.appendChild(createCodeLine(line));
+    codeViewer.appendChild(createCodeLine(line, syntaxState));
   });
   return panel;
 }
