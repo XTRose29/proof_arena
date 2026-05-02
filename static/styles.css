@@ -260,6 +260,14 @@ select {
   line-height: 1.5;
 }
 
+.fullscreen-instruction {
+  display: none;
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-weight: 700;
+  line-height: 1.4;
+}
+
 .evaluation-tabs {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -337,14 +345,6 @@ select {
   color: white;
   border-color: #0d4f46;
   box-shadow: 0 10px 24px rgba(15, 94, 83, 0.18);
-}
-
-.matrix-choice-key {
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: 0.8;
 }
 
 .matrix-choice-label {
@@ -540,6 +540,10 @@ select {
 .workspace-card:fullscreen .comment-side-panel,
 .workspace-card:fullscreen .status-text {
   display: none;
+}
+
+.workspace-card:fullscreen .fullscreen-instruction {
+  display: block;
 }
 
 .workspace-card:fullscreen .comment-side-panel:not(.hidden) {

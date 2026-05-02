@@ -272,7 +272,7 @@ function updateCriterionUi() {
   document.getElementById("criterionHint").textContent =
     state.activeTab === "comment"
       ? "Leave an optional overall comment. Submit is available after all four criteria are selected."
-      : "Use Left/Right to choose how strongly you lean toward A or B. Press Enter to confirm this criterion.";
+      : "Use Left/Right to choose a rating, Up/Down to change criterion, and Enter to submit.";
 
   const matrix = document.getElementById("scoreMatrix");
   matrix.querySelectorAll(".matrix-choice").forEach((choiceEl, index) => {
@@ -301,10 +301,7 @@ function renderScoreMatrix() {
     button.className = "matrix-choice";
     button.dataset.index = String(index);
     button.dataset.value = value;
-    button.innerHTML = `
-      <span class="matrix-choice-key">${index + 1}</span>
-      <span class="matrix-choice-label">${label}</span>
-    `;
+    button.innerHTML = `<span class="matrix-choice-label">${label}</span>`;
     button.addEventListener("click", () => {
       state.preferences[criterionKey] = value;
       state.completedCriteria.add(criterionKey);
@@ -315,6 +312,14 @@ function renderScoreMatrix() {
 
   matrix.appendChild(row);
   updateCriterionUi();
+}
+
+function showCriterionTab(index) {
+  state.activeCriterionIndex = Math.max(0, Math.min(criteria.length - 1, index));
+  state.activeTab = criteria[state.activeCriterionIndex][0];
+  document.getElementById("scoreMatrix").classList.remove("hidden");
+  document.getElementById("commentPanel").classList.add("hidden");
+  renderScoreMatrix();
 }
 
 function renderEvaluationTabs() {
@@ -334,11 +339,7 @@ function renderEvaluationTabs() {
       }
       const index = criteria.findIndex(([criterionKey]) => criterionKey === key);
       if (index >= 0) {
-        state.activeCriterionIndex = index;
-        state.activeTab = key;
-        document.getElementById("scoreMatrix").classList.remove("hidden");
-        document.getElementById("commentPanel").classList.add("hidden");
-        renderScoreMatrix();
+        showCriterionTab(index);
       }
     });
     tabs.appendChild(button);
@@ -588,14 +589,13 @@ async function advanceCriterion() {
 }
 
 function goToPreviousCriterion() {
-  if (state.activeCriterionIndex === 0) {
-    return;
-  }
-  state.activeCriterionIndex -= 1;
-  state.activeTab = criteria[state.activeCriterionIndex][0];
-  document.getElementById("scoreMatrix").classList.remove("hidden");
-  document.getElementById("commentPanel").classList.add("hidden");
-  renderScoreMatrix();
+  showCriterionTab(state.activeCriterionIndex - 1);
+}
+
+function moveCriterion(direction) {
+  const currentIndex = state.activeTab === "comment" ? criteria.length : state.activeCriterionIndex;
+  const nextIndex = (currentIndex + direction + criteria.length) % criteria.length;
+  showCriterionTab(nextIndex);
 }
 
 function handleKeyboardShortcuts(event) {
@@ -616,17 +616,18 @@ function handleKeyboardShortcuts(event) {
   } else if (event.key === "ArrowRight") {
     event.preventDefault();
     shiftChoice(1);
+  } else if (event.key === "ArrowUp") {
+    event.preventDefault();
+    moveCriterion(-1);
+  } else if (event.key === "ArrowDown") {
+    event.preventDefault();
+    moveCriterion(1);
   } else if (event.key === "Enter") {
     event.preventDefault();
-    advanceCriterion().catch((error) => setStatus(error.message, true));
+    submitEvaluation().catch((error) => setStatus(error.message, true));
   } else if (event.key === "Backspace") {
     event.preventDefault();
     goToPreviousCriterion();
-  } else if (/^[1-5]$/.test(event.key)) {
-    const [criterionKey] = criteria[state.activeCriterionIndex];
-    state.preferences[criterionKey] = preferenceChoices[Number(event.key) - 1][0];
-    state.completedCriteria.add(criterionKey);
-    updateCriterionUi();
   }
 }
 
