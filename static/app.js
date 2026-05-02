@@ -15,7 +15,7 @@ const criteria = [
   ["overall", "Overall"],
 ];
 
-const defaultPreferences = Object.fromEntries(criteria.map(([key]) => [key, "no_difference"]));
+const defaultPreferences = Object.fromEntries(criteria.map(([key]) => [key, null]));
 const tabItems = [...criteria, ["comment", "Comment"]];
 
 const state = {
@@ -554,7 +554,11 @@ async function submitEvaluation() {
 function shiftChoice(direction) {
   const [criterionKey] = criteria[state.activeCriterionIndex];
   const currentIndex = preferenceChoices.findIndex(([value]) => value === state.preferences[criterionKey]);
-  const nextIndex = Math.max(0, Math.min(preferenceChoices.length - 1, currentIndex + direction));
+  const startingIndex = direction < 0 ? 1 : 3;
+  const nextIndex =
+    currentIndex === -1
+      ? startingIndex
+      : Math.max(0, Math.min(preferenceChoices.length - 1, currentIndex + direction));
   state.preferences[criterionKey] = preferenceChoices[nextIndex][0];
   state.completedCriteria.add(criterionKey);
   updateCriterionUi();
@@ -566,6 +570,9 @@ async function advanceCriterion() {
     return;
   }
   const [criterionKey] = criteria[state.activeCriterionIndex];
+  if (!state.preferences[criterionKey]) {
+    throw new Error("Choose a rating for this criterion before continuing.");
+  }
   state.completedCriteria.add(criterionKey);
   if (state.activeCriterionIndex < criteria.length - 1) {
     state.activeCriterionIndex += 1;
@@ -622,13 +629,6 @@ function handleKeyboardShortcuts(event) {
 async function toggleFullscreen() {
   const workspace = document.querySelector(".workspace-card");
   if (!document.fullscreenElement) {
-    if (state.activeTab === "comment") {
-      state.activeCriterionIndex = criteria.length - 1;
-      state.activeTab = criteria[state.activeCriterionIndex][0];
-      document.getElementById("scoreMatrix").classList.remove("hidden");
-      document.getElementById("commentPanel").classList.add("hidden");
-      renderScoreMatrix();
-    }
     await workspace.requestFullscreen();
   } else {
     await document.exitFullscreen();

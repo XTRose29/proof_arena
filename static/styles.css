@@ -542,6 +542,10 @@ select {
   display: none;
 }
 
+.workspace-card:fullscreen .comment-side-panel:not(.hidden) {
+  display: grid;
+}
+
 .workspace-card:fullscreen .section-heading {
   margin-bottom: 8px;
 }
