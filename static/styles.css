@@ -555,8 +555,31 @@ select {
   justify-content: flex-end;
 }
 
+.workspace-card:fullscreen #submitButton {
+  display: inline-flex !important;
+  position: fixed;
+  top: 26px;
+  right: 222px;
+  z-index: 20;
+  align-items: center;
+  justify-content: center;
+}
+
 .workspace-card:fullscreen #loadButton {
-  display: none;
+  display: inline-flex !important;
+  position: fixed;
+  top: 26px;
+  right: 410px;
+  z-index: 20;
+  align-items: center;
+  justify-content: center;
+}
+
+.workspace-card:fullscreen #fullscreenButton {
+  position: fixed;
+  top: 26px;
+  right: 30px;
+  z-index: 20;
 }
 
 .workspace-card:fullscreen .evaluation-layout {
