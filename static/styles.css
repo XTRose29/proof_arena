@@ -423,7 +423,11 @@ select {
   border: 1px solid rgba(99, 86, 70, 0.16);
   border-radius: 16px;
   background: #fffdf9;
-  padding: 12px;
+  padding: 10px 12px;
+}
+
+.comment-side-panel textarea {
+  min-height: 72px;
 }
 
 .comment-block label {
@@ -522,7 +526,7 @@ select {
 
 .workspace-card:fullscreen {
   display: grid;
-  grid-template-rows: auto auto 1fr;
+  grid-template-rows: auto auto auto minmax(0, 1fr);
   width: 100vw;
   height: 100vh;
   overflow: hidden;
@@ -532,7 +536,6 @@ select {
 }
 
 .workspace-card:fullscreen .section-heading > div:first-child,
-.workspace-card:fullscreen .evaluation-tabs,
 .workspace-card:fullscreen .criterion-hint,
 .workspace-card:fullscreen .comment-side-panel,
 .workspace-card:fullscreen .status-text {
@@ -549,8 +552,6 @@ select {
 }
 
 .workspace-card:fullscreen #loadButton,
-.workspace-card:fullscreen #prevCriterionButton,
-.workspace-card:fullscreen #criterionProgress,
 .workspace-card:fullscreen #submitButton {
   display: none;
 }
@@ -583,6 +584,11 @@ select {
 
 .workspace-card:fullscreen .code-viewer {
   flex: 1;
+}
+
+.code-card {
+  padding: 0;
+  overflow: hidden;
 }
 
 .loading-panel {

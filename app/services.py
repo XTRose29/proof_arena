@@ -462,9 +462,12 @@ def random_pair_same_node_same_question(session: Session) -> tuple[int, int] | N
          AND n1.name = n2.name
          AND n1.id < n2.id
          AND n1.proof_id != n2.proof_id
+        JOIN proofs p1 ON p1.id = n1.proof_id
+        JOIN proofs p2 ON p2.id = n2.proof_id
         WHERE TRIM(n1.code) != ''
           AND TRIM(n2.code) != ''
           AND TRIM(n1.code) != TRIM(n2.code)
+          AND p1.source_path != p2.source_path
         """,
     )
     filtered_pairs = _filter_node_pairs(pairs)

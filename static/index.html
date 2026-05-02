@@ -49,8 +49,6 @@
           </div>
           <div class="matrix-progress-block">
             <button id="loadButton" class="secondary-button" type="button">Next Random Comparison</button>
-            <button id="prevCriterionButton" class="secondary-button compact-button" type="button">Previous</button>
-            <div id="criterionProgress" class="matrix-progress">1 / 4</div>
             <button id="fullscreenButton" class="secondary-button compact-button" type="button">Full Screen</button>
             <button id="submitButton" class="submit-button" type="button">Submit Preference</button>
           </div>
@@ -63,7 +61,7 @@
           <div id="scoreMatrix" class="score-matrix"></div>
           <div id="commentPanel" class="comment-block comment-side-panel hidden">
             <label for="generalComment">Comments</label>
-            <textarea id="generalComment" rows="4" placeholder="Optional overall comments about this pair."></textarea>
+            <textarea id="generalComment" rows="2" placeholder="Optional overall comments about this pair."></textarea>
           </div>
         </div>
 
@@ -128,11 +126,6 @@
         </header>
 
         <section class="card code-card">
-          <div class="code-card-top">
-            <div>
-              <h3>Lean Code</h3>
-            </div>
-          </div>
           <pre class="code-viewer"></pre>
         </section>
       </article>

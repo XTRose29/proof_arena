@@ -269,7 +269,6 @@ function renderPanel(sideLabel, entity) {
 function updateCriterionUi() {
   const [criterionKey, criterionLabel] = criteria[state.activeCriterionIndex];
   const choiceIndex = preferenceChoices.findIndex(([value]) => value === state.preferences[criterionKey]);
-  document.getElementById("criterionProgress").textContent = `${state.activeCriterionIndex + 1} / ${criteria.length}`;
   document.getElementById("criterionHint").textContent =
     state.activeTab === "comment"
       ? "Leave an optional overall comment. Submit is available after all four criteria are selected."
@@ -279,7 +278,6 @@ function updateCriterionUi() {
   matrix.querySelectorAll(".matrix-choice").forEach((choiceEl, index) => {
     choiceEl.classList.toggle("selected", index === choiceIndex);
   });
-  document.getElementById("prevCriterionButton").disabled = state.activeCriterionIndex === 0;
   document.getElementById("submitButton").disabled = !isEvaluationComplete();
   renderEvaluationTabs();
 }
@@ -647,7 +645,6 @@ async function main() {
   document.getElementById("loadButton").addEventListener("click", () => loadComparison().catch((error) => setStatus(error.message, true)));
   document.getElementById("submitButton").addEventListener("click", () => submitEvaluation().catch((error) => setStatus(error.message, true)));
   document.getElementById("fullscreenButton").addEventListener("click", () => toggleFullscreen().catch((error) => setStatus(error.message, true)));
-  document.getElementById("prevCriterionButton").addEventListener("click", goToPreviousCriterion);
   document.getElementById("openProfileButton").addEventListener("click", openProfileDialog);
   document.getElementById("logoutButton").addEventListener("click", logout);
   document.getElementById("closeProfileButton").addEventListener("click", closeProfileDialog);
