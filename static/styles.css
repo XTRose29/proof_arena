@@ -555,8 +555,7 @@ select {
   justify-content: flex-end;
 }
 
-.workspace-card:fullscreen #loadButton,
-.workspace-card:fullscreen #submitButton {
+.workspace-card:fullscreen #loadButton {
   display: none;
 }
 

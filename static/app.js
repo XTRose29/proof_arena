@@ -442,12 +442,11 @@ async function saveProfile(event) {
     affiliation: document.getElementById("profileAffiliation").value.trim(),
     experienceLevel: document.getElementById("profileExperienceLevel").value.trim(),
   };
-  const result = await fetchJson("/api/me", {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-  setCurrentUser(result.user);
+  if (!payload.displayName) {
+    throw new Error("Display name is required.");
+  }
+  state.currentUser = { ...state.currentUser, ...payload };
+  document.getElementById("accountCompactName").textContent = state.currentUser.displayName;
   closeProfileDialog();
 }
 
@@ -528,6 +527,11 @@ function buildEvaluationPayload() {
       entityId: state.comparison.b.entityId,
     },
     preferences: state.preferences,
+    evaluator: {
+      displayName: state.currentUser.displayName,
+      affiliation: state.currentUser.affiliation || "",
+      experienceLevel: state.currentUser.experienceLevel || "",
+    },
     generalComment: document.getElementById("generalComment").value.trim(),
   };
 }

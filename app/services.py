@@ -437,7 +437,7 @@ def _filter_node_pairs(pairs: list[dict[str, Any]]) -> list[dict[str, Any]]:
     ]
 
 
-def random_pair_same_node_same_question(session: Session) -> tuple[int, int] | None:
+def random_pair_same_node_same_question(session: Session, user_id: int | None = None) -> tuple[int, int] | None:
     pairs = fetch_all_dicts(
         session,
         """
@@ -468,7 +468,22 @@ def random_pair_same_node_same_question(session: Session) -> tuple[int, int] | N
           AND TRIM(n2.code) != ''
           AND TRIM(n1.code) != TRIM(n2.code)
           AND p1.source_path != p2.source_path
+          AND (
+            :user_id IS NULL
+            OR NOT EXISTS (
+              SELECT 1
+              FROM preference_evaluations e
+              WHERE e.user_id = :user_id
+                AND e.entity_a_kind = 'node'
+                AND e.entity_b_kind = 'node'
+                AND (
+                  (e.entity_a_node_id = n1.id AND e.entity_b_node_id = n2.id)
+                  OR (e.entity_a_node_id = n2.id AND e.entity_b_node_id = n1.id)
+                )
+            )
+          )
         """,
+        {"user_id": user_id},
     )
     filtered_pairs = _filter_node_pairs(pairs)
     if not filtered_pairs:
@@ -520,8 +535,8 @@ def _entity_fields(kind: str, entity_id: int) -> tuple[int | None, int | None]:
     return None, entity_id
 
 
-def build_random_comparison(session: Session) -> dict[str, Any]:
-    pair = random_pair_same_node_same_question(session)
+def build_random_comparison(session: Session, user: User | None = None) -> dict[str, Any]:
+    pair = random_pair_same_node_same_question(session, user.id if user else None)
     if pair is None:
         raise LookupError("No comparison pairs available.")
 
@@ -540,6 +555,7 @@ def build_random_comparison(session: Session) -> dict[str, Any]:
 def save_preference_evaluation(session: Session, user: User, payload: PreferenceEvaluationCreate) -> int:
     a_proof_id, a_node_id = _entity_fields(payload.a.kind, payload.a.entityId)
     b_proof_id, b_node_id = _entity_fields(payload.b.kind, payload.b.entityId)
+    evaluator = payload.evaluator
 
     record = PreferenceEvaluation(
         user_id=user.id,
@@ -550,9 +566,9 @@ def save_preference_evaluation(session: Session, user: User, payload: Preference
         entity_b_proof_id=b_proof_id,
         entity_a_node_id=a_node_id,
         entity_b_node_id=b_node_id,
-        evaluator_display_name=user.display_name.strip(),
-        evaluator_affiliation=user.affiliation.strip(),
-        evaluator_experience_level=user.experience_level.strip(),
+        evaluator_display_name=(evaluator.displayName if evaluator else user.display_name).strip(),
+        evaluator_affiliation=(evaluator.affiliation if evaluator else user.affiliation).strip(),
+        evaluator_experience_level=(evaluator.experienceLevel if evaluator else user.experience_level).strip(),
         general_comment=payload.generalComment.strip(),
         created_at=utc_now(),
     )
