@@ -463,9 +463,27 @@ def _filter_node_pairs(pairs: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 
 def random_pair_same_node_same_question(session: Session, user_id: int | None = None) -> tuple[int, int] | None:
+    user_filter = ""
+    params: dict[str, Any] = {}
+    if user_id is not None:
+        user_filter = """
+          AND NOT EXISTS (
+            SELECT 1
+            FROM preference_evaluations e
+            WHERE e.user_id = :user_id
+              AND e.entity_a_kind = 'node'
+              AND e.entity_b_kind = 'node'
+              AND (
+                (e.entity_a_node_id = n1.id AND e.entity_b_node_id = n2.id)
+                OR (e.entity_a_node_id = n2.id AND e.entity_b_node_id = n1.id)
+              )
+          )
+        """
+        params["user_id"] = user_id
+
     pairs = fetch_all_dicts(
         session,
-        """
+        f"""
         SELECT
           n1.id AS left_id,
           n2.id AS right_id,
@@ -493,22 +511,9 @@ def random_pair_same_node_same_question(session: Session, user_id: int | None = 
           AND TRIM(n2.code) != ''
           AND TRIM(n1.code) != TRIM(n2.code)
           AND p1.source_path != p2.source_path
-          AND (
-            :user_id IS NULL
-            OR NOT EXISTS (
-              SELECT 1
-              FROM preference_evaluations e
-              WHERE e.user_id = :user_id
-                AND e.entity_a_kind = 'node'
-                AND e.entity_b_kind = 'node'
-                AND (
-                  (e.entity_a_node_id = n1.id AND e.entity_b_node_id = n2.id)
-                  OR (e.entity_a_node_id = n2.id AND e.entity_b_node_id = n1.id)
-                )
-            )
-          )
+          {user_filter}
         """,
-        {"user_id": user_id},
+        params,
     )
     filtered_pairs = _filter_node_pairs(pairs)
     if not filtered_pairs:

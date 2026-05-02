@@ -408,6 +408,7 @@ function renderScoreMatrix() {
 function showCriterionTab(index) {
   state.activeCriterionIndex = Math.max(0, Math.min(criteria.length - 1, index));
   state.activeTab = criteria[state.activeCriterionIndex][0];
+  document.getElementById("evaluationLayout").classList.add("rating-only");
   document.getElementById("scoreMatrix").classList.remove("hidden");
   document.getElementById("commentPanel").classList.add("hidden");
   renderScoreMatrix();
@@ -443,6 +444,7 @@ function isEvaluationComplete() {
 
 function showCommentTab() {
   state.activeTab = "comment";
+  document.getElementById("evaluationLayout").classList.remove("rating-only");
   document.getElementById("scoreMatrix").classList.add("hidden");
   document.getElementById("commentPanel").classList.remove("hidden");
   updateCriterionUi();
@@ -454,6 +456,7 @@ function resetEvaluationForm() {
   state.activeCriterionIndex = 0;
   state.activeTab = "clarity";
   document.getElementById("generalComment").value = "";
+  document.getElementById("evaluationLayout").classList.add("rating-only");
   document.getElementById("scoreMatrix").classList.remove("hidden");
   document.getElementById("commentPanel").classList.add("hidden");
   renderScoreMatrix();
@@ -602,9 +605,15 @@ async function loadComparison() {
     document.getElementById("arenaGrid").innerHTML = '<article class="panel loading-panel">Log in with Google to see a node comparison.</article>';
     return;
   }
-  const comparison = await fetchJson("/api/comparison");
-  renderComparison(comparison);
-  setStatus("");
+  try {
+    const comparison = await fetchJson("/api/comparison");
+    renderComparison(comparison);
+    setStatus("");
+  } catch (error) {
+    document.getElementById("arenaGrid").innerHTML =
+      `<article class="panel loading-panel">${escapeHtml(error.message)}</article>`;
+    throw error;
+  }
 }
 
 function buildEvaluationPayload() {

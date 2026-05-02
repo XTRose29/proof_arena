@@ -304,6 +304,10 @@ select {
   align-items: stretch;
 }
 
+.evaluation-layout.rating-only {
+  grid-template-columns: 1fr;
+}
+
 .score-matrix {
   display: grid;
   gap: 8px;
