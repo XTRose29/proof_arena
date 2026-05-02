@@ -547,7 +547,10 @@ select {
 }
 
 .workspace-card:fullscreen .section-heading {
-  margin-bottom: 8px;
+  min-height: 58px;
+  margin-bottom: 10px;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .workspace-card:fullscreen .matrix-progress-block {
@@ -557,29 +560,14 @@ select {
 
 .workspace-card:fullscreen #submitButton {
   display: inline-flex !important;
-  position: fixed;
-  top: 26px;
-  right: 222px;
-  z-index: 20;
   align-items: center;
   justify-content: center;
 }
 
 .workspace-card:fullscreen #loadButton {
   display: inline-flex !important;
-  position: fixed;
-  top: 26px;
-  right: 410px;
-  z-index: 20;
   align-items: center;
   justify-content: center;
-}
-
-.workspace-card:fullscreen #fullscreenButton {
-  position: fixed;
-  top: 26px;
-  right: 30px;
-  z-index: 20;
 }
 
 .workspace-card:fullscreen .evaluation-layout {
