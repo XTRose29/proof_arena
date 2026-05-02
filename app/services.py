@@ -61,8 +61,8 @@ def serialize_user(user: User) -> dict[str, Any]:
         id=user.id,
         email=user.email,
         displayName=user.display_name,
-        affiliation=user.affiliation,
-        experienceLevel=user.experience_level,
+        affiliation="",
+        experienceLevel="",
     )
     return payload.model_dump()
 
@@ -76,8 +76,6 @@ def create_user(session: Session, payload: RegisterRequest) -> tuple[str, dict[s
     user = User(
         email=payload.email.lower(),
         display_name=payload.displayName.strip(),
-        affiliation=payload.affiliation.strip(),
-        experience_level=payload.experienceLevel.strip(),
         password_hash=_hash_password(payload.password, salt),
         password_salt=salt,
         created_at=utc_now(),
@@ -138,8 +136,6 @@ def login_user_with_google(session: Session, payload: GoogleAuthRequest) -> tupl
         user = User(
             email=email,
             display_name=display_name,
-            affiliation="",
-            experience_level="",
             password_hash="google_oauth",
             password_salt="google_oauth",
             created_at=utc_now(),
@@ -173,10 +169,11 @@ def auth_user_from_token(session: Session, raw_token: str | None) -> User:
 
 def update_user_profile(session: Session, user: User, payload: UpdateProfileRequest) -> dict[str, Any]:
     user.display_name = payload.displayName.strip()
-    user.affiliation = payload.affiliation.strip()
-    user.experience_level = payload.experienceLevel.strip()
     session.commit()
-    return serialize_user(user)
+    serialized = serialize_user(user)
+    serialized["affiliation"] = payload.affiliation.strip()
+    serialized["experienceLevel"] = payload.experienceLevel.strip()
+    return serialized
 
 
 def init_database(session: Session) -> None:
@@ -329,6 +326,57 @@ def normalize_text_for_compare(text_value: str) -> str:
     return re.sub(r"\s+", " ", text_value).strip()
 
 
+def normalize_lean_code_for_compare(code: str) -> str:
+    parts: list[str] = []
+    index = 0
+    block_comment_depth = 0
+
+    while index < len(code):
+        if block_comment_depth > 0:
+            if code.startswith("/-", index):
+                block_comment_depth += 1
+                index += 2
+                continue
+            if code.startswith("-/", index):
+                block_comment_depth -= 1
+                index += 2
+                continue
+            index += 1
+            continue
+
+        if code.startswith("--", index):
+            newline_index = code.find("\n", index)
+            if newline_index == -1:
+                break
+            index = newline_index + 1
+            continue
+
+        if code.startswith("/-", index):
+            block_comment_depth = 1
+            index += 2
+            continue
+
+        if code[index] == "\"":
+            string_start = index
+            index += 1
+            while index < len(code):
+                if code[index] == "\\":
+                    index += 2
+                    continue
+                if code[index] == "\"":
+                    index += 1
+                    break
+                index += 1
+            parts.append(code[string_start:index])
+            continue
+
+        if not code[index].isspace():
+            parts.append(code[index])
+        index += 1
+
+    return "".join(parts).strip()
+
+
 def proof_payload(session: Session, proof_id: int) -> dict[str, Any]:
     proof = fetch_one_dict(
         session,
@@ -410,30 +458,7 @@ def random_pair_different_questions(session: Session) -> tuple[int, int] | None:
 def _filter_node_pairs(pairs: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [
         pair for pair in pairs
-        if normalize_text_for_compare(
-            " | ".join(
-                [
-                    pair["left_name"] or "",
-                    pair["left_type"] or "",
-                    pair["left_natural"] or "",
-                    pair["left_nl_proof"] or "",
-                    pair["left_decl_name"] or "",
-                    pair["left_code"].split(":=")[0],
-                ]
-            )
-        )
-        != normalize_text_for_compare(
-            " | ".join(
-                [
-                    pair["right_name"] or "",
-                    pair["right_type"] or "",
-                    pair["right_natural"] or "",
-                    pair["right_nl_proof"] or "",
-                    pair["right_decl_name"] or "",
-                    pair["right_code"].split(":=")[0],
-                ]
-            )
-        )
+        if normalize_lean_code_for_compare(pair["left_code"]) != normalize_lean_code_for_compare(pair["right_code"])
     ]
 
 
@@ -567,8 +592,8 @@ def save_preference_evaluation(session: Session, user: User, payload: Preference
         entity_a_node_id=a_node_id,
         entity_b_node_id=b_node_id,
         evaluator_display_name=(evaluator.displayName if evaluator else user.display_name).strip(),
-        evaluator_affiliation=(evaluator.affiliation if evaluator else user.affiliation).strip(),
-        evaluator_experience_level=(evaluator.experienceLevel if evaluator else user.experience_level).strip(),
+        evaluator_affiliation=(evaluator.affiliation if evaluator else "").strip(),
+        evaluator_experience_level=(evaluator.experienceLevel if evaluator else "").strip(),
         general_comment=payload.generalComment.strip(),
         created_at=utc_now(),
     )

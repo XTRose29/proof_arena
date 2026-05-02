@@ -354,6 +354,7 @@ function renderPanel(sideLabel, entity) {
   panel.querySelector(".panel-meta").remove();
 
   const codeViewer = panel.querySelector(".code-viewer");
+  codeViewer.dataset.side = sideLabel;
   const syntaxState = { blockCommentDepth: 0 };
   entity.lines.forEach((line) => {
     codeViewer.appendChild(createCodeLine(line, syntaxState));
@@ -362,12 +363,12 @@ function renderPanel(sideLabel, entity) {
 }
 
 function updateCriterionUi() {
-  const [criterionKey, criterionLabel] = criteria[state.activeCriterionIndex];
+  const [criterionKey] = criteria[state.activeCriterionIndex];
   const choiceIndex = preferenceChoices.findIndex(([value]) => value === state.preferences[criterionKey]);
   document.getElementById("criterionHint").textContent =
     state.activeTab === "comment"
       ? "Leave an optional overall comment. Submit is available after all four criteria are selected."
-      : "Use Left/Right to choose a rating, Up/Down to change criterion, and Enter to submit.";
+      : "Use Left/Right to choose a rating, Up/Down to change criterion/comment, W/S to scroll A, O/L to scroll B, and Enter to submit.";
 
   const matrix = document.getElementById("scoreMatrix");
   matrix.querySelectorAll(".matrix-choice").forEach((choiceEl, index) => {
@@ -381,14 +382,9 @@ function renderScoreMatrix() {
   const matrix = document.getElementById("scoreMatrix");
   matrix.innerHTML = "";
 
-  const [criterionKey, criterionLabel] = criteria[state.activeCriterionIndex];
+  const [criterionKey] = criteria[state.activeCriterionIndex];
   const row = document.createElement("div");
   row.className = "matrix-row matrix-row-single";
-
-  const criterion = document.createElement("div");
-  criterion.className = "matrix-criterion matrix-criterion-single";
-  criterion.innerHTML = `<span class="minor-label">Criterion</span><strong>${criterionLabel}</strong>`;
-  row.appendChild(criterion);
 
   preferenceChoices.forEach(([value, label], index) => {
     const button = document.createElement("button");
@@ -652,6 +648,9 @@ async function submitEvaluation() {
 }
 
 function shiftChoice(direction) {
+  if (state.activeTab === "comment") {
+    return;
+  }
   const [criterionKey] = criteria[state.activeCriterionIndex];
   const currentIndex = preferenceChoices.findIndex(([value]) => value === state.preferences[criterionKey]);
   const startingIndex = direction < 0 ? 1 : 3;
@@ -688,9 +687,23 @@ function goToPreviousCriterion() {
 }
 
 function moveCriterion(direction) {
+  const sectionCount = criteria.length + 1;
   const currentIndex = state.activeTab === "comment" ? criteria.length : state.activeCriterionIndex;
-  const nextIndex = (currentIndex + direction + criteria.length) % criteria.length;
+  const nextIndex = (currentIndex + direction + sectionCount) % sectionCount;
+  if (nextIndex === criteria.length) {
+    showCommentTab();
+    return;
+  }
   showCriterionTab(nextIndex);
+}
+
+function scrollCodePane(sideLabel, direction) {
+  const codeViewer = document.querySelector(`.code-viewer[data-side="${sideLabel}"]`);
+  if (!codeViewer) {
+    return;
+  }
+  const amount = Math.max(120, codeViewer.clientHeight * 0.65);
+  codeViewer.scrollBy({ top: amount * direction, behavior: "smooth" });
 }
 
 function handleKeyboardShortcuts(event) {
@@ -723,6 +736,18 @@ function handleKeyboardShortcuts(event) {
   } else if (event.key === "Backspace") {
     event.preventDefault();
     goToPreviousCriterion();
+  } else if (event.key.toLowerCase() === "w") {
+    event.preventDefault();
+    scrollCodePane("A", -1);
+  } else if (event.key.toLowerCase() === "s") {
+    event.preventDefault();
+    scrollCodePane("A", 1);
+  } else if (event.key.toLowerCase() === "o") {
+    event.preventDefault();
+    scrollCodePane("B", -1);
+  } else if (event.key.toLowerCase() === "l") {
+    event.preventDefault();
+    scrollCodePane("B", 1);
   }
 }
 

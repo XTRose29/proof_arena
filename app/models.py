@@ -71,8 +71,6 @@ class User(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     email: Mapped[str] = mapped_column(Text, unique=True, nullable=False)
     display_name: Mapped[str] = mapped_column(Text, nullable=False)
-    affiliation: Mapped[str] = mapped_column(Text, nullable=False, default="")
-    experience_level: Mapped[str] = mapped_column(Text, nullable=False, default="")
     password_hash: Mapped[str] = mapped_column(Text, nullable=False)
     password_salt: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[str] = mapped_column(Text, nullable=False)
@@ -91,6 +89,8 @@ class PreferenceEvaluation(Base):
     __tablename__ = "preference_evaluations"
     __table_args__ = (
         Index("idx_preference_evaluations_user_id", "user_id"),
+        Index("idx_preference_evaluations_user_node_a", "user_id", "entity_a_node_id"),
+        Index("idx_preference_evaluations_user_node_b", "user_id", "entity_b_node_id"),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -112,6 +112,7 @@ class PreferenceEvaluation(Base):
 class PreferenceVote(Base):
     __tablename__ = "preference_votes"
     __table_args__ = (
+        Index("idx_preference_votes_evaluation_id", "evaluation_id"),
         CheckConstraint(
             "criterion IN ('clarity', 'conciseness', 'idiomatic_structure', 'overall')",
             name="ck_preference_votes_criterion",
