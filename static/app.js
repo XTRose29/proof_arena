@@ -61,8 +61,81 @@ const leanKeywords = new Set([
   "where",
 ]);
 
-const leanBuiltins = new Set(["Prop", "Set", "Type", "True", "False", "Nat", "Int", "String", "Fin", "MetricSpace"]);
-const leanTactics = new Set(["aesop", "apply", "assumption", "calc", "constructor", "exact", "have", "induction", "intro", "omega", "rcases", "refine", "repeat", "ring", "rw", "rfl", "simp", "simpa"]);
+const leanBuiltins = new Set([
+  "Bool",
+  "False",
+  "Fin",
+  "Float",
+  "Int",
+  "List",
+  "MetricSpace",
+  "Nat",
+  "Option",
+  "Prop",
+  "Set",
+  "String",
+  "Subtype",
+  "True",
+  "Type",
+  "Unit",
+]);
+const leanTactics = new Set([
+  "aesop",
+  "apply",
+  "assumption",
+  "cases",
+  "change",
+  "constructor",
+  "contradiction",
+  "decide",
+  "exact",
+  "ext",
+  "field_simp",
+  "funext",
+  "induction",
+  "intro",
+  "intros",
+  "linarith",
+  "norm_num",
+  "omega",
+  "positivity",
+  "r_cases",
+  "rcases",
+  "refine",
+  "ring",
+  "rw",
+  "rfl",
+  "simp",
+  "simpa",
+  "tauto",
+]);
+const leanOperators = [
+  ":=",
+  "=>",
+  "->",
+  "<-",
+  "<=",
+  ">=",
+  "==",
+  "!=",
+  "&&",
+  "||",
+  "|>",
+  "←",
+  "→",
+  "↦",
+  "≤",
+  "≥",
+  "≠",
+  "∧",
+  "∨",
+  "¬",
+  "∀",
+  "∃",
+  "λ",
+  "⟨",
+  "⟩",
+];
 
 async function fetchJson(url, options = {}) {
   const headers = new Headers(options.headers || {});
@@ -91,50 +164,72 @@ function escapeHtml(text) {
 }
 
 function highlightToken(token) {
+  const escaped = escapeHtml(token);
   if (leanKeywords.has(token)) {
-    return `<span class="tok-keyword">${token}</span>`;
+    return `<span class="tok-keyword">${escaped}</span>`;
   }
   if (leanTactics.has(token)) {
-    return `<span class="tok-tactic">${token}</span>`;
+    return `<span class="tok-tactic">${escaped}</span>`;
   }
   if (token === "sorry") {
-    return `<span class="tok-sorry">${token}</span>`;
+    return `<span class="tok-sorry">${escaped}</span>`;
   }
   if (leanBuiltins.has(token) || /^[A-Z][A-Za-z0-9_'.]*$/.test(token)) {
-    return `<span class="tok-type">${token}</span>`;
+    return `<span class="tok-type">${escaped}</span>`;
   }
-  return token;
+  return escaped;
 }
 
 function highlightLeanCodeSegment(text) {
-  const escaped = escapeHtml(text);
-  const placeholders = [];
-  let working = escaped.replace(/"([^"\\]|\\.)*"/g, (match) => {
-    const key = `__STRING_${placeholders.length}__`;
-    placeholders.push(`<span class="tok-string">${match}</span>`);
-    return key;
-  });
+  const parts = [];
+  let index = 0;
 
-  working = working.replace(/(?<![\w'])((?:0x[0-9A-Fa-f]+)|(?:\d+(?:\.\d+)?))\b/g, (_, token) => {
-    return `<span class="tok-number">${token}</span>`;
-  });
+  const pushPlain = (value) => {
+    parts.push(escapeHtml(value));
+  };
 
-  working = working.replace(/[:][=]|=>|->|←|→|↦|:=|≤|≥|≠|∧|∨|¬|∀|∃|λ|\|>/g, (token) => {
-    return `<span class="tok-operator">${token}</span>`;
-  });
-
-  working = working.replace(/\b[A-Za-z_][A-Za-z0-9_']*\b/g, (token) => {
-    if (token.startsWith("__STRING_")) {
-      return token;
+  while (index < text.length) {
+    const rest = text.slice(index);
+    const stringMatch = rest.match(/^"([^"\\]|\\.)*"?/);
+    if (stringMatch && rest.startsWith("\"")) {
+      parts.push(`<span class="tok-string">${escapeHtml(stringMatch[0])}</span>`);
+      index += stringMatch[0].length;
+      continue;
     }
-    return highlightToken(token);
-  });
 
-  placeholders.forEach((value, index) => {
-    working = working.replace(`__STRING_${index}__`, value);
-  });
+    const whitespaceMatch = rest.match(/^\s+/);
+    if (whitespaceMatch) {
+      pushPlain(whitespaceMatch[0]);
+      index += whitespaceMatch[0].length;
+      continue;
+    }
 
-  return working;
+    const numberMatch = rest.match(/^(0x[0-9A-Fa-f]+|\d+(?:\.\d+)?)/);
+    if (numberMatch) {
+      parts.push(`<span class="tok-number">${escapeHtml(numberMatch[0])}</span>`);
+      index += numberMatch[0].length;
+      continue;
+    }
+
+    const operator = leanOperators.find((candidate) => rest.startsWith(candidate));
+    if (operator) {
+      parts.push(`<span class="tok-operator">${escapeHtml(operator)}</span>`);
+      index += operator.length;
+      continue;
+    }
+
+    const identifierMatch = rest.match(/^[A-Za-z_][A-Za-z0-9_']*/);
+    if (identifierMatch) {
+      parts.push(highlightToken(identifierMatch[0]));
+      index += identifierMatch[0].length;
+      continue;
+    }
+
+    pushPlain(text[index]);
+    index += 1;
+  }
+
+  return parts.join("");
 }
 
 function highlightLeanLine(text, syntaxState) {
