@@ -26,6 +26,8 @@ const state = {
   completedCriteria: new Set(),
   activeCriterionIndex: 0,
   activeTab: "clarity",
+  vimFocus: "rating",
+  waitingForWindowSwitch: false,
   googleReady: false,
   googleInitAttempts: 0,
   profileDialogOpen: false,
@@ -349,9 +351,11 @@ function createCodeLine(line, syntaxState) {
 function renderPanel(sideLabel, entity) {
   const template = document.getElementById("panelTemplate");
   const panel = template.content.firstElementChild.cloneNode(true);
+  panel.dataset.side = sideLabel;
   panel.querySelector(".panel-side").textContent = sideLabel;
   panel.querySelector(".panel-title").remove();
   panel.querySelector(".panel-meta").remove();
+  panel.addEventListener("click", () => setVimFocus(sideLabel));
 
   const codeViewer = panel.querySelector(".code-viewer");
   codeViewer.dataset.side = sideLabel;
@@ -368,7 +372,7 @@ function updateCriterionUi() {
   document.getElementById("criterionHint").textContent =
     state.activeTab === "comment"
       ? "Leave an optional overall comment. Submit is available after all four criteria are selected."
-      : "Use Left/Right to choose a rating, Up/Down to change criterion/comment, W/S to scroll A, O/L to scroll B, and Enter to submit.";
+      : "Ctrl-W h/l: A/B panes. Ctrl-W k/j: rating/comment. h/l rates, j/k moves or scrolls. Enter submits.";
 
   const matrix = document.getElementById("scoreMatrix");
   matrix.querySelectorAll(".matrix-choice").forEach((choiceEl, index) => {
@@ -376,6 +380,7 @@ function updateCriterionUi() {
   });
   document.getElementById("submitButton").disabled = !isEvaluationComplete();
   renderEvaluationTabs();
+  updateVimFocusUi();
 }
 
 function renderScoreMatrix() {
@@ -412,6 +417,33 @@ function showCriterionTab(index) {
   document.getElementById("scoreMatrix").classList.remove("hidden");
   document.getElementById("commentPanel").classList.add("hidden");
   renderScoreMatrix();
+}
+
+function setVimFocus(region) {
+  state.vimFocus = region;
+  state.waitingForWindowSwitch = false;
+  if (region === "rating" && state.activeTab === "comment") {
+    showCriterionTab(state.activeCriterionIndex);
+    return;
+  }
+  if (region === "comment") {
+    showCommentTab();
+    return;
+  }
+  updateVimFocusUi();
+}
+
+function updateVimFocusUi() {
+  document.querySelectorAll(".vim-focused").forEach((el) => el.classList.remove("vim-focused"));
+  if (state.vimFocus === "rating") {
+    document.getElementById("evaluationLayout")?.classList.add("vim-focused");
+    return;
+  }
+  if (state.vimFocus === "comment") {
+    document.getElementById("commentPanel")?.classList.add("vim-focused");
+    return;
+  }
+  document.querySelector(`.panel[data-side="${state.vimFocus}"]`)?.classList.add("vim-focused");
 }
 
 function renderEvaluationTabs() {
@@ -455,6 +487,8 @@ function resetEvaluationForm() {
   state.completedCriteria = new Set();
   state.activeCriterionIndex = 0;
   state.activeTab = "clarity";
+  state.vimFocus = "rating";
+  state.waitingForWindowSwitch = false;
   document.getElementById("generalComment").value = "";
   document.getElementById("evaluationLayout").classList.add("rating-only");
   document.getElementById("scoreMatrix").classList.remove("hidden");
@@ -470,6 +504,7 @@ function renderComparison(comparison) {
   arena.innerHTML = "";
   arena.appendChild(renderPanel("A", comparison.a));
   arena.appendChild(renderPanel("B", comparison.b));
+  updateVimFocusUi();
 }
 
 function setCurrentUser(user, token) {
@@ -700,8 +735,12 @@ function moveCriterion(direction) {
   const currentIndex = state.activeTab === "comment" ? criteria.length : state.activeCriterionIndex;
   const nextIndex = (currentIndex + direction + sectionCount) % sectionCount;
   if (nextIndex === criteria.length) {
+    state.vimFocus = "comment";
     showCommentTab();
     return;
+  }
+  if (state.vimFocus === "comment") {
+    state.vimFocus = "rating";
   }
   showCriterionTab(nextIndex);
 }
@@ -715,6 +754,26 @@ function scrollCodePane(sideLabel, direction) {
   codeViewer.scrollBy({ top: amount * direction, behavior: "smooth" });
 }
 
+function handleWindowSwitch(key) {
+  if (key === "h") {
+    setVimFocus("A");
+    return true;
+  }
+  if (key === "l") {
+    setVimFocus("B");
+    return true;
+  }
+  if (key === "k") {
+    setVimFocus("rating");
+    return true;
+  }
+  if (key === "j") {
+    setVimFocus("comment");
+    return true;
+  }
+  return false;
+}
+
 function handleKeyboardShortcuts(event) {
   if (state.profileDialogOpen) {
     return;
@@ -724,6 +783,23 @@ function handleKeyboardShortcuts(event) {
     return;
   }
   if (!state.comparison) {
+    return;
+  }
+  const key = event.key.toLowerCase();
+
+  if (event.ctrlKey && key === "w") {
+    event.preventDefault();
+    state.waitingForWindowSwitch = true;
+    setStatus("Ctrl-W: h=A, l=B, k=rating, j=comment");
+    return;
+  }
+
+  if (state.waitingForWindowSwitch) {
+    event.preventDefault();
+    state.waitingForWindowSwitch = false;
+    if (handleWindowSwitch(key)) {
+      setStatus("");
+    }
     return;
   }
 
@@ -745,18 +821,32 @@ function handleKeyboardShortcuts(event) {
   } else if (event.key === "Backspace") {
     event.preventDefault();
     goToPreviousCriterion();
-  } else if (event.key.toLowerCase() === "w") {
+  } else if (event.key === "Escape") {
     event.preventDefault();
-    scrollCodePane("A", -1);
-  } else if (event.key.toLowerCase() === "s") {
+    state.waitingForWindowSwitch = false;
+    state.vimFocus = null;
+    updateVimFocusUi();
+    setStatus("");
+  } else if (key === "h" && state.vimFocus === "rating") {
     event.preventDefault();
-    scrollCodePane("A", 1);
-  } else if (event.key.toLowerCase() === "o") {
+    shiftChoice(-1);
+  } else if (key === "l" && state.vimFocus === "rating") {
     event.preventDefault();
-    scrollCodePane("B", -1);
-  } else if (event.key.toLowerCase() === "l") {
+    shiftChoice(1);
+  } else if (key === "j") {
     event.preventDefault();
-    scrollCodePane("B", 1);
+    if (state.vimFocus === "A" || state.vimFocus === "B") {
+      scrollCodePane(state.vimFocus, 1);
+    } else {
+      moveCriterion(1);
+    }
+  } else if (key === "k") {
+    event.preventDefault();
+    if (state.vimFocus === "A" || state.vimFocus === "B") {
+      scrollCodePane(state.vimFocus, -1);
+    } else {
+      moveCriterion(-1);
+    }
   }
 }
 
@@ -776,6 +866,11 @@ function updateFullscreenButton() {
 async function main() {
   document.body.dataset.googleClientId = "";
   renderScoreMatrix();
+  document.getElementById("evaluationLayout").addEventListener("click", () => setVimFocus("rating"));
+  document.getElementById("commentPanel").addEventListener("click", (event) => {
+    event.stopPropagation();
+    setVimFocus("comment");
+  });
   document.getElementById("loadButton").addEventListener("click", () => loadComparison().catch((error) => setStatus(error.message, true)));
   document.getElementById("submitButton").addEventListener("click", () => submitEvaluation().catch((error) => setStatus(error.message, true)));
   document.getElementById("fullscreenButton").addEventListener("click", () => toggleFullscreen().catch((error) => setStatus(error.message, true)));

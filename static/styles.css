@@ -425,6 +425,19 @@ select {
   min-height: 72px;
 }
 
+.vim-focused {
+  outline: 3px solid rgba(15, 94, 83, 0.5);
+  outline-offset: 4px;
+}
+
+.panel.vim-focused {
+  border-color: rgba(15, 94, 83, 0.55);
+}
+
+.evaluation-layout.vim-focused {
+  border-radius: 16px;
+}
+
 .comment-block label {
   font-weight: 800;
 }
