@@ -326,11 +326,11 @@ select {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  min-height: 76px;
+  min-height: 58px;
   border: 1px solid var(--line);
   border-radius: 18px;
   background: #fffdf9;
-  padding: 10px 12px;
+  padding: 8px 12px;
   color: var(--ink);
   text-align: center;
 }
