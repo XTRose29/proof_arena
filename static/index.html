@@ -14,7 +14,7 @@
           <p class="eyebrow">Autoformalization Benchmark</p>
           <h1>Lean Proof Arena</h1>
           <p class="hero-copy">
-            This interface presents two complete Lean proofs for the same question.
+            This interface presents two Lean nodes for the same question.
             Score one comparison criterion at a time, use the arrow keys to move
             toward A or B, press Enter to confirm, and optionally leave a comment
             under the code before the next pair loads.
@@ -45,28 +45,32 @@
         <div class="section-heading">
           <div>
             <p class="eyebrow small">Preference Matrix</p>
-            <h2 id="criterionTitle">Clarity</h2>
+            <h2>Node to Node Comparison</h2>
           </div>
           <div class="matrix-progress-block">
             <button id="loadButton" class="secondary-button" type="button">Next Random Comparison</button>
             <button id="prevCriterionButton" class="secondary-button compact-button" type="button">Previous</button>
             <div id="criterionProgress" class="matrix-progress">1 / 4</div>
+            <button id="fullscreenButton" class="secondary-button compact-button" type="button">Full Screen</button>
             <button id="submitButton" class="submit-button" type="button">Submit Preference</button>
           </div>
         </div>
+        <nav id="evaluationTabs" class="evaluation-tabs" aria-label="Evaluation sections"></nav>
         <p id="criterionHint" class="criterion-hint">
           Use Left/Right to choose how strongly you lean toward A or B. Press Enter to confirm this row.
         </p>
-        <div id="scoreMatrix" class="score-matrix"></div>
+        <div class="evaluation-layout">
+          <div id="scoreMatrix" class="score-matrix"></div>
+          <div id="commentPanel" class="comment-block comment-side-panel hidden">
+            <label for="generalComment">Comments</label>
+            <textarea id="generalComment" rows="4" placeholder="Optional overall comments about this pair."></textarea>
+          </div>
+        </div>
 
         <section class="arena-grid" id="arenaGrid">
-          <article class="panel loading-panel">Loading randomized comparison...</article>
+          <article class="panel loading-panel">Log in with Google to see a node comparison.</article>
         </section>
-
-        <div class="comment-block comment-under-code">
-          <label for="generalComment">Comments</label>
-          <textarea id="generalComment" rows="4" placeholder="Optional overall comments about this pair."></textarea>
-        </div>
+        <p id="statusText" class="status-text" role="status"></p>
       </section>
 
       <footer class="page-note">
@@ -95,7 +99,18 @@
         <label>Email<input id="profileEmail" name="email" type="email" readonly /></label>
         <label>Display Name<input id="profileDisplayName" name="displayName" type="text" required /></label>
         <label>Affiliation<input id="profileAffiliation" name="affiliation" type="text" /></label>
-        <label>Experience Level<input id="profileExperienceLevel" name="experienceLevel" type="text" placeholder="e.g. Undergraduate / PhD / Researcher" /></label>
+        <label>
+          Lean Experience Level
+          <select id="profileExperienceLevel" name="experienceLevel">
+            <option value="">Choose Lean experience</option>
+            <option value="0">0</option>
+            <option value="6 month">6 month</option>
+            <option value="1 year">1 year</option>
+            <option value="2 years">2 years</option>
+            <option value="5 years">5 years</option>
+            <option value="5+ years">5+ years</option>
+          </select>
+        </label>
         <div class="profile-actions">
           <button id="saveProfileButton" class="submit-button" type="submit">Save</button>
         </div>

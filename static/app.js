@@ -16,13 +16,16 @@ const criteria = [
 ];
 
 const defaultPreferences = Object.fromEntries(criteria.map(([key]) => [key, "no_difference"]));
+const tabItems = [...criteria, ["comment", "Comment"]];
 
 const state = {
   comparison: null,
   authToken: localStorage.getItem(AUTH_TOKEN_KEY),
   currentUser: null,
   preferences: { ...defaultPreferences },
+  completedCriteria: new Set(),
   activeCriterionIndex: 0,
+  activeTab: "clarity",
   googleReady: false,
   googleInitAttempts: 0,
   profileDialogOpen: false,
@@ -93,6 +96,9 @@ function highlightToken(token) {
   }
   if (leanTactics.has(token)) {
     return `<span class="tok-tactic">${token}</span>`;
+  }
+  if (token === "sorry") {
+    return `<span class="tok-sorry">${token}</span>`;
   }
   if (leanBuiltins.has(token) || /^[A-Z][A-Za-z0-9_'.]*$/.test(token)) {
     return `<span class="tok-type">${token}</span>`;
@@ -263,18 +269,19 @@ function renderPanel(sideLabel, entity) {
 function updateCriterionUi() {
   const [criterionKey, criterionLabel] = criteria[state.activeCriterionIndex];
   const choiceIndex = preferenceChoices.findIndex(([value]) => value === state.preferences[criterionKey]);
-  document.getElementById("criterionTitle").textContent = criterionLabel;
   document.getElementById("criterionProgress").textContent = `${state.activeCriterionIndex + 1} / ${criteria.length}`;
   document.getElementById("criterionHint").textContent =
-    state.activeCriterionIndex === criteria.length - 1
-      ? "Use Left/Right to adjust the final row. Press Enter to submit this evaluation and load the next pair."
-      : "Use Left/Right to choose how strongly you lean toward A or B. Press Enter to confirm this row.";
+    state.activeTab === "comment"
+      ? "Leave an optional overall comment. Submit is available after all four criteria are selected."
+      : "Use Left/Right to choose how strongly you lean toward A or B. Press Enter to confirm this criterion.";
 
   const matrix = document.getElementById("scoreMatrix");
   matrix.querySelectorAll(".matrix-choice").forEach((choiceEl, index) => {
     choiceEl.classList.toggle("selected", index === choiceIndex);
   });
   document.getElementById("prevCriterionButton").disabled = state.activeCriterionIndex === 0;
+  document.getElementById("submitButton").disabled = !isEvaluationComplete();
+  renderEvaluationTabs();
 }
 
 function renderScoreMatrix() {
@@ -302,6 +309,7 @@ function renderScoreMatrix() {
     `;
     button.addEventListener("click", () => {
       state.preferences[criterionKey] = value;
+      state.completedCriteria.add(criterionKey);
       updateCriterionUi();
     });
     row.appendChild(button);
@@ -311,10 +319,53 @@ function renderScoreMatrix() {
   updateCriterionUi();
 }
 
+function renderEvaluationTabs() {
+  const tabs = document.getElementById("evaluationTabs");
+  tabs.innerHTML = "";
+  tabItems.forEach(([key, label]) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "evaluation-tab";
+    button.classList.toggle("active", key === state.activeTab);
+    button.classList.toggle("complete", key !== "comment" && state.completedCriteria.has(key));
+    button.textContent = label;
+    button.addEventListener("click", () => {
+      if (key === "comment") {
+        showCommentTab();
+        return;
+      }
+      const index = criteria.findIndex(([criterionKey]) => criterionKey === key);
+      if (index >= 0) {
+        state.activeCriterionIndex = index;
+        state.activeTab = key;
+        document.getElementById("scoreMatrix").classList.remove("hidden");
+        document.getElementById("commentPanel").classList.add("hidden");
+        renderScoreMatrix();
+      }
+    });
+    tabs.appendChild(button);
+  });
+}
+
+function isEvaluationComplete() {
+  return criteria.every(([key]) => state.completedCriteria.has(key));
+}
+
+function showCommentTab() {
+  state.activeTab = "comment";
+  document.getElementById("scoreMatrix").classList.add("hidden");
+  document.getElementById("commentPanel").classList.remove("hidden");
+  updateCriterionUi();
+}
+
 function resetEvaluationForm() {
   state.preferences = { ...defaultPreferences };
+  state.completedCriteria = new Set();
   state.activeCriterionIndex = 0;
+  state.activeTab = "clarity";
   document.getElementById("generalComment").value = "";
+  document.getElementById("scoreMatrix").classList.remove("hidden");
+  document.getElementById("commentPanel").classList.add("hidden");
   renderScoreMatrix();
 }
 
@@ -345,10 +396,12 @@ function setCurrentUser(user, token) {
 function clearCurrentUser() {
   state.currentUser = null;
   state.authToken = null;
+  state.comparison = null;
   localStorage.removeItem(AUTH_TOKEN_KEY);
   document.getElementById("accountCardTitle").textContent = "Google Login";
   document.getElementById("googleLoginMount").classList.remove("hidden");
   document.getElementById("accountCompact").classList.add("hidden");
+  document.getElementById("arenaGrid").innerHTML = '<article class="panel loading-panel">Log in with Google to see a node comparison.</article>';
 }
 
 function populateProfileForm(user) {
@@ -420,6 +473,7 @@ async function handleGoogleCredentialResponse(response) {
   });
   setCurrentUser(result.user, result.token);
   setStatus("");
+  await loadComparison();
 }
 
 function initializeGoogleLogin() {
@@ -455,6 +509,10 @@ function initializeGoogleLogin() {
 }
 
 async function loadComparison() {
+  if (!state.authToken || !state.currentUser) {
+    document.getElementById("arenaGrid").innerHTML = '<article class="panel loading-panel">Log in with Google to see a node comparison.</article>';
+    return;
+  }
   const comparison = await fetchJson("/api/comparison");
   renderComparison(comparison);
   setStatus("");
@@ -483,7 +541,10 @@ async function submitEvaluation() {
   if (!state.comparison) {
     throw new Error("No comparison loaded.");
   }
-  const result = await fetchJson("/api/evaluations", {
+  if (!isEvaluationComplete()) {
+    throw new Error("Select ratings for all four criteria before submitting.");
+  }
+  await fetchJson("/api/evaluations", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(buildEvaluationPayload()),
@@ -497,16 +558,24 @@ function shiftChoice(direction) {
   const currentIndex = preferenceChoices.findIndex(([value]) => value === state.preferences[criterionKey]);
   const nextIndex = Math.max(0, Math.min(preferenceChoices.length - 1, currentIndex + direction));
   state.preferences[criterionKey] = preferenceChoices[nextIndex][0];
+  state.completedCriteria.add(criterionKey);
   updateCriterionUi();
 }
 
 async function advanceCriterion() {
+  if (state.activeTab === "comment") {
+    await submitEvaluation();
+    return;
+  }
+  const [criterionKey] = criteria[state.activeCriterionIndex];
+  state.completedCriteria.add(criterionKey);
   if (state.activeCriterionIndex < criteria.length - 1) {
     state.activeCriterionIndex += 1;
+    state.activeTab = criteria[state.activeCriterionIndex][0];
     renderScoreMatrix();
     return;
   }
-  await submitEvaluation();
+  showCommentTab();
 }
 
 function goToPreviousCriterion() {
@@ -514,6 +583,9 @@ function goToPreviousCriterion() {
     return;
   }
   state.activeCriterionIndex -= 1;
+  state.activeTab = criteria[state.activeCriterionIndex][0];
+  document.getElementById("scoreMatrix").classList.remove("hidden");
+  document.getElementById("commentPanel").classList.add("hidden");
   renderScoreMatrix();
 }
 
@@ -544,8 +616,29 @@ function handleKeyboardShortcuts(event) {
   } else if (/^[1-5]$/.test(event.key)) {
     const [criterionKey] = criteria[state.activeCriterionIndex];
     state.preferences[criterionKey] = preferenceChoices[Number(event.key) - 1][0];
+    state.completedCriteria.add(criterionKey);
     updateCriterionUi();
   }
+}
+
+async function toggleFullscreen() {
+  const workspace = document.querySelector(".workspace-card");
+  if (!document.fullscreenElement) {
+    if (state.activeTab === "comment") {
+      state.activeCriterionIndex = criteria.length - 1;
+      state.activeTab = criteria[state.activeCriterionIndex][0];
+      document.getElementById("scoreMatrix").classList.remove("hidden");
+      document.getElementById("commentPanel").classList.add("hidden");
+      renderScoreMatrix();
+    }
+    await workspace.requestFullscreen();
+  } else {
+    await document.exitFullscreen();
+  }
+}
+
+function updateFullscreenButton() {
+  document.getElementById("fullscreenButton").textContent = document.fullscreenElement ? "Exit Full Screen" : "Full Screen";
 }
 
 async function main() {
@@ -553,6 +646,7 @@ async function main() {
   renderScoreMatrix();
   document.getElementById("loadButton").addEventListener("click", () => loadComparison().catch((error) => setStatus(error.message, true)));
   document.getElementById("submitButton").addEventListener("click", () => submitEvaluation().catch((error) => setStatus(error.message, true)));
+  document.getElementById("fullscreenButton").addEventListener("click", () => toggleFullscreen().catch((error) => setStatus(error.message, true)));
   document.getElementById("prevCriterionButton").addEventListener("click", goToPreviousCriterion);
   document.getElementById("openProfileButton").addEventListener("click", openProfileDialog);
   document.getElementById("logoutButton").addEventListener("click", logout);
@@ -561,6 +655,7 @@ async function main() {
   document.getElementById("profileDialog").addEventListener("close", () => {
     state.profileDialogOpen = false;
   });
+  document.addEventListener("fullscreenchange", updateFullscreenButton);
   window.addEventListener("keydown", handleKeyboardShortcuts);
 
   try {
@@ -568,7 +663,9 @@ async function main() {
     document.body.dataset.googleClientId = config.googleClientId || "";
     initializeGoogleLogin();
     await restoreSession();
-    await loadComparison();
+    if (state.currentUser) {
+      await loadComparison();
+    }
   } catch (error) {
     setStatus(error.message, true);
   }

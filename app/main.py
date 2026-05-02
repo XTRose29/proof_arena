@@ -138,9 +138,15 @@ def get_evaluations(
 
 
 @app.get("/api/comparison")
-def get_comparison(db: Session = Depends(get_db)) -> dict:
+def get_comparison(
+    authorization: str | None = Header(default=None),
+    db: Session = Depends(get_db),
+) -> dict:
     try:
+        auth_user_from_token(db, authorization)
         return build_random_comparison(db)
+    except PermissionError as exc:
+        raise HTTPException(status_code=401, detail=str(exc)) from exc
     except (LookupError, ValueError) as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 

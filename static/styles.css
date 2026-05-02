@@ -139,6 +139,12 @@ button:hover {
   transform: translateY(-1px);
 }
 
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+  transform: none;
+}
+
 .secondary-button {
   background: var(--accent-soft);
   color: var(--accent);
@@ -158,12 +164,14 @@ label {
 
 input,
 textarea,
+select,
 button {
   font: inherit;
 }
 
 input,
-textarea {
+textarea,
+select {
   width: 100%;
   border-radius: 12px;
   border: 1px solid var(--line);
@@ -250,6 +258,42 @@ textarea {
 .criterion-hint {
   margin-bottom: 10px;
   line-height: 1.5;
+}
+
+.evaluation-tabs {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.evaluation-tab {
+  min-height: 54px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: #fffdf9;
+  color: var(--ink);
+  font-weight: 800;
+  padding: 9px 12px;
+}
+
+.evaluation-tab.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+.evaluation-tab.complete:not(.active) {
+  background: #e7f2df;
+  border-color: #a4c391;
+  color: #315c25;
+}
+
+.evaluation-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 0.34fr);
+  gap: 12px;
+  align-items: stretch;
 }
 
 .score-matrix {
@@ -375,6 +419,13 @@ textarea {
   gap: 8px;
 }
 
+.comment-side-panel {
+  border: 1px solid rgba(99, 86, 70, 0.16);
+  border-radius: 16px;
+  background: #fffdf9;
+  padding: 12px;
+}
+
 .comment-block label {
   font-weight: 800;
 }
@@ -457,8 +508,81 @@ textarea {
   font-weight: 600;
 }
 
+.tok-sorry {
+  color: #ff4d6d;
+  font-weight: 800;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
 .hidden {
   display: none;
+}
+
+.workspace-card:fullscreen {
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  margin: 0;
+  border-radius: 0;
+  background: var(--paper);
+}
+
+.workspace-card:fullscreen .section-heading > div:first-child,
+.workspace-card:fullscreen .evaluation-tabs,
+.workspace-card:fullscreen .criterion-hint,
+.workspace-card:fullscreen .comment-side-panel,
+.workspace-card:fullscreen .status-text {
+  display: none;
+}
+
+.workspace-card:fullscreen .section-heading {
+  margin-bottom: 8px;
+}
+
+.workspace-card:fullscreen .matrix-progress-block {
+  width: 100%;
+  justify-content: flex-end;
+}
+
+.workspace-card:fullscreen #loadButton,
+.workspace-card:fullscreen #prevCriterionButton,
+.workspace-card:fullscreen #criterionProgress,
+.workspace-card:fullscreen #submitButton {
+  display: none;
+}
+
+.workspace-card:fullscreen .evaluation-layout {
+  grid-template-columns: 1fr;
+}
+
+.workspace-card:fullscreen .arena-grid {
+  min-height: 0;
+  margin-top: 8px;
+}
+
+.workspace-card:fullscreen .panel {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.workspace-card:fullscreen .code-card,
+.workspace-card:fullscreen .code-viewer {
+  min-height: 0;
+  height: 100%;
+  max-height: none;
+}
+
+.workspace-card:fullscreen .code-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.workspace-card:fullscreen .code-viewer {
+  flex: 1;
 }
 
 .loading-panel {
@@ -471,8 +595,13 @@ textarea {
 
 @media (max-width: 1200px) {
   .arena-grid,
-  .matrix-row-single {
+  .matrix-row-single,
+  .evaluation-layout {
     grid-template-columns: 1fr;
+  }
+
+  .evaluation-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .hero {
