@@ -26,6 +26,7 @@ const state = {
   completedCriteria: new Set(),
   activeCriterionIndex: 0,
   activeTab: "clarity",
+  codePaneFocus: "A",
   vimFocus: "rating",
   waitingForWindowSwitch: false,
   googleReady: false,
@@ -370,9 +371,7 @@ function updateCriterionUi() {
   const [criterionKey] = criteria[state.activeCriterionIndex];
   const choiceIndex = preferenceChoices.findIndex(([value]) => value === state.preferences[criterionKey]);
   document.getElementById("criterionHint").textContent =
-    state.activeTab === "comment"
-      ? "Leave an optional overall comment. Submit is available after all four criteria are selected."
-      : "Ctrl-W h/l: A/B panes. Ctrl-W k/j: rating/comment. h/l rates, j/k moves or scrolls. Enter submits.";
+    "Ctrl-W then k/j moves focus up/down. h/l changes the focused row. j/k scrolls code. Space changes criterion. Enter submits.";
 
   const matrix = document.getElementById("scoreMatrix");
   matrix.querySelectorAll(".matrix-choice").forEach((choiceEl, index) => {
@@ -419,31 +418,43 @@ function showCriterionTab(index) {
   renderScoreMatrix();
 }
 
+function showTabByIndex(index) {
+  const sectionCount = tabItems.length;
+  const nextIndex = (index + sectionCount) % sectionCount;
+  if (nextIndex === criteria.length) {
+    showCommentTab();
+    return;
+  }
+  showCriterionTab(nextIndex);
+}
+
+function cycleCriterion(direction = 1) {
+  const currentIndex = state.activeTab === "comment" ? criteria.length : state.activeCriterionIndex;
+  showTabByIndex(currentIndex + direction);
+}
+
 function setVimFocus(region) {
   state.vimFocus = region;
   state.waitingForWindowSwitch = false;
-  if (region === "rating" && state.activeTab === "comment") {
-    showCriterionTab(state.activeCriterionIndex);
-    return;
-  }
-  if (region === "comment") {
-    showCommentTab();
-    return;
+  if (region === "A" || region === "B") {
+    state.codePaneFocus = region;
   }
   updateVimFocusUi();
 }
 
 function updateVimFocusUi() {
   document.querySelectorAll(".vim-focused").forEach((el) => el.classList.remove("vim-focused"));
+  if (state.vimFocus === "criteria") {
+    document.getElementById("evaluationTabs")?.classList.add("vim-focused");
+    return;
+  }
   if (state.vimFocus === "rating") {
-    document.getElementById("evaluationLayout")?.classList.add("vim-focused");
+    const target = state.activeTab === "comment" ? "commentPanel" : "evaluationLayout";
+    document.getElementById(target)?.classList.add("vim-focused");
     return;
   }
-  if (state.vimFocus === "comment") {
-    document.getElementById("commentPanel")?.classList.add("vim-focused");
-    return;
-  }
-  document.querySelector(`.panel[data-side="${state.vimFocus}"]`)?.classList.add("vim-focused");
+  const sideLabel = state.vimFocus === "A" || state.vimFocus === "B" ? state.vimFocus : state.codePaneFocus;
+  document.querySelector(`.panel[data-side="${sideLabel}"]`)?.classList.add("vim-focused");
 }
 
 function renderEvaluationTabs() {
@@ -457,6 +468,7 @@ function renderEvaluationTabs() {
     button.classList.toggle("complete", key !== "comment" && state.completedCriteria.has(key));
     button.textContent = label;
     button.addEventListener("click", () => {
+      setVimFocus("criteria");
       if (key === "comment") {
         showCommentTab();
         return;
@@ -487,6 +499,7 @@ function resetEvaluationForm() {
   state.completedCriteria = new Set();
   state.activeCriterionIndex = 0;
   state.activeTab = "clarity";
+  state.codePaneFocus = "A";
   state.vimFocus = "rating";
   state.waitingForWindowSwitch = false;
   document.getElementById("generalComment").value = "";
@@ -727,22 +740,11 @@ async function advanceCriterion() {
 }
 
 function goToPreviousCriterion() {
-  showCriterionTab(state.activeCriterionIndex - 1);
+  cycleCriterion(-1);
 }
 
 function moveCriterion(direction) {
-  const sectionCount = criteria.length + 1;
-  const currentIndex = state.activeTab === "comment" ? criteria.length : state.activeCriterionIndex;
-  const nextIndex = (currentIndex + direction + sectionCount) % sectionCount;
-  if (nextIndex === criteria.length) {
-    state.vimFocus = "comment";
-    showCommentTab();
-    return;
-  }
-  if (state.vimFocus === "comment") {
-    state.vimFocus = "rating";
-  }
-  showCriterionTab(nextIndex);
+  cycleCriterion(direction);
 }
 
 function scrollCodePane(sideLabel, direction) {
@@ -755,23 +757,37 @@ function scrollCodePane(sideLabel, direction) {
 }
 
 function handleWindowSwitch(key) {
-  if (key === "h") {
-    setVimFocus("A");
-    return true;
-  }
-  if (key === "l") {
-    setVimFocus("B");
-    return true;
-  }
   if (key === "k") {
-    setVimFocus("rating");
+    if (state.vimFocus === "rating") {
+      setVimFocus("criteria");
+    } else if (state.vimFocus === "A" || state.vimFocus === "B") {
+      setVimFocus("rating");
+    }
     return true;
   }
   if (key === "j") {
-    setVimFocus("comment");
+    if (state.vimFocus === "criteria") {
+      setVimFocus("rating");
+    } else if (state.vimFocus === "rating") {
+      setVimFocus(state.codePaneFocus);
+    }
     return true;
   }
   return false;
+}
+
+function handleHorizontalShortcut(direction) {
+  if (state.vimFocus === "criteria") {
+    cycleCriterion(direction);
+    return;
+  }
+  if (state.vimFocus === "rating") {
+    shiftChoice(direction);
+    return;
+  }
+  if (state.vimFocus === "A" || state.vimFocus === "B") {
+    setVimFocus(direction < 0 ? "A" : "B");
+  }
 }
 
 function handleKeyboardShortcuts(event) {
@@ -790,7 +806,7 @@ function handleKeyboardShortcuts(event) {
   if (event.ctrlKey && key === "w") {
     event.preventDefault();
     state.waitingForWindowSwitch = true;
-    setStatus("Ctrl-W: h=A, l=B, k=rating, j=comment");
+    setStatus("Ctrl-W: k=focus up, j=focus down");
     return;
   }
 
@@ -805,19 +821,22 @@ function handleKeyboardShortcuts(event) {
 
   if (event.key === "ArrowLeft") {
     event.preventDefault();
-    shiftChoice(-1);
+    handleHorizontalShortcut(-1);
   } else if (event.key === "ArrowRight") {
     event.preventDefault();
-    shiftChoice(1);
+    handleHorizontalShortcut(1);
   } else if (event.key === "ArrowUp") {
     event.preventDefault();
-    moveCriterion(-1);
+    handleWindowSwitch("k");
   } else if (event.key === "ArrowDown") {
     event.preventDefault();
-    moveCriterion(1);
+    handleWindowSwitch("j");
   } else if (event.key === "Enter") {
     event.preventDefault();
     submitEvaluation().catch((error) => setStatus(error.message, true));
+  } else if (event.key === " ") {
+    event.preventDefault();
+    cycleCriterion(1);
   } else if (event.key === "Backspace") {
     event.preventDefault();
     goToPreviousCriterion();
@@ -827,25 +846,21 @@ function handleKeyboardShortcuts(event) {
     state.vimFocus = null;
     updateVimFocusUi();
     setStatus("");
-  } else if (key === "h" && state.vimFocus === "rating") {
+  } else if (key === "h") {
     event.preventDefault();
-    shiftChoice(-1);
-  } else if (key === "l" && state.vimFocus === "rating") {
+    handleHorizontalShortcut(-1);
+  } else if (key === "l") {
     event.preventDefault();
-    shiftChoice(1);
+    handleHorizontalShortcut(1);
   } else if (key === "j") {
-    event.preventDefault();
     if (state.vimFocus === "A" || state.vimFocus === "B") {
+      event.preventDefault();
       scrollCodePane(state.vimFocus, 1);
-    } else {
-      moveCriterion(1);
     }
   } else if (key === "k") {
-    event.preventDefault();
     if (state.vimFocus === "A" || state.vimFocus === "B") {
+      event.preventDefault();
       scrollCodePane(state.vimFocus, -1);
-    } else {
-      moveCriterion(-1);
     }
   }
 }
@@ -866,10 +881,11 @@ function updateFullscreenButton() {
 async function main() {
   document.body.dataset.googleClientId = "";
   renderScoreMatrix();
+  document.getElementById("evaluationTabs").addEventListener("click", () => setVimFocus("criteria"));
   document.getElementById("evaluationLayout").addEventListener("click", () => setVimFocus("rating"));
   document.getElementById("commentPanel").addEventListener("click", (event) => {
     event.stopPropagation();
-    setVimFocus("comment");
+    setVimFocus("rating");
   });
   document.getElementById("loadButton").addEventListener("click", () => loadComparison().catch((error) => setStatus(error.message, true)));
   document.getElementById("submitButton").addEventListener("click", () => submitEvaluation().catch((error) => setStatus(error.message, true)));

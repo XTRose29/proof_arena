@@ -15,8 +15,8 @@
           <h1>Lean Proof Arena</h1>
           <p class="hero-copy">
             This interface presents two Lean nodes for the same question.
-            Score one comparison criterion at a time, use the arrow keys to move
-            toward A or B, press Enter to confirm, and optionally leave a comment
+            Score one comparison criterion at a time, use h/l to move
+            toward A or B on the rating row, press Enter to submit, and optionally leave a comment
             under the code before the next pair loads.
           </p>
         </div>
@@ -55,9 +55,9 @@
         </div>
         <nav id="evaluationTabs" class="evaluation-tabs" aria-label="Evaluation sections"></nav>
         <p id="criterionHint" class="criterion-hint">
-          Use Left/Right to choose a rating, Up/Down to change criterion, and Enter to submit.
+          Ctrl-W then k/j moves focus up/down. h/l changes the focused row. j/k scrolls code. Space changes criterion. Enter submits.
         </p>
-        <p class="fullscreen-instruction">Ctrl-W h/l: A/B panes | Ctrl-W k/j: rating/comment | h/l: rating | j/k: move or scroll | Enter: submit</p>
+        <p class="fullscreen-instruction">Focus up/down = Ctrl-W then k/j | left/right = h/l | scroll = j/k | next criterion = Space | submit = Enter</p>
         <div class="evaluation-layout rating-only" id="evaluationLayout">
           <div id="scoreMatrix" class="score-matrix"></div>
           <div id="commentPanel" class="comment-block comment-side-panel hidden">

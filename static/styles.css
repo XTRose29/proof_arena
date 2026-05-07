@@ -434,6 +434,10 @@ select {
   border-color: rgba(15, 94, 83, 0.55);
 }
 
+.evaluation-tabs.vim-focused {
+  border-radius: 14px;
+}
+
 .evaluation-layout.vim-focused {
   border-radius: 16px;
 }
