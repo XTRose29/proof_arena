@@ -9,6 +9,7 @@ REPO_ROOT = ROOT.parent
 STATIC_DIR = ROOT / "static"
 QUESTION_SETS_DIR = ROOT / "question_sets"
 LOCAL_DB_PATH = ROOT / "proof_arena.db"
+GOOGLE_VERIFICATION_FILE = STATIC_DIR / "googlef32254fd0dfa1cb9.html"
 
 
 def database_url() -> str:

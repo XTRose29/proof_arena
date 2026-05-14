@@ -9,7 +9,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
-from .config import STATIC_DIR, auto_seed_enabled, cors_origins, google_client_id
+from .config import GOOGLE_VERIFICATION_FILE, STATIC_DIR, auto_seed_enabled, cors_origins, google_client_id
 from .database import Base, SessionLocal, engine, ensure_models_imported, get_db
 from .schemas import GoogleAuthRequest, LoginRequest, PreferenceEvaluationCreate, RegisterRequest, UpdateProfileRequest
 from .services import (
@@ -180,6 +180,11 @@ def styles() -> FileResponse:
 @app.get("/app.js")
 def javascript() -> FileResponse:
     return FileResponse(STATIC_DIR / "app.js")
+
+
+@app.get("/googlef32254fd0dfa1cb9.html")
+def google_site_verification() -> FileResponse:
+    return FileResponse(GOOGLE_VERIFICATION_FILE, media_type="text/html")
 
 
 if Path(STATIC_DIR).exists():
