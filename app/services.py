@@ -567,19 +567,24 @@ def _entity_fields(kind: str, entity_id: int) -> tuple[int | None, int | None]:
 
 def build_random_comparison(session: Session, user: User | None = None) -> dict[str, Any]:
     pair = random_pair_same_node_same_question(session, user.id if user else None)
-    if pair is None:
-        raise LookupError("No comparison pairs available.")
-
-    mode = "same_question_nodes"
-    label = MODE_LABELS[mode]
-    a_id, b_id = pair
-    a_payload = node_payload(session, a_id)
-    b_payload = node_payload(session, b_id)
+    if pair is not None:
+        mode = "same_question_nodes"
+        a_id, b_id = pair
+        a_payload = node_payload(session, a_id)
+        b_payload = node_payload(session, b_id)
+    else:
+        pair = random_pair_same_question(session)
+        if pair is None:
+            raise LookupError("No comparison pairs available.")
+        mode = "same_question_proofs"
+        a_id, b_id = pair
+        a_payload = proof_payload(session, a_id)
+        b_payload = proof_payload(session, b_id)
 
     if random.choice([True, False]):
         a_payload, b_payload = b_payload, a_payload
 
-    return {"mode": mode, "modeLabel": label, "a": a_payload, "b": b_payload}
+    return {"mode": mode, "modeLabel": MODE_LABELS[mode], "a": a_payload, "b": b_payload}
 
 
 def save_preference_evaluation(session: Session, user: User, payload: PreferenceEvaluationCreate) -> int:

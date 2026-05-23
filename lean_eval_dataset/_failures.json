@@ -1,0 +1,10 @@
+[
+  {
+    "label": "ci_regenerate_main_check / rishistyping / Stealth Model",
+    "error": "git clone https://github.com/rishistyping/autoformalization-machine-intelligence.git /private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence failed: Cloning into '/private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence'...\nremote: Repository not found.\nfatal: repository 'https://github.com/rishistyping/autoformalization-machine-intelligence.git/' not found"
+  },
+  {
+    "label": "two_plus_two / rishistyping / Stealth Model",
+    "error": "git clone https://github.com/rishistyping/autoformalization-machine-intelligence.git /private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence failed: Cloning into '/private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence'...\nremote: Repository not found.\nfatal: repository 'https://github.com/rishistyping/autoformalization-machine-intelligence.git/' not found"
+  }
+]

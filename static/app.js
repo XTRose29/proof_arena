@@ -542,7 +542,7 @@ function clearCurrentUser() {
   document.getElementById("accountCardTitle").textContent = "Google Login";
   document.getElementById("googleLoginMount").classList.remove("hidden");
   document.getElementById("accountCompact").classList.add("hidden");
-  document.getElementById("arenaGrid").innerHTML = '<article class="panel loading-panel">Log in with Google to see a node comparison.</article>';
+  document.getElementById("arenaGrid").innerHTML = '<article class="panel loading-panel">Log in with Google to see a proof comparison.</article>';
 }
 
 function populateProfileForm(user) {
@@ -650,7 +650,7 @@ function initializeGoogleLogin() {
 
 async function loadComparison() {
   if (!state.authToken || !state.currentUser) {
-    document.getElementById("arenaGrid").innerHTML = '<article class="panel loading-panel">Log in with Google to see a node comparison.</article>';
+    document.getElementById("arenaGrid").innerHTML = '<article class="panel loading-panel">Log in with Google to see a proof comparison.</article>';
     return;
   }
   try {
