@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: brauer_character_in_cyclotomic
-user: Morgan-Griffiths
-model: GPT-5.5
-submission_repo: Morgan-Griffiths/997b9a415edd5b3300f67b0b86e2d6d3
-submission_ref: aa6af3605a939af31c219c540940de95a99afdc4
-issue_number: 46
--/
 import Mathlib
 
 namespace Submission

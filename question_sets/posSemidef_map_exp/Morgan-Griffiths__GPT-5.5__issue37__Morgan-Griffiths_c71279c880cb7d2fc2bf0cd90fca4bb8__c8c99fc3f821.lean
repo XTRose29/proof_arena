@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: posSemidef_map_exp
-user: Morgan-Griffiths
-model: GPT-5.5
-submission_repo: Morgan-Griffiths/c71279c880cb7d2fc2bf0cd90fca4bb8
-submission_ref: c8c99fc3f82132045106510b592d4111d4b31e0b
-issue_number: 37
--/
 import Mathlib
 
 namespace Submission

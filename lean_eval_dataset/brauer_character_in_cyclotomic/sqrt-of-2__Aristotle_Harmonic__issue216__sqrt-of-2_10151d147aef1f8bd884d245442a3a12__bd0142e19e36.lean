@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: brauer_character_in_cyclotomic
-user: sqrt-of-2
-model: Aristotle (Harmonic)
-submission_repo: sqrt-of-2/10151d147aef1f8bd884d245442a3a12
-submission_ref: bd0142e19e36f3a42be5761dc04dc634e88d820e
-issue_number: 216
--/
 import Mathlib
 
 namespace Submission

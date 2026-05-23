@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: pi1_circle_mulEquiv_int
-user: sqrt-of-2
-model: Aristotle (Harmonic)
-submission_repo: sqrt-of-2/17c730f1a52371a667d402a8cd0d75a4
-submission_ref: ed99743e84cc93dd0f278aa9022e08d7d1a27aef
-issue_number: 225
--/
 import Mathlib
 
 namespace Submission

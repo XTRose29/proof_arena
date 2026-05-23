@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: contractibleSpace_houseWithTwoRooms
-user: daouid
-model: Antigravity (Multi-Model Ensemble: Gemini 3.1 Pro, Gemini 3 Flash, Claude 4.6 Sonnet/Opus)
-submission_repo: daouid/73182095262a4e329bcec8579bdd573a
-submission_ref: f3ec57f3111929e08560cc8209d9664b3f17893e
-issue_number: 243
--/
 import Mathlib
 import ChallengeDeps
 

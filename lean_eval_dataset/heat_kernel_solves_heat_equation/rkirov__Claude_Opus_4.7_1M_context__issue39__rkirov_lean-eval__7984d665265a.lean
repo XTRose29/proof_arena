@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: heat_kernel_solves_heat_equation
-user: rkirov
-model: Claude Opus 4.7 (1M context)
-submission_repo: rkirov/lean-eval
-submission_ref: 7984d665265a2bde32e64599842ea98d1d7991b1
-issue_number: 39
--/
 import ChallengeDeps
 import Submission.Helpers
 

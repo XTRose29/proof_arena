@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: dirichlet_eigenvalues_eq_nat_sq
-user: sqrt-of-2
-model: GPT 5.5
-submission_repo: sqrt-of-2/5d253653afb78ab2e57ae1446599c9eb
-submission_ref: 83414975249f7c62a1e816c2609eb3471635213c
-issue_number: 223
--/
 import Mathlib
 
 open scoped Real

@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: finite_group_isSolvable_of_card_eq_prime_pow_mul_prime_pow
-user: LorenzoLuccioli
-model: Aristotle (Harmonic)
-submission_repo: LorenzoLuccioli/lean-eval
-submission_ref: 6ae2287b66eb687095e58fd0dbaeb7635ab26aba
-issue_number: 270
--/
 import Mathlib
 import Submission.Helpers
 

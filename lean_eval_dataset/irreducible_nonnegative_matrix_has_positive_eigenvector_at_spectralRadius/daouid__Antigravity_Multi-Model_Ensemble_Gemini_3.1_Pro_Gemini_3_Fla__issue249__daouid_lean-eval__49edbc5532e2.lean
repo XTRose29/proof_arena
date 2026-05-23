@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: irreducible_nonnegative_matrix_has_positive_eigenvector_at_spectralRadius
-user: daouid
-model: Antigravity (Multi-Model Ensemble: Gemini 3.1 Pro, Gemini 3 Flash, Claude 4.6 Sonnet/Opus)
-submission_repo: daouid/lean-eval
-submission_ref: 49edbc5532e271c0a40b1538db98cadd2ac3219d
-issue_number: 249
--/
 import Mathlib
 
 open Matrix

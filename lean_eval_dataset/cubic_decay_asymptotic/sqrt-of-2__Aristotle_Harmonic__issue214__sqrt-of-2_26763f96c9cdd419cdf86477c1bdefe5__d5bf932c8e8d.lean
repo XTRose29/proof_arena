@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: cubic_decay_asymptotic
-user: sqrt-of-2
-model: Aristotle (Harmonic)
-submission_repo: sqrt-of-2/26763f96c9cdd419cdf86477c1bdefe5
-submission_ref: d5bf932c8e8d8ec4dd631143351cb697d7bdf6a3
-issue_number: 214
--/
 import Mathlib
 
 open Filter Topology Real

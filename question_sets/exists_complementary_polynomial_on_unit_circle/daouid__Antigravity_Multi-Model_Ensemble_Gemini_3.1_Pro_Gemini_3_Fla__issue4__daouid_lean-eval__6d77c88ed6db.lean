@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: exists_complementary_polynomial_on_unit_circle
-user: daouid
-model: Antigravity (Multi-Model Ensemble: Gemini 3.1 Pro, Gemini 3 Flash, Claude 4.6 Sonnet/Opus)
-submission_repo: daouid/lean-eval
-submission_ref: 6d77c88ed6db82e990b092a900b197de2db3b6b1
-issue_number: 4
--/
 import Mathlib
 
 open Polynomial Complex

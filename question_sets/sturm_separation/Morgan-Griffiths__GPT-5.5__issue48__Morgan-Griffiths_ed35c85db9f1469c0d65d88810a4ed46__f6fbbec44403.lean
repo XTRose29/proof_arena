@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: sturm_separation
-user: Morgan-Griffiths
-model: GPT-5.5
-submission_repo: Morgan-Griffiths/ed35c85db9f1469c0d65d88810a4ed46
-submission_ref: f6fbbec44403ca1deb935e418096d549b3667820
-issue_number: 48
--/
 import Mathlib.Analysis.Calculus.Deriv.Basic
 
 namespace Submission

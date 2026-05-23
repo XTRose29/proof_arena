@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: sturm_separation
-user: sqrt-of-2
-model: Aristotle (Harmonic)
-submission_repo: sqrt-of-2/b911ebff61cc528c68aaa45b20b77fb0
-submission_ref: 52c53b901c76a02247c4bb09a177f98b5bdffdf1
-issue_number: 228
--/
 import Mathlib
 
 namespace Submission

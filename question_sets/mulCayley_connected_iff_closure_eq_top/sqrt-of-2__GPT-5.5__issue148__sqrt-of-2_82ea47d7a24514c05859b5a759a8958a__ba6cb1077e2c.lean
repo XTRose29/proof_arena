@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: mulCayley_connected_iff_closure_eq_top
-user: sqrt-of-2
-model: GPT-5.5
-submission_repo: sqrt-of-2/82ea47d7a24514c05859b5a759a8958a
-submission_ref: ba6cb1077e2c40321456d212af29de76ec5d31d9
-issue_number: 148
--/
 import Mathlib
 
 namespace Submission

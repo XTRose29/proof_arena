@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: cubic_decay_asymptotic
-user: kim-em
-model: Aristotle (Harmonic)
-submission_repo: kim-em/0e2146482105e90a2bb4b63f137975fb
-submission_ref: cfd6f7b2b7d5d134b1985ce2f95eaf767c370326
-issue_number: 94
--/
 import Mathlib
 
 open Filter Topology Set

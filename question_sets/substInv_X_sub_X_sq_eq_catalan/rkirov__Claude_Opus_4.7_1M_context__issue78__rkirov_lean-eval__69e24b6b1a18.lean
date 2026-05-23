@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: substInv_X_sub_X_sq_eq_catalan
-user: rkirov
-model: Claude Opus 4.7 (1M context)
-submission_repo: rkirov/lean-eval
-submission_ref: 69e24b6b1a18117485ef55663d4773900655e033
-issue_number: 78
--/
 import Mathlib.RingTheory.PowerSeries.Substitution
 import Mathlib.RingTheory.PowerSeries.Catalan
 import Mathlib.Data.Nat.Choose.Central

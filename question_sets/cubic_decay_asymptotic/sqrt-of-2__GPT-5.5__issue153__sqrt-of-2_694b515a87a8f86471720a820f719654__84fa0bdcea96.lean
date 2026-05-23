@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: cubic_decay_asymptotic
-user: sqrt-of-2
-model: GPT-5.5
-submission_repo: sqrt-of-2/694b515a87a8f86471720a820f719654
-submission_ref: 84fa0bdcea96d1dfe0a53da3240af504324413ee
-issue_number: 153
--/
 import Mathlib
 
 open Filter Topology

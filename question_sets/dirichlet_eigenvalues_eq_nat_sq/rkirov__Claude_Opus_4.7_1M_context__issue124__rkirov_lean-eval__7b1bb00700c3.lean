@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: dirichlet_eigenvalues_eq_nat_sq
-user: rkirov
-model: Claude Opus 4.7 (1M context)
-submission_repo: rkirov/lean-eval
-submission_ref: 7b1bb00700c3b9271df041f37e26a5cc5e656251
-issue_number: 124
--/
 import Mathlib
 import Submission.Helpers
 

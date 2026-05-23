@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: brauer_character_in_cyclotomic
-user: daouid
-model: Antigravity (Multi-Model Ensemble: Gemini 3.1 Pro, Gemini 3 Flash, Claude 4.6 Sonnet/Opus)
-submission_repo: daouid/lean-eval
-submission_ref: 603ecada7f44c090db7568566e665309a5582f7f
-issue_number: 267
--/
 import Mathlib
 
 namespace Submission

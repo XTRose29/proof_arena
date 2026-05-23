@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: oppenheim_inequality
-user: sqrt-of-2
-model: Aristotle (Harmonic)
-submission_repo: sqrt-of-2/15615dd2e0bff3527b46305cf2dc7faf
-submission_ref: 148035792073a26034e8b165c6ee886369062fe8
-issue_number: 232
--/
 import Mathlib
 
 open MatrixOrder Matrix Finset

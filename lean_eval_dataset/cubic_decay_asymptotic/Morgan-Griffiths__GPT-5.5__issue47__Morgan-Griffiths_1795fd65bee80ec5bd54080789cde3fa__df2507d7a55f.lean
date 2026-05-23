@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: cubic_decay_asymptotic
-user: Morgan-Griffiths
-model: GPT-5.5
-submission_repo: Morgan-Griffiths/1795fd65bee80ec5bd54080789cde3fa
-submission_ref: df2507d7a55fa45e93a751ede355a1e9766cb789
-issue_number: 47
--/
 import Mathlib.Analysis.Calculus.Deriv.Basic
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 

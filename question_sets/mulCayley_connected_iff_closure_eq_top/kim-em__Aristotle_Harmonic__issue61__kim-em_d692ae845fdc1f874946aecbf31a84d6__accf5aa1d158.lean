@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: mulCayley_connected_iff_closure_eq_top
-user: kim-em
-model: Aristotle (Harmonic)
-submission_repo: kim-em/d692ae845fdc1f874946aecbf31a84d6
-submission_ref: accf5aa1d158976df301d07f784a4c8ae8c35618
-issue_number: 61
--/
 import Mathlib
 
 namespace Submission

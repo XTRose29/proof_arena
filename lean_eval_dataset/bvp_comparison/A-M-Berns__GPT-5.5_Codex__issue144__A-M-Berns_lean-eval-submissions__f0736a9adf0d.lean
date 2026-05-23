@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: bvp_comparison
-user: A-M-Berns
-model: GPT-5.5 Codex
-submission_repo: A-M-Berns/lean-eval-submissions
-submission_ref: f0736a9adf0d663276cfb2d86f622f610a5b5ae0
-issue_number: 144
--/
 import Mathlib.Analysis.Convex.Deriv
 import Mathlib.Analysis.Calculus.Deriv.Add
 import Mathlib.Tactic

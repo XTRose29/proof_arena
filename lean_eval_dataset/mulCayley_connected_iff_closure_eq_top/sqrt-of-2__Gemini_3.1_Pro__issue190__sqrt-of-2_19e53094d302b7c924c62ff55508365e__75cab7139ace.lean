@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: mulCayley_connected_iff_closure_eq_top
-user: sqrt-of-2
-model: Gemini 3.1 Pro
-submission_repo: sqrt-of-2/19e53094d302b7c924c62ff55508365e
-submission_ref: 75cab7139ace8c092d8d2f0273c4e6c35833f0f6
-issue_number: 190
--/
 import Mathlib
 
 open SimpleGraph Matrix

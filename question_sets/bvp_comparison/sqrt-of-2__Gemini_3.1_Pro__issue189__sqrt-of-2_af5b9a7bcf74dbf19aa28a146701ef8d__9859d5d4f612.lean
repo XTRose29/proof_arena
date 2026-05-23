@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: bvp_comparison
-user: sqrt-of-2
-model: Gemini 3.1 Pro
-submission_repo: sqrt-of-2/af5b9a7bcf74dbf19aa28a146701ef8d
-submission_ref: 9859d5d4f612b1d4ca3437effb805d92c25b47a8
-issue_number: 189
--/
 import Mathlib
 
 open Set Filter

@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: substInv_X_sub_X_sq_eq_catalan
-user: sqrt-of-2
-model: GPT-5.5
-submission_repo: sqrt-of-2/db925d3c572726772a5b9124b39f1e89
-submission_ref: ae3d3cad03cd6ab3f03392619b1ae9c3b6d82b78
-issue_number: 149
--/
 import Mathlib
 
 open PowerSeries

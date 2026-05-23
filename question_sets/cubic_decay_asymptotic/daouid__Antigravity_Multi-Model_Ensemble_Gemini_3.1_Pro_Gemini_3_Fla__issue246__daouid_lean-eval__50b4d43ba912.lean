@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: cubic_decay_asymptotic
-user: daouid
-model: Antigravity (Multi-Model Ensemble: Gemini 3.1 Pro, Gemini 3 Flash, Claude 4.6 Sonnet/Opus)
-submission_repo: daouid/lean-eval
-submission_ref: 50b4d43ba912ea3ae79d128a43a478184dffec43
-issue_number: 246
--/
 import Mathlib
 
 open Filter Topology

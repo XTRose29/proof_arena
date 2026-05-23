@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: finite_graph_ramsey_theorem
-user: kim-em
-model: Aristotle (Harmonic)
-submission_repo: kim-em/15cab769a93e323f4a87f68ecb84ffb8
-submission_ref: 13d74bd985294975f54a1457633364117c38f840
-issue_number: 60
--/
 import Mathlib
 
 open SimpleGraph

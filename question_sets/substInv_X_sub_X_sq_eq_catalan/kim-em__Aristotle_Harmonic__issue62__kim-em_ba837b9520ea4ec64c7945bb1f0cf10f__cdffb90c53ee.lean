@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: substInv_X_sub_X_sq_eq_catalan
-user: kim-em
-model: Aristotle (Harmonic)
-submission_repo: kim-em/ba837b9520ea4ec64c7945bb1f0cf10f
-submission_ref: cdffb90c53ee5fdcf41369769f15130fa6bd6b3b
-issue_number: 62
--/
 import Mathlib
 
 open PowerSeries

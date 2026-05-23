@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: bvp_comparison
-user: kim-em
-model: Aristotle (Harmonic)
-submission_repo: kim-em/e63b6679f735afd3ba4d5945a83a810d
-submission_ref: 83181e9586a8fe41e7fa7168047271add60789bb
-issue_number: 90
--/
 import Mathlib
 
 namespace Submission

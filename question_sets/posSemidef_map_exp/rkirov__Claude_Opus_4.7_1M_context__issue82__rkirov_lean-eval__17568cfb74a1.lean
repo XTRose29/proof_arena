@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: posSemidef_map_exp
-user: rkirov
-model: Claude Opus 4.7 (1M context)
-submission_repo: rkirov/lean-eval
-submission_ref: 17568cfb74a1f49b2aacc5fbfab52bfa90c33cbb
-issue_number: 82
--/
 import Mathlib.LinearAlgebra.Matrix.PosDef
 import Mathlib.Analysis.Matrix.Order
 import Mathlib.Analysis.Normed.Algebra.Exponential

@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: finite_graph_ramsey_theorem
-user: sqrt-of-2
-model: GPT-5.5
-submission_repo: sqrt-of-2/e19d4e2ed5a4ecad14dbf0b429842bc9
-submission_ref: bfd5b5deffe9e82a180ec3dee0aa66d00f689d63
-issue_number: 152
--/
 import Mathlib
 
 open SimpleGraph

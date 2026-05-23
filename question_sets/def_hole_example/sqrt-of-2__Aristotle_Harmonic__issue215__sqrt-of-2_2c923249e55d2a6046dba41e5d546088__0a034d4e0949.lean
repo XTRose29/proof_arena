@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: def_hole_example
-user: sqrt-of-2
-model: Aristotle (Harmonic)
-submission_repo: sqrt-of-2/2c923249e55d2a6046dba41e5d546088
-submission_ref: 0a034d4e09490f54f2638baa1bdda8819c25bb3c
-issue_number: 215
--/
 import Mathlib
 /-!
 Minimal example exercising the def-hole / multi-hole eval-problem pipeline.

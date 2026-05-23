@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: brauer_character_in_cyclotomic
-user: sqrt-of-2
-model: GPT-5.5
-submission_repo: sqrt-of-2/98bbe7aa1b1f90113f3ecd0ee38c724b
-submission_ref: 4a71ab534eac6a87a54275b9e00a1fc65dc7543a
-issue_number: 154
--/
 import Mathlib
 
 namespace Submission

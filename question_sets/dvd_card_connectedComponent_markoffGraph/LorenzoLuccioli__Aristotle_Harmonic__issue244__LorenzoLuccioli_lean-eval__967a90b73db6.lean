@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: dvd_card_connectedComponent_markoffGraph
-user: LorenzoLuccioli
-model: Aristotle (Harmonic)
-submission_repo: LorenzoLuccioli/lean-eval
-submission_ref: 967a90b73db64a1939ef0fba144e183e35e97612
-issue_number: 244
--/
 import ChallengeDeps
 import Submission.markoff
 import Mathlib

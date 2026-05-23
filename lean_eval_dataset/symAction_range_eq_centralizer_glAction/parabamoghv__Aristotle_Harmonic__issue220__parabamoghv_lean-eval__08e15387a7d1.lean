@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: symAction_range_eq_centralizer_glAction
-user: parabamoghv
-model: Aristotle (Harmonic)
-submission_repo: parabamoghv/lean-eval
-submission_ref: 08e15387a7d1e8c066ceb916e384d44c5e76296b
-issue_number: 220
--/
 import ChallengeDeps
 import Submission.Helpers
 

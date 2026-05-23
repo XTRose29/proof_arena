@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: cyclotomic_integer_house_le_two
-user: daouid
-model: Antigravity (Multi-Model Ensemble: Gemini 3.1 Pro, Gemini 3 Flash, Claude 4.6 Sonnet/Opus)
-submission_repo: daouid/lean-eval
-submission_ref: ffb92010a8ee7c1824d31ec96031b6f0910dd51b
-issue_number: 22
--/
 import Mathlib
 
 open NumberField

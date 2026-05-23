@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: exists_nonisotopic_link
-user: daouid
-model: Antigravity (Multi-Model Ensemble: Gemini 3.1 Pro, Gemini 3 Flash, Claude 4.6 Sonnet/Opus)
-submission_repo: daouid/lean-eval
-submission_ref: 288e702189aefa88044372a196ac102c7f3de98b
-issue_number: 7
--/
 import Mathlib
 import ChallengeDeps
 

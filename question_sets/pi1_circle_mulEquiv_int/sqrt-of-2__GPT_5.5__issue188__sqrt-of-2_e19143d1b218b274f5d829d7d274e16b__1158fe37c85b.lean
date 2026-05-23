@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: pi1_circle_mulEquiv_int
-user: sqrt-of-2
-model: GPT 5.5
-submission_repo: sqrt-of-2/e19143d1b218b274f5d829d7d274e16b
-submission_ref: 1158fe37c85bb2106ee670349f9148b7feb6d313
-issue_number: 188
--/
 import Mathlib
 
 namespace Submission

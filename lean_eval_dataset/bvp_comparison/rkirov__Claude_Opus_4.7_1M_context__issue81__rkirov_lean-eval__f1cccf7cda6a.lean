@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: bvp_comparison
-user: rkirov
-model: Claude Opus 4.7 (1M context)
-submission_repo: rkirov/lean-eval
-submission_ref: f1cccf7cda6aec137608be10e68c5545eef7ba63
-issue_number: 81
--/
 import Mathlib.Analysis.Convex.Deriv
 import Mathlib.Analysis.Convex.Function
 import Mathlib.Analysis.Calculus.Deriv.Add

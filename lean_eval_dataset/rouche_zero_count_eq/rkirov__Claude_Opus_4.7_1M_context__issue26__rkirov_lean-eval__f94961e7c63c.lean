@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: rouche_zero_count_eq
-user: rkirov
-model: Claude Opus 4.7 (1M context)
-submission_repo: rkirov/lean-eval
-submission_ref: f94961e7c63cc81d6a0e7990322d3a5eb236d6ec
-issue_number: 26
--/
 import Mathlib
 import Submission.Helpers
 

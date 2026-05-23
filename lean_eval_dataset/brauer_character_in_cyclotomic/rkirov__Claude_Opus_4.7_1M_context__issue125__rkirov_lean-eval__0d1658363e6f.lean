@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: brauer_character_in_cyclotomic
-user: rkirov
-model: Claude Opus 4.7 (1M context)
-submission_repo: rkirov/lean-eval
-submission_ref: 0d1658363e6fea77c26c9b016814398298dc03e4
-issue_number: 125
--/
 import Mathlib
 import Submission.Helpers
 

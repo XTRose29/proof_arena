@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: rouche_zero_count_eq
-user: LorenzoLuccioli
-model: Aristotle (Harmonic)
-submission_repo: LorenzoLuccioli/lean-eval
-submission_ref: 8ed098c66c24d6da96ea1e7de6489aa4aaf30a60
-issue_number: 261
--/
 import Mathlib
 import Submission.Helpers
 import Submission.ArgPrinciple

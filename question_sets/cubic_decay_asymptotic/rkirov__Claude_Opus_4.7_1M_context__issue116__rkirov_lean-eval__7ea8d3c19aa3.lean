@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: cubic_decay_asymptotic
-user: rkirov
-model: Claude Opus 4.7 (1M context)
-submission_repo: rkirov/lean-eval
-submission_ref: 7ea8d3c19aa3ce2fd2376f9ac70126d9bb970baf
-issue_number: 116
--/
 import Mathlib
 import Submission.Helpers
 

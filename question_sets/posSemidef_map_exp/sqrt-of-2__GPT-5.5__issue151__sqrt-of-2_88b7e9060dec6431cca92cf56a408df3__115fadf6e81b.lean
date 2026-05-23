@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: posSemidef_map_exp
-user: sqrt-of-2
-model: GPT-5.5
-submission_repo: sqrt-of-2/88b7e9060dec6431cca92cf56a408df3
-submission_ref: 115fadf6e81b5de783af32becb958bb8a6d96dd7
-issue_number: 151
--/
 import Mathlib
 
 open scoped MatrixOrder Matrix

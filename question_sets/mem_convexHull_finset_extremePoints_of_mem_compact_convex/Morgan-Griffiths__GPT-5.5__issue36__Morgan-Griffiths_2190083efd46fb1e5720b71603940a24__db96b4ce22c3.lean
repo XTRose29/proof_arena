@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: mem_convexHull_finset_extremePoints_of_mem_compact_convex
-user: Morgan-Griffiths
-model: GPT-5.5
-submission_repo: Morgan-Griffiths/2190083efd46fb1e5720b71603940a24
-submission_ref: db96b4ce22c3aadf0d9a5a436b5b28b7aef0bd5f
-issue_number: 36
--/
 import Mathlib
 
 namespace Submission

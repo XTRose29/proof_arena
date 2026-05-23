@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: rouche_zero_count_eq
-user: daouid
-model: Antigravity (Multi-Model Ensemble: Gemini 3.1 Pro, Gemini 3 Flash, Claude 4.6 Sonnet/Opus)
-submission_repo: daouid/lean-eval
-submission_ref: af1b0c11fab8544e36697e0d7cb85d1aee926215
-issue_number: 23
--/
 import Mathlib
 
 open MeromorphicOn Metric Real

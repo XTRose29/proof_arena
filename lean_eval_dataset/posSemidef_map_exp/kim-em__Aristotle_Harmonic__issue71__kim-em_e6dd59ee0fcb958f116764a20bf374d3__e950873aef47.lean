@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: posSemidef_map_exp
-user: kim-em
-model: Aristotle (Harmonic)
-submission_repo: kim-em/e6dd59ee0fcb958f116764a20bf374d3
-submission_ref: e950873aef479ab789df674fa8d5a21097f24092
-issue_number: 71
--/
 import Mathlib
 
 open scoped MatrixOrder Matrix

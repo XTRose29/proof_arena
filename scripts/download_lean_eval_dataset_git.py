@@ -165,24 +165,6 @@ def proof_stem(entry: dict[str, Any]) -> str:
     return "__".join(parts)
 
 
-def header(entry: dict[str, Any]) -> str:
-    record = entry["record"]
-    return "\n".join(
-        [
-            "/-",
-            "Downloaded from the public lean-eval leaderboard provenance.",
-            f"problem_id: {entry['problem_id']}",
-            f"user: {entry['user']}",
-            f"model: {entry['model']}",
-            f"submission_repo: {record.get('submission_repo')}",
-            f"submission_ref: {record.get('submission_ref')}",
-            f"issue_number: {record.get('issue_number')}",
-            "-/",
-            "",
-        ]
-    )
-
-
 def write_entry(output_dir: Path, entry: dict[str, Any], lean_files: dict[str, str]) -> list[str]:
     primary = lean_files.get("Submission.lean")
     if primary is None:
@@ -194,7 +176,7 @@ def write_entry(output_dir: Path, entry: dict[str, Any], lean_files: dict[str, s
     written: list[str] = []
 
     primary_path = problem_dir / f"{stem}.lean"
-    primary_path.write_text(header(entry) + primary)
+    primary_path.write_text(primary)
     written.append(str(primary_path))
 
     support_files = {rel: text for rel, text in lean_files.items() if rel != "Submission.lean"}

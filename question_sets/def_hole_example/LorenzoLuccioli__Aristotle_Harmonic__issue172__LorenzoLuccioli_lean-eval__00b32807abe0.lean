@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: def_hole_example
-user: LorenzoLuccioli
-model: Aristotle (Harmonic)
-submission_repo: LorenzoLuccioli/lean-eval
-submission_ref: 00b32807abe0d286c4638daf888c739e1bb4b90c
-issue_number: 172
--/
 import Submission.Helpers
 /-!
 Minimal example exercising the def-hole / multi-hole eval-problem pipeline.

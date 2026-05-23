@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: posSemidef_map_exp
-user: sqrt-of-2
-model: Aristotle (Harmonic)
-submission_repo: sqrt-of-2/931556b393de1dc23de63d1c5aefc109
-submission_ref: 6fb74c6f721c1824f764bfefcd7de649de5f04ac
-issue_number: 226
--/
 import Mathlib
 
 open scoped MatrixOrder Matrix

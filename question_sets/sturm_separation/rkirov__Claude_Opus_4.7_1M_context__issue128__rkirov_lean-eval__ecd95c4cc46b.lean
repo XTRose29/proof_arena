@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: sturm_separation
-user: rkirov
-model: Claude Opus 4.7 (1M context)
-submission_repo: rkirov/lean-eval
-submission_ref: ecd95c4cc46b14181d140adadbefe67021533ea7
-issue_number: 128
--/
 import Mathlib
 import Submission.Helpers
 

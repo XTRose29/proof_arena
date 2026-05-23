@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: oppenheim_inequality
-user: daouid
-model: Antigravity (Multi-Model Ensemble: Gemini 3.1 Pro, Gemini 3 Flash, Claude 4.6 Sonnet/Opus)
-submission_repo: daouid/lean-eval
-submission_ref: 26b8057f1ef181b15beeab762febd29bf3e6f895
-issue_number: 268
--/
 import Mathlib
 
 namespace Submission

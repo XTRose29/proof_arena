@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: heat_kernel_solves_heat_equation
-user: LorenzoLuccioli
-model: Aristotle (Harmonic)
-submission_repo: LorenzoLuccioli/lean-eval
-submission_ref: 00b32807abe0d286c4638daf888c739e1bb4b90c
-issue_number: 172
--/
 import ChallengeDeps
 import Submission.Helpers
 

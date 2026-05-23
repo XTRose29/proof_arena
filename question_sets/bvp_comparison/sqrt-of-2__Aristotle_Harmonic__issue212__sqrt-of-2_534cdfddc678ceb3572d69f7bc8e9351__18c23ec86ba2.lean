@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: bvp_comparison
-user: sqrt-of-2
-model: Aristotle (Harmonic)
-submission_repo: sqrt-of-2/534cdfddc678ceb3572d69f7bc8e9351
-submission_ref: 18c23ec86ba2365a051483b2939ac5c552d7cd5d
-issue_number: 212
--/
 import Mathlib
 
 namespace Submission

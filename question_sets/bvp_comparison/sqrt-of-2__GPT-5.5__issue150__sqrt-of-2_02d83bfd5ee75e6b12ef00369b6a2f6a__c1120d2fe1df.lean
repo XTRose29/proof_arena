@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: bvp_comparison
-user: sqrt-of-2
-model: GPT-5.5
-submission_repo: sqrt-of-2/02d83bfd5ee75e6b12ef00369b6a2f6a
-submission_ref: c1120d2fe1df1749f4a6a4daf660c100bd61701d
-issue_number: 150
--/
 import Mathlib
 
 namespace Submission

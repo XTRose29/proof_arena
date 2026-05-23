@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: vonNeumann_doubleCommutant_tfae
-user: daouid
-model: Antigravity (Multi-Model Ensemble: Gemini 3.1 Pro, Gemini 3 Flash, Claude 4.6 Sonnet/Opus)
-submission_repo: daouid/lean-eval
-submission_ref: fab2fd9d8801fa14b19706209bd9245500a97ce4
-issue_number: 13
--/
 import Mathlib
 
 namespace Submission

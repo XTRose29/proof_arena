@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: finite_graph_ramsey_theorem
-user: machinelearning2014
-model: EVO
-submission_repo: machinelearning2014/deepthought_lean_eval
-submission_ref: a1e0792d6a3c8ef61256554f03d3e2b66dee95ff
-issue_number: 9
--/
 import Mathlib
 import Submission.Helpers
 

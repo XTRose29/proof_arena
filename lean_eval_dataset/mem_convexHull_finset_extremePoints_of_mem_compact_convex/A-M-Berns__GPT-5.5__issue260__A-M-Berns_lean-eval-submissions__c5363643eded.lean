@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: mem_convexHull_finset_extremePoints_of_mem_compact_convex
-user: A-M-Berns
-model: GPT-5.5
-submission_repo: A-M-Berns/lean-eval-submissions
-submission_ref: c5363643ededf1b933d30ca50f9ff2c1c4d7483f
-issue_number: 260
--/
 import Mathlib.Analysis.Convex.Caratheodory
 import Mathlib.Analysis.Convex.Intrinsic
 import Mathlib.Analysis.Convex.KreinMilman

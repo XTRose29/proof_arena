@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: permute_to_unimodal
-user: LorenzoLuccioli
-model: Aristotle (Harmonic)
-submission_repo: LorenzoLuccioli/lean-eval
-submission_ref: 8ca62f2b83dde51613a3dd3ea14e1fc581db5293
-issue_number: 16
--/
 import ChallengeDeps
 import Submission.LowerBound
 import Submission.Achievability

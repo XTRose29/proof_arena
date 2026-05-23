@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: mem_convexHull_finset_extremePoints_of_mem_compact_convex
-user: daouid
-model: Antigravity (Multi-Model Ensemble: Gemini 3.1 Pro, Gemini 3 Flash, Claude 4.6 Sonnet/Opus)
-submission_repo: daouid/lean-eval
-submission_ref: 46f806927dd92bed763a8bc71fe106a417c66259
-issue_number: 251
--/
 import Mathlib
 import Submission.Helpers
 

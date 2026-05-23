@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: oppenheim_inequality
-user: Morgan-Griffiths
-model: GPT-5.5
-submission_repo: Morgan-Griffiths/5a6dfcdd13165a579e6fe9101c1568a0
-submission_ref: 9024c01533ea012383110196915bcb582331bcce
-issue_number: 38
--/
 import Mathlib
 
 namespace Submission

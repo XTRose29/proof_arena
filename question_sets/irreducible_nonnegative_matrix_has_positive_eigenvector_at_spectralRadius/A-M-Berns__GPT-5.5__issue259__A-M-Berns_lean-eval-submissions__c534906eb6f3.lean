@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: irreducible_nonnegative_matrix_has_positive_eigenvector_at_spectralRadius
-user: A-M-Berns
-model: GPT-5.5
-submission_repo: A-M-Berns/lean-eval-submissions
-submission_ref: c534906eb6f3bde20d1d57e266a8fc6fe5d52b36
-issue_number: 259
--/
 import Mathlib.Analysis.Convex.StdSimplex
 import Mathlib.Analysis.Matrix.Spectrum
 import Mathlib.Analysis.Normed.Algebra.GelfandFormula

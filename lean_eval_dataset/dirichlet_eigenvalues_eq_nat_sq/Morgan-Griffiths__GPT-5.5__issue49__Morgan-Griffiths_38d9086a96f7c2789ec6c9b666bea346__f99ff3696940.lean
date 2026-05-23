@@ -1,12 +1,3 @@
-/-
-Downloaded from the public lean-eval leaderboard provenance.
-problem_id: dirichlet_eigenvalues_eq_nat_sq
-user: Morgan-Griffiths
-model: GPT-5.5
-submission_repo: Morgan-Griffiths/38d9086a96f7c2789ec6c9b666bea346
-submission_ref: f99ff369694089eaa380b08a98ca9d931446a5fe
-issue_number: 49
--/
 import Mathlib.Analysis.Calculus.Deriv.Basic
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv
