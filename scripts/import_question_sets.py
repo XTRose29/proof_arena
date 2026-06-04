@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from scripts.env_file import load_env_file
+
+load_env_file()
+
 from app.database import Base, SessionLocal, engine, ensure_models_imported
 from app.services import sync_question_sets
 
@@ -14,7 +18,7 @@ def main() -> None:
         session.close()
     print(
         "Synchronized question sets: "
-        f"{stats['questions']} questions, {stats['proofs']} proofs, {stats['nodes']} nodes"
+        f"{stats['questions']} questions, {stats['proofs']} proofs"
     )
 
 

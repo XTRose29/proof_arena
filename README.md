@@ -10,7 +10,7 @@ The current production deployment uses:
 ## What The App Does
 
 - Parses Lean files from `question_sets/`
-- Stores parsed questions, proofs, and nodes in PostgreSQL
+- Stores parsed questions and proofs in PostgreSQL
 - Serves the frontend and API from the same FastAPI app
 - Loads randomized same-question proof pairs from the database
 - Saves evaluator metadata and A/B preference submissions into the database
@@ -42,8 +42,14 @@ proof_arena/
     services.py
   question_sets/
   scripts/
+    dataset_counts.py
+    download_lean_eval_dataset_git.py
+    export_backend_database.py
     import_question_sets.py
+    migrate_proof_only_schema.py
+    migrate_user_profile_fields.py
   static/
+  backend_database_export/
   .env.example
   docker-compose.yml
   Dockerfile
@@ -60,7 +66,7 @@ Lean files in `question_sets/` are not read directly by the webpage at request t
 
 Instead:
 
-1. The sync script parses files from `question_sets/`
+1. The sync script reads Lean files from `question_sets/`
 2. Parsed records are inserted or updated in PostgreSQL
 3. The frontend reads dataset information through the API
 4. The API serves randomized A/B comparisons from the database
@@ -80,6 +86,17 @@ When a user submits an evaluation:
    - `preference_votes`
 
 So evaluator metadata, A/B assignments, and preference scores are stored in PostgreSQL, not in local files.
+
+### Current database tables
+
+The current backend schema is proof-only:
+
+- `questions`
+- `proofs`
+- `preference_evaluations`
+- `preference_votes`
+- `users`
+- `auth_tokens`
 
 ## Environment Variables
 
@@ -136,7 +153,9 @@ Then open:
 http://127.0.0.1:8000
 ```
 
-## Syncing Question Sets
+## Database Operations
+
+### Sync question sets
 
 To sync `question_sets/` into PostgreSQL:
 
@@ -148,8 +167,8 @@ This command:
 
 - creates tables if needed
 - parses Lean files under `question_sets/`
-- adds new questions/proofs/nodes
-- updates changed questions/proofs/nodes
+- adds new questions/proofs
+- updates changed questions/proofs
 - removes dataset records that no longer exist locally
 - preserves saved user evaluations and votes
 
@@ -157,6 +176,34 @@ Use it when:
 
 - setting up a new database
 - refreshing the dataset after editing `question_sets/`
+
+For an older database that still has node-comparison tables or columns, run:
+
+```bash
+python3 -m scripts.migrate_proof_only_schema
+```
+
+To move evaluator affiliation and Lean experience fields from evaluations to users, run:
+
+```bash
+python3 -m scripts.migrate_user_profile_fields
+```
+
+### Export backend data
+
+To export the configured backend database into repo-local JSON files:
+
+```bash
+python3 -m scripts.export_backend_database
+```
+
+The export is written to `backend_database_export/`. Auth tokens and password hashes are redacted by default; pass `--include-sensitive` only for a private backup.
+
+The export folder contains:
+
+- `_manifest.json`
+- `_schema.json`
+- one JSON file per database table under `tables/`
 
 ## Deployment
 
@@ -190,7 +237,7 @@ If you use a pooled Neon connection string, keep the parameters Neon provides.
 
 - The website reads dataset snapshots and randomized comparison data from PostgreSQL
 - Submitted evaluations are saved into PostgreSQL with evaluator identity and metadata
-- If the database is empty, the site will show `0 questions, 0 proofs, 0 nodes`
+- If the database is empty, the site will show `0 questions, 0 proofs`
 - After importing `question_sets/`, the UI will start serving real comparisons
 
 ## Notes

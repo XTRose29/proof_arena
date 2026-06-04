@@ -12,7 +12,6 @@ from app.database import SessionLocal, ensure_models_imported
 TABLES = [
     "questions",
     "proofs",
-    "nodes",
     "preference_evaluations",
     "preference_votes",
     "users",

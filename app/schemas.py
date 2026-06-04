@@ -51,7 +51,7 @@ class EvaluationMetaIn(BaseModel):
 
 
 class ComparisonEntityRef(BaseModel):
-    kind: Literal["proof", "node"]
+    kind: Literal["proof"]
     entityId: int
 
 
@@ -63,7 +63,7 @@ class PreferenceScoresIn(BaseModel):
 
 
 class PreferenceEvaluationCreate(BaseModel):
-    mode: str
+    mode: Literal["same_question_proofs"]
     a: ComparisonEntityRef
     b: ComparisonEntityRef
     preferences: PreferenceScoresIn
