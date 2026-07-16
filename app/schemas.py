@@ -56,9 +56,10 @@ class ComparisonEntityRef(BaseModel):
 
 
 class PreferenceScoresIn(BaseModel):
-    clarity: PreferenceValue
-    conciseness: PreferenceValue
-    idiomaticStructure: PreferenceValue
+    reuse: PreferenceValue
+    naming: PreferenceValue
+    documentation: PreferenceValue
+    proofQuality: PreferenceValue
     overall: PreferenceValue
 
 

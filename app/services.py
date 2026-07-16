@@ -363,9 +363,10 @@ def save_preference_evaluation(session: Session, user: User, payload: Preference
     session.flush()
 
     votes = {
-        "clarity": payload.preferences.clarity,
-        "conciseness": payload.preferences.conciseness,
-        "idiomatic_structure": payload.preferences.idiomaticStructure,
+        "reuse": payload.preferences.reuse,
+        "naming": payload.preferences.naming,
+        "documentation": payload.preferences.documentation,
+        "proof_quality": payload.preferences.proofQuality,
         "overall": payload.preferences.overall,
     }
     for criterion, preference in votes.items():

@@ -76,7 +76,7 @@ class PreferenceVote(Base):
     __table_args__ = (
         Index("idx_preference_votes_evaluation_id", "evaluation_id"),
         CheckConstraint(
-            "criterion IN ('clarity', 'conciseness', 'idiomatic_structure', 'overall')",
+            "criterion IN ('reuse', 'naming', 'documentation', 'proof_quality', 'overall')",
             name="ck_preference_votes_criterion",
         ),
         CheckConstraint(
