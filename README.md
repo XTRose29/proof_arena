@@ -1,6 +1,6 @@
 # Proof Arena
 
-Proof Arena is a deployable `FastAPI + PostgreSQL` app for randomized A/B comparison of Lean proofs for the same question, Google-based evaluator login, and persistent storage of both the dataset and submitted preferences.
+Proof Arena is a deployable `FastAPI + PostgreSQL` app for randomized A/B comparison of Lean proofs, model-generated meta-reviews, Google-based evaluator login, and persistent storage of the resulting judgments.
 
 The current production deployment uses:
 
@@ -14,6 +14,8 @@ The current production deployment uses:
 - Serves the frontend and API from the same FastAPI app
 - Loads randomized same-question proof pairs from the database
 - Saves evaluator metadata and A/B preference submissions into the database
+- Generates two independent rubric-based evaluations for a database or uploaded Lean proof
+- Saves each meta-review pair and the evaluator's A/B/tie choice
 
 Current API surface:
 
@@ -27,6 +29,10 @@ Current API surface:
 - `GET /api/comparison`
 - `POST /api/evaluations`
 - `GET /api/evaluations?limit=50`
+- `GET /api/meta-review/proofs`
+- `GET /api/meta-review/featured`
+- `POST /api/meta-review/generate`
+- `POST /api/meta-review/{session_id}/selection`
 
 ## Repository Layout
 
@@ -97,6 +103,8 @@ The current backend schema is proof-only:
 - `preference_votes`
 - `users`
 - `auth_tokens`
+- `meta_review_sessions`
+- `meta_review_votes`
 
 ## Environment Variables
 
@@ -118,6 +126,12 @@ Optional:
   - Default: `*`
 - `PROOF_ARENA_GOOGLE_CLIENT_ID`
   - Google OAuth web client ID used by the frontend sign-in button and backend ID token verification
+- `ANTHROPIC_API_KEY`
+  - API key used to generate the two meta-review evaluations
+- `CLAUDE_MODEL`
+  - Claude model identifier used for both independent evaluation calls
+- `ANTHROPIC_BASE_URL`
+  - Optional Anthropic-compatible API base URL; defaults to `https://api.anthropic.com`
 
 See [`.env.example`](/Users/xutianruo/Documents/proof_arena/.env.example).
 
@@ -139,6 +153,8 @@ For local PostgreSQL:
 export PROOF_ARENA_DATABASE_URL='postgresql+psycopg://proof_arena:password@localhost:5432/proof_arena'
 export PROOF_ARENA_AUTO_SEED=false
 export PROOF_ARENA_GOOGLE_CLIENT_ID='your-google-web-client-id.apps.googleusercontent.com'
+export ANTHROPIC_API_KEY='your-api-key'
+export CLAUDE_MODEL='your-claude-model'
 ```
 
 ### 3. Run the app
@@ -189,6 +205,12 @@ To move evaluator affiliation and Lean experience fields from evaluations to use
 python3 -m scripts.migrate_user_profile_fields
 ```
 
+To generate the single featured meta-review shown when users open the Meta Reviewer tab, run:
+
+```bash
+python3 -m scripts.pregenerate_featured_meta_review
+```
+
 ### Export backend data
 
 To export the configured backend database into repo-local JSON files:
@@ -217,6 +239,9 @@ For Vercel, set these environment variables in Project Settings:
 - `PROOF_ARENA_AUTO_SEED=false`
 - `PROOF_ARENA_CORS_ORIGINS`
 - `PROOF_ARENA_GOOGLE_CLIENT_ID`
+- `ANTHROPIC_API_KEY`
+- `CLAUDE_MODEL`
+- `ANTHROPIC_BASE_URL` (only when using a compatible proxy or gateway)
 
 Recommended:
 

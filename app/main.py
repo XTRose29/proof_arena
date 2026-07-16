@@ -11,16 +11,28 @@ from sqlalchemy.orm import Session
 
 from .config import GOOGLE_VERIFICATION_FILE, STATIC_DIR, auto_seed_enabled, cors_origins, google_client_id
 from .database import Base, SessionLocal, engine, ensure_models_imported, get_db
-from .schemas import GoogleAuthRequest, LoginRequest, PreferenceEvaluationCreate, RegisterRequest, UpdateProfileRequest
+from .schemas import (
+    GoogleAuthRequest,
+    LoginRequest,
+    MetaReviewGenerateRequest,
+    MetaReviewSelectionRequest,
+    PreferenceEvaluationCreate,
+    RegisterRequest,
+    UpdateProfileRequest,
+)
 from .services import (
     auth_user_from_token,
     build_random_comparison,
+    build_meta_review,
+    database_proof_options,
     create_user,
     evaluations_payload,
+    featured_meta_review,
     init_database,
     login_user_with_google,
     login_user,
     save_preference_evaluation,
+    save_meta_review_selection,
     serialize_user,
     summary_payload,
     update_user_profile,
@@ -165,6 +177,64 @@ def create_evaluation(
     except (KeyError, TypeError, ValueError) as exc:
         raise HTTPException(status_code=400, detail=f"Invalid request: {exc}") from exc
     return {"ok": True, "sessionId": session_id}
+
+
+@app.get("/api/meta-review/proofs")
+def get_meta_review_proofs(
+    authorization: str | None = Header(default=None),
+    db: Session = Depends(get_db),
+) -> dict:
+    try:
+        auth_user_from_token(db, authorization)
+        return {"proofs": database_proof_options(db)}
+    except PermissionError as exc:
+        raise HTTPException(status_code=401, detail=str(exc)) from exc
+
+
+@app.get("/api/meta-review/featured")
+def get_featured_meta_review(
+    authorization: str | None = Header(default=None),
+    db: Session = Depends(get_db),
+) -> dict:
+    try:
+        auth_user_from_token(db, authorization)
+        return featured_meta_review(db)
+    except PermissionError as exc:
+        raise HTTPException(status_code=401, detail=str(exc)) from exc
+    except LookupError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@app.post("/api/meta-review/generate", status_code=201)
+def generate_meta_review(
+    payload: MetaReviewGenerateRequest,
+    authorization: str | None = Header(default=None),
+    db: Session = Depends(get_db),
+) -> dict:
+    try:
+        user = auth_user_from_token(db, authorization)
+        return build_meta_review(db, user, payload)
+    except PermissionError as exc:
+        raise HTTPException(status_code=401, detail=str(exc)) from exc
+    except (KeyError, ValueError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post("/api/meta-review/{session_id}/selection")
+def select_meta_review(
+    session_id: int,
+    payload: MetaReviewSelectionRequest,
+    authorization: str | None = Header(default=None),
+    db: Session = Depends(get_db),
+) -> dict[str, bool]:
+    try:
+        user = auth_user_from_token(db, authorization)
+        save_meta_review_selection(db, user, session_id, payload)
+    except PermissionError as exc:
+        raise HTTPException(status_code=401, detail=str(exc)) from exc
+    except (KeyError, ValueError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return {"ok": True}
 
 
 @app.get("/")

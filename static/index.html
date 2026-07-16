@@ -40,7 +40,12 @@
         </article>
       </section>
 
-      <section class="card scoring-card workspace-card">
+      <nav class="mode-switch" aria-label="Arena mode">
+        <button id="reviewerModeButton" class="mode-switch-button active" type="button">Reviewer</button>
+        <button id="metaReviewerModeButton" class="mode-switch-button" type="button">Meta Reviewer</button>
+      </nav>
+
+      <section id="reviewerWorkspace" class="card scoring-card workspace-card">
         <div class="section-heading">
           <div>
             <p class="eyebrow small">Preference Matrix</p>
@@ -91,6 +96,63 @@
           <article class="panel loading-panel">Log in with Google to see a proof comparison.</article>
         </section>
         <p id="statusText" class="status-text" role="status"></p>
+      </section>
+
+      <section id="metaReviewerWorkspace" class="card workspace-card meta-workspace hidden">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow small">Evaluation Comparison</p>
+            <h2>Meta Reviewer</h2>
+          </div>
+        </div>
+
+        <div class="meta-source-tabs" role="tablist" aria-label="Proof source">
+          <button id="databaseSourceButton" class="meta-source-tab active" type="button" role="tab">Database proof</button>
+          <button id="uploadSourceButton" class="meta-source-tab" type="button" role="tab">Upload Lean proof</button>
+        </div>
+
+        <div id="databaseSourcePanel" class="meta-source-panel">
+          <label for="metaProofSelect">
+            Proof
+            <select id="metaProofSelect">
+              <option value="">Choose a proof</option>
+            </select>
+          </label>
+        </div>
+
+        <div id="uploadSourcePanel" class="meta-source-panel hidden">
+          <label for="metaProofTitle">Title<input id="metaProofTitle" type="text" value="Uploaded Lean proof" /></label>
+          <label for="metaProofFile">Lean file<input id="metaProofFile" type="file" accept=".lean,text/plain" /></label>
+          <label for="metaProofText">Lean source<textarea id="metaProofText" rows="13" spellcheck="false" placeholder="Paste Lean source here."></textarea></label>
+        </div>
+
+        <div class="meta-actions">
+          <button id="generateMetaReviewButton" class="submit-button" type="button">Generate two evaluations</button>
+        </div>
+
+        <section id="metaResults" class="meta-results hidden" aria-live="polite">
+          <div class="meta-results-heading">
+            <div>
+              <p class="eyebrow small">Generated Evaluations</p>
+              <h3 id="metaProofHeading"></h3>
+            </div>
+          </div>
+          <details class="meta-proof-details">
+            <summary>Proof source</summary>
+            <pre id="metaProofPreview" class="code-viewer meta-proof-viewer"></pre>
+          </details>
+          <div id="metaEvaluationGrid" class="meta-evaluation-grid"></div>
+          <div class="meta-selection">
+            <p>Which evaluation is more accurate and useful?</p>
+            <div class="meta-selection-buttons" role="group" aria-label="Choose a better evaluation">
+              <button class="secondary-button" type="button" data-meta-choice="a">Evaluation A</button>
+              <button class="secondary-button" type="button" data-meta-choice="b">Evaluation B</button>
+              <button class="ghost-button" type="button" data-meta-choice="tie">No difference</button>
+            </div>
+            <label for="metaSelectionReason">Reason (optional)<textarea id="metaSelectionReason" rows="3" placeholder="What made this evaluation better?"></textarea></label>
+          </div>
+        </section>
+        <p id="metaStatusText" class="status-text" role="status"></p>
       </section>
 
       <footer class="page-note">

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 PreferenceValue = Literal["a_way_better", "a_better", "no_difference", "b_better", "b_way_better"]
@@ -70,3 +70,22 @@ class PreferenceEvaluationCreate(BaseModel):
     preferences: PreferenceScoresIn
     evaluator: EvaluationMetaIn | None = None
     generalComment: str = Field(default="", max_length=5000)
+
+
+class MetaReviewGenerateRequest(BaseModel):
+    proofId: int | None = Field(default=None, ge=1)
+    customTitle: str = Field(default="Uploaded Lean proof", max_length=300)
+    customProof: str = Field(default="", max_length=80000)
+
+    @model_validator(mode="after")
+    def has_exactly_one_source(self) -> "MetaReviewGenerateRequest":
+        has_database_proof = self.proofId is not None
+        has_uploaded_proof = bool(self.customProof.strip())
+        if has_database_proof == has_uploaded_proof:
+            raise ValueError("Provide either a database proof or uploaded Lean text.")
+        return self
+
+
+class MetaReviewSelectionRequest(BaseModel):
+    choice: Literal["a", "b", "tie"]
+    reason: str = Field(default="", max_length=5000)

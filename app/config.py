@@ -27,3 +27,15 @@ def auto_seed_enabled() -> bool:
 
 def google_client_id() -> str:
     return os.environ.get("PROOF_ARENA_GOOGLE_CLIENT_ID", "").strip()
+
+
+def anthropic_api_key() -> str:
+    return os.environ.get("ANTHROPIC_API_KEY", "").strip()
+
+
+def anthropic_base_url() -> str:
+    return os.environ.get("ANTHROPIC_BASE_URL", "https://api.anthropic.com").rstrip("/")
+
+
+def claude_model() -> str:
+    return os.environ.get("CLAUDE_MODEL", "").strip()

@@ -3,6 +3,10 @@ from __future__ import annotations
 import os
 
 import uvicorn
+from scripts.env_file import load_env_file
+
+load_env_file()
+
 from app.main import app
 
 

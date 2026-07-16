@@ -21,6 +21,11 @@ const tabItems = [...criteria, ["comment", "Comment"]];
 
 const state = {
   comparison: null,
+  activeMode: "reviewer",
+  metaSource: "database",
+  metaProofsLoaded: false,
+  featuredMetaReviewLoaded: false,
+  metaSession: null,
   authToken: localStorage.getItem(AUTH_TOKEN_KEY),
   currentUser: null,
   preferences: { ...defaultPreferences },
@@ -163,8 +168,17 @@ function setStatus(message, isError = false) {
   el.style.color = isError ? "var(--warn)" : "var(--muted)";
 }
 
+function setMetaStatus(message, isError = false) {
+  const el = document.getElementById("metaStatusText");
+  if (!el) {
+    return;
+  }
+  el.textContent = message;
+  el.style.color = isError ? "var(--warn)" : "var(--muted)";
+}
+
 function escapeHtml(text) {
-  return text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+  return String(text).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 }
 
 function highlightToken(token) {
@@ -555,11 +569,17 @@ function clearCurrentUser() {
   state.currentUser = null;
   state.authToken = null;
   state.comparison = null;
+  state.metaProofsLoaded = false;
+  state.featuredMetaReviewLoaded = false;
+  state.metaSession = null;
   localStorage.removeItem(AUTH_TOKEN_KEY);
   document.getElementById("accountCardTitle").textContent = "Google Login";
   document.getElementById("googleLoginMount").classList.remove("hidden");
   document.getElementById("accountCompact").classList.add("hidden");
   document.getElementById("arenaGrid").innerHTML = '<article class="panel loading-panel">Log in with Google to see a proof comparison.</article>';
+  document.getElementById("metaResults").classList.add("hidden");
+  document.getElementById("metaProofSelect").innerHTML = '<option value="">Choose a proof</option>';
+  setMetaStatus("");
 }
 
 function populateProfileForm(user) {
@@ -678,6 +698,186 @@ async function loadComparison() {
     document.getElementById("arenaGrid").innerHTML =
       `<article class="panel loading-panel">${escapeHtml(error.message)}</article>`;
     throw error;
+  }
+}
+
+function setArenaMode(mode) {
+  state.activeMode = mode;
+  const reviewerActive = mode === "reviewer";
+  document.getElementById("reviewerWorkspace").classList.toggle("hidden", !reviewerActive);
+  document.getElementById("metaReviewerWorkspace").classList.toggle("hidden", reviewerActive);
+  document.getElementById("reviewerModeButton").classList.toggle("active", reviewerActive);
+  document.getElementById("metaReviewerModeButton").classList.toggle("active", !reviewerActive);
+  setStatus("");
+
+  if (!reviewerActive && state.currentUser) {
+    loadFeaturedMetaReview().catch((error) => setMetaStatus(error.message, true));
+    loadMetaProofs().catch((error) => setMetaStatus(error.message, true));
+  }
+}
+
+function setMetaSource(source) {
+  state.metaSource = source;
+  const databaseSelected = source === "database";
+  document.getElementById("databaseSourceButton").classList.toggle("active", databaseSelected);
+  document.getElementById("uploadSourceButton").classList.toggle("active", !databaseSelected);
+  document.getElementById("databaseSourcePanel").classList.toggle("hidden", !databaseSelected);
+  document.getElementById("uploadSourcePanel").classList.toggle("hidden", databaseSelected);
+}
+
+async function loadMetaProofs() {
+  if (!state.currentUser || state.metaProofsLoaded) {
+    return;
+  }
+  const result = await fetchJson("/api/meta-review/proofs");
+  const select = document.getElementById("metaProofSelect");
+  select.innerHTML = '<option value="">Choose a proof</option>';
+  result.proofs.forEach((proof) => {
+    const option = document.createElement("option");
+    option.value = String(proof.id);
+    const author = proof.author ? `, ${proof.author}` : "";
+    option.textContent = `${proof.questionTitle} - ${proof.title}${author} (${proof.lineCount} lines)`;
+    select.appendChild(option);
+  });
+  state.metaProofsLoaded = true;
+}
+
+async function loadFeaturedMetaReview() {
+  if (!state.currentUser || state.featuredMetaReviewLoaded) {
+    return;
+  }
+  const result = await fetchJson("/api/meta-review/featured");
+  renderMetaReview(result);
+  state.featuredMetaReviewLoaded = true;
+  setMetaStatus("Choose the evaluation you find more accurate and useful.");
+}
+
+function renderMetaEvaluation(label, evaluation) {
+  const card = document.createElement("article");
+  card.className = "panel meta-evaluation-card";
+
+  const header = document.createElement("header");
+  header.className = "meta-evaluation-header";
+  const heading = document.createElement("h3");
+  heading.textContent = `Evaluation ${label}`;
+  const summary = document.createElement("p");
+  summary.className = "meta-summary";
+  summary.textContent = evaluation.summary;
+  header.append(heading, summary);
+  card.appendChild(header);
+
+  criteria.forEach(([clientKey, labelText]) => {
+    const apiKey = clientKey === "proofQuality" ? "proof_quality" : clientKey;
+    const item = evaluation[apiKey];
+    const section = document.createElement("section");
+    section.className = "meta-criterion";
+    const title = document.createElement("h4");
+    title.textContent = labelText;
+    const verdict = document.createElement("span");
+    verdict.className = `meta-verdict ${item.verdict}`;
+    verdict.textContent = item.verdict.replace("_", " ");
+    const reason = document.createElement("p");
+    reason.textContent = item.reason;
+    section.append(title, verdict, reason);
+    card.appendChild(section);
+  });
+  return card;
+}
+
+function renderMetaReview(result) {
+  state.metaSession = result.sessionId;
+  const results = document.getElementById("metaResults");
+  document.getElementById("metaProofHeading").textContent = result.source.title;
+  document.getElementById("metaProofPreview").textContent = result.source.proof;
+  const selectionReason = document.getElementById("metaSelectionReason");
+  selectionReason.value = "";
+  selectionReason.disabled = false;
+  const grid = document.getElementById("metaEvaluationGrid");
+  grid.innerHTML = "";
+  grid.append(renderMetaEvaluation("A", result.a), renderMetaEvaluation("B", result.b));
+  document.querySelectorAll("[data-meta-choice]").forEach((button) => {
+    button.disabled = false;
+    button.classList.remove("selected");
+  });
+  results.classList.remove("hidden");
+}
+
+async function generateMetaReview() {
+  if (!state.currentUser) {
+    throw new Error("Log in with Google before generating evaluations.");
+  }
+  const button = document.getElementById("generateMetaReviewButton");
+  let payload;
+  if (state.metaSource === "database") {
+    const proofId = Number(document.getElementById("metaProofSelect").value);
+    if (!proofId) {
+      throw new Error("Choose a database proof.");
+    }
+    payload = { proofId };
+  } else {
+    const customProof = document.getElementById("metaProofText").value.trim();
+    if (!customProof) {
+      throw new Error("Upload a Lean file or paste Lean source.");
+    }
+    payload = {
+      customTitle: document.getElementById("metaProofTitle").value.trim() || "Uploaded Lean proof",
+      customProof,
+    };
+  }
+
+  button.disabled = true;
+  setMetaStatus("Generating two independent evaluations...");
+  try {
+    const result = await fetchJson("/api/meta-review/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    renderMetaReview(result);
+    setMetaStatus("Choose the evaluation you find more accurate and useful.");
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function selectMetaReview(choice, button) {
+  if (!state.metaSession) {
+    throw new Error("Generate evaluations before choosing one.");
+  }
+  const buttons = [...document.querySelectorAll("[data-meta-choice]")];
+  buttons.forEach((choiceButton) => {
+    choiceButton.disabled = true;
+  });
+  try {
+    await fetchJson(`/api/meta-review/${state.metaSession}/selection`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        choice,
+        reason: document.getElementById("metaSelectionReason").value.trim(),
+      }),
+    });
+    button.classList.add("selected");
+    document.getElementById("metaSelectionReason").disabled = true;
+    setMetaStatus("Your selection has been recorded.");
+  } catch (error) {
+    buttons.forEach((choiceButton) => {
+      choiceButton.disabled = false;
+    });
+    throw error;
+  }
+}
+
+async function loadMetaProofFile(event) {
+  const file = event.target.files?.[0];
+  if (!file) {
+    return;
+  }
+  const text = await file.text();
+  document.getElementById("metaProofText").value = text;
+  const title = document.getElementById("metaProofTitle");
+  if (!title.value || title.value === "Uploaded Lean proof") {
+    title.value = file.name.replace(/\.lean$/i, "");
   }
 }
 
@@ -808,6 +1008,9 @@ function handleHorizontalShortcut(direction) {
 }
 
 function handleKeyboardShortcuts(event) {
+  if (state.activeMode !== "reviewer") {
+    return;
+  }
   if (state.profileDialogOpen) {
     return;
   }
@@ -898,6 +1101,7 @@ function updateFullscreenButton() {
 async function main() {
   document.body.dataset.googleClientId = "";
   renderScoreMatrix();
+  setArenaMode("reviewer");
   document.getElementById("evaluationTabs").addEventListener("click", () => setVimFocus("criteria"));
   document.getElementById("evaluationLayout").addEventListener("click", () => setVimFocus("rating"));
   document.getElementById("commentPanel").addEventListener("click", (event) => {
@@ -913,6 +1117,21 @@ async function main() {
   document.getElementById("profileForm").addEventListener("submit", (event) => saveProfile(event).catch((error) => setStatus(error.message, true)));
   document.getElementById("profileDialog").addEventListener("close", () => {
     state.profileDialogOpen = false;
+  });
+  document.getElementById("reviewerModeButton").addEventListener("click", () => setArenaMode("reviewer"));
+  document.getElementById("metaReviewerModeButton").addEventListener("click", () => setArenaMode("meta"));
+  document.getElementById("databaseSourceButton").addEventListener("click", () => setMetaSource("database"));
+  document.getElementById("uploadSourceButton").addEventListener("click", () => setMetaSource("upload"));
+  document.getElementById("metaProofFile").addEventListener("change", (event) => {
+    loadMetaProofFile(event).catch((error) => setMetaStatus(error.message, true));
+  });
+  document.getElementById("generateMetaReviewButton").addEventListener("click", () => {
+    generateMetaReview().catch((error) => setMetaStatus(error.message, true));
+  });
+  document.querySelectorAll("[data-meta-choice]").forEach((button) => {
+    button.addEventListener("click", () => {
+      selectMetaReview(button.dataset.metaChoice, button).catch((error) => setMetaStatus(error.message, true));
+    });
   });
   document.addEventListener("fullscreenchange", updateFullscreenButton);
   window.addEventListener("keydown", handleKeyboardShortcuts);
