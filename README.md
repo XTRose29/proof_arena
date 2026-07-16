@@ -14,8 +14,8 @@ The current production deployment uses:
 - Serves the frontend and API from the same FastAPI app
 - Loads randomized same-question proof pairs from the database
 - Saves evaluator metadata and A/B preference submissions into the database
-- Generates two independent rubric-based evaluations for a database or uploaded Lean proof
-- Saves each meta-review pair and the evaluator's A/B/tie choice
+- Pre-generates two independent rubric-based evaluations for one featured database proof
+- Saves each evaluator's A/B/tie choice for that featured pair
 
 Current API surface:
 
@@ -54,6 +54,7 @@ proof_arena/
     import_question_sets.py
     migrate_proof_only_schema.py
     migrate_user_profile_fields.py
+    pregenerate_featured_meta_review.py
   static/
   backend_database_export/
   .env.example

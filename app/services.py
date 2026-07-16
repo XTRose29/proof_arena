@@ -652,7 +652,7 @@ def build_featured_meta_review(session: Session) -> dict[str, Any]:
     return _serialize_meta_review(record)
 
 
-def featured_meta_review(session: Session) -> dict[str, Any]:
+def featured_meta_review(session: Session, user: User | None = None) -> dict[str, Any]:
     record = session.execute(
         select(MetaReviewSession)
         .where(MetaReviewSession.is_featured.is_(True))
@@ -660,7 +660,16 @@ def featured_meta_review(session: Session) -> dict[str, Any]:
     ).scalars().first()
     if record is None:
         raise LookupError("The featured meta review has not been generated yet.")
-    return _serialize_meta_review(record)
+    payload = _serialize_meta_review(record)
+    if user is not None:
+        vote = session.execute(
+            select(MetaReviewVote).where(
+                MetaReviewVote.session_id == record.id,
+                MetaReviewVote.user_id == user.id,
+            )
+        ).scalar_one_or_none()
+        payload["userChoice"] = vote.choice if vote is not None else None
+    return payload
 
 
 def save_meta_review_selection(

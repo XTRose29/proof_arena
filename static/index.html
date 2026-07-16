@@ -106,30 +106,6 @@
           </div>
         </div>
 
-        <div class="meta-source-tabs" role="tablist" aria-label="Proof source">
-          <button id="databaseSourceButton" class="meta-source-tab active" type="button" role="tab">Database proof</button>
-          <button id="uploadSourceButton" class="meta-source-tab" type="button" role="tab">Upload Lean proof</button>
-        </div>
-
-        <div id="databaseSourcePanel" class="meta-source-panel">
-          <label for="metaProofSelect">
-            Proof
-            <select id="metaProofSelect">
-              <option value="">Choose a proof</option>
-            </select>
-          </label>
-        </div>
-
-        <div id="uploadSourcePanel" class="meta-source-panel hidden">
-          <label for="metaProofTitle">Title<input id="metaProofTitle" type="text" value="Uploaded Lean proof" /></label>
-          <label for="metaProofFile">Lean file<input id="metaProofFile" type="file" accept=".lean,text/plain" /></label>
-          <label for="metaProofText">Lean source<textarea id="metaProofText" rows="13" spellcheck="false" placeholder="Paste Lean source here."></textarea></label>
-        </div>
-
-        <div class="meta-actions">
-          <button id="generateMetaReviewButton" class="submit-button" type="button">Generate two evaluations</button>
-        </div>
-
         <section id="metaResults" class="meta-results hidden" aria-live="polite">
           <div class="meta-results-heading">
             <div>

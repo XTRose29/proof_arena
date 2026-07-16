@@ -197,8 +197,8 @@ def get_featured_meta_review(
     db: Session = Depends(get_db),
 ) -> dict:
     try:
-        auth_user_from_token(db, authorization)
-        return featured_meta_review(db)
+        user = auth_user_from_token(db, authorization)
+        return featured_meta_review(db, user)
     except PermissionError as exc:
         raise HTTPException(status_code=401, detail=str(exc)) from exc
     except LookupError as exc:

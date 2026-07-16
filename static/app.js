@@ -22,8 +22,6 @@ const tabItems = [...criteria, ["comment", "Comment"]];
 const state = {
   comparison: null,
   activeMode: "reviewer",
-  metaSource: "database",
-  metaProofsLoaded: false,
   featuredMetaReviewLoaded: false,
   metaSession: null,
   authToken: localStorage.getItem(AUTH_TOKEN_KEY),
@@ -569,7 +567,6 @@ function clearCurrentUser() {
   state.currentUser = null;
   state.authToken = null;
   state.comparison = null;
-  state.metaProofsLoaded = false;
   state.featuredMetaReviewLoaded = false;
   state.metaSession = null;
   localStorage.removeItem(AUTH_TOKEN_KEY);
@@ -578,7 +575,6 @@ function clearCurrentUser() {
   document.getElementById("accountCompact").classList.add("hidden");
   document.getElementById("arenaGrid").innerHTML = '<article class="panel loading-panel">Log in with Google to see a proof comparison.</article>';
   document.getElementById("metaResults").classList.add("hidden");
-  document.getElementById("metaProofSelect").innerHTML = '<option value="">Choose a proof</option>';
   setMetaStatus("");
 }
 
@@ -712,34 +708,7 @@ function setArenaMode(mode) {
 
   if (!reviewerActive && state.currentUser) {
     loadFeaturedMetaReview().catch((error) => setMetaStatus(error.message, true));
-    loadMetaProofs().catch((error) => setMetaStatus(error.message, true));
   }
-}
-
-function setMetaSource(source) {
-  state.metaSource = source;
-  const databaseSelected = source === "database";
-  document.getElementById("databaseSourceButton").classList.toggle("active", databaseSelected);
-  document.getElementById("uploadSourceButton").classList.toggle("active", !databaseSelected);
-  document.getElementById("databaseSourcePanel").classList.toggle("hidden", !databaseSelected);
-  document.getElementById("uploadSourcePanel").classList.toggle("hidden", databaseSelected);
-}
-
-async function loadMetaProofs() {
-  if (!state.currentUser || state.metaProofsLoaded) {
-    return;
-  }
-  const result = await fetchJson("/api/meta-review/proofs");
-  const select = document.getElementById("metaProofSelect");
-  select.innerHTML = '<option value="">Choose a proof</option>';
-  result.proofs.forEach((proof) => {
-    const option = document.createElement("option");
-    option.value = String(proof.id);
-    const author = proof.author ? `, ${proof.author}` : "";
-    option.textContent = `${proof.questionTitle} - ${proof.title}${author} (${proof.lineCount} lines)`;
-    select.appendChild(option);
-  });
-  state.metaProofsLoaded = true;
 }
 
 async function loadFeaturedMetaReview() {
@@ -749,7 +718,11 @@ async function loadFeaturedMetaReview() {
   const result = await fetchJson("/api/meta-review/featured");
   renderMetaReview(result);
   state.featuredMetaReviewLoaded = true;
-  setMetaStatus("Choose the evaluation you find more accurate and useful.");
+  setMetaStatus(
+    result.userChoice
+      ? "Your selection has already been recorded."
+      : "Choose the evaluation you find more accurate and useful.",
+  );
 }
 
 function renderMetaEvaluation(label, evaluation) {
@@ -791,58 +764,21 @@ function renderMetaReview(result) {
   document.getElementById("metaProofPreview").textContent = result.source.proof;
   const selectionReason = document.getElementById("metaSelectionReason");
   selectionReason.value = "";
-  selectionReason.disabled = false;
+  selectionReason.disabled = Boolean(result.userChoice);
   const grid = document.getElementById("metaEvaluationGrid");
   grid.innerHTML = "";
   grid.append(renderMetaEvaluation("A", result.a), renderMetaEvaluation("B", result.b));
   document.querySelectorAll("[data-meta-choice]").forEach((button) => {
-    button.disabled = false;
-    button.classList.remove("selected");
+    const isSelected = button.dataset.metaChoice === result.userChoice;
+    button.disabled = Boolean(result.userChoice);
+    button.classList.toggle("selected", isSelected);
   });
   results.classList.remove("hidden");
 }
 
-async function generateMetaReview() {
-  if (!state.currentUser) {
-    throw new Error("Log in with Google before generating evaluations.");
-  }
-  const button = document.getElementById("generateMetaReviewButton");
-  let payload;
-  if (state.metaSource === "database") {
-    const proofId = Number(document.getElementById("metaProofSelect").value);
-    if (!proofId) {
-      throw new Error("Choose a database proof.");
-    }
-    payload = { proofId };
-  } else {
-    const customProof = document.getElementById("metaProofText").value.trim();
-    if (!customProof) {
-      throw new Error("Upload a Lean file or paste Lean source.");
-    }
-    payload = {
-      customTitle: document.getElementById("metaProofTitle").value.trim() || "Uploaded Lean proof",
-      customProof,
-    };
-  }
-
-  button.disabled = true;
-  setMetaStatus("Generating two independent evaluations...");
-  try {
-    const result = await fetchJson("/api/meta-review/generate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    renderMetaReview(result);
-    setMetaStatus("Choose the evaluation you find more accurate and useful.");
-  } finally {
-    button.disabled = false;
-  }
-}
-
 async function selectMetaReview(choice, button) {
   if (!state.metaSession) {
-    throw new Error("Generate evaluations before choosing one.");
+    throw new Error("The featured evaluation is not available yet.");
   }
   const buttons = [...document.querySelectorAll("[data-meta-choice]")];
   buttons.forEach((choiceButton) => {
@@ -865,19 +801,6 @@ async function selectMetaReview(choice, button) {
       choiceButton.disabled = false;
     });
     throw error;
-  }
-}
-
-async function loadMetaProofFile(event) {
-  const file = event.target.files?.[0];
-  if (!file) {
-    return;
-  }
-  const text = await file.text();
-  document.getElementById("metaProofText").value = text;
-  const title = document.getElementById("metaProofTitle");
-  if (!title.value || title.value === "Uploaded Lean proof") {
-    title.value = file.name.replace(/\.lean$/i, "");
   }
 }
 
@@ -1120,14 +1043,6 @@ async function main() {
   });
   document.getElementById("reviewerModeButton").addEventListener("click", () => setArenaMode("reviewer"));
   document.getElementById("metaReviewerModeButton").addEventListener("click", () => setArenaMode("meta"));
-  document.getElementById("databaseSourceButton").addEventListener("click", () => setMetaSource("database"));
-  document.getElementById("uploadSourceButton").addEventListener("click", () => setMetaSource("upload"));
-  document.getElementById("metaProofFile").addEventListener("change", (event) => {
-    loadMetaProofFile(event).catch((error) => setMetaStatus(error.message, true));
-  });
-  document.getElementById("generateMetaReviewButton").addEventListener("click", () => {
-    generateMetaReview().catch((error) => setMetaStatus(error.message, true));
-  });
   document.querySelectorAll("[data-meta-choice]").forEach((button) => {
     button.addEventListener("click", () => {
       selectMetaReview(button.dataset.metaChoice, button).catch((error) => setMetaStatus(error.message, true));

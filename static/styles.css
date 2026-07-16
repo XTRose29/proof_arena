@@ -128,8 +128,7 @@ p {
   background: rgba(255, 250, 242, 0.72);
 }
 
-.mode-switch-button,
-.meta-source-tab {
+.mode-switch-button {
   border-radius: 6px;
   background: transparent;
   color: var(--muted);
@@ -141,7 +140,7 @@ p {
 }
 
 .mode-switch-button.active,
-.meta-source-tab.active {
+.meta-selection-buttons .selected {
   background: var(--accent);
   color: white;
 }
@@ -150,44 +149,8 @@ p {
   max-width: 1120px;
 }
 
-.meta-source-tabs {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 18px;
-  border-bottom: 1px solid rgba(99, 86, 70, 0.16);
-}
-
-.meta-source-tab {
-  border-radius: 6px 6px 0 0;
-  padding: 10px 14px;
-}
-
-.meta-source-panel {
-  max-width: 840px;
-}
-
-.meta-source-panel label + label {
-  margin-top: 14px;
-}
-
-.meta-source-panel textarea {
-  min-height: 260px;
-  resize: vertical;
-  font-family: var(--mono);
-  font-size: 0.9rem;
-  line-height: 1.5;
-}
-
-.meta-actions {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 18px;
-}
-
 .meta-results {
-  margin-top: 28px;
-  padding-top: 22px;
-  border-top: 1px solid rgba(99, 86, 70, 0.16);
+  margin-top: 8px;
 }
 
 .meta-results-heading {
@@ -309,11 +272,6 @@ p {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
-}
-
-.meta-selection-buttons .selected {
-  background: var(--accent);
-  color: white;
 }
 
 .section-heading {
@@ -752,8 +710,8 @@ select {
 }
 
 .workspace-card:fullscreen {
-  display: grid;
-  grid-template-rows: auto auto auto auto minmax(0, 1fr);
+  display: flex;
+  flex-direction: column;
   width: 100vw;
   height: 100vh;
   overflow: hidden;
@@ -840,12 +798,14 @@ select {
 }
 
 .workspace-card:fullscreen .arena-grid {
+  flex: 1 1 0;
   min-height: 0;
   margin-top: 12px;
   gap: 12px;
 }
 
 .workspace-card:fullscreen .panel {
+  height: 100%;
   min-height: 0;
   padding: 8px;
   overflow: hidden;
@@ -923,18 +883,13 @@ select {
   }
 
   .mode-switch,
-  .meta-source-tabs,
   .meta-selection-buttons {
     width: 100%;
   }
 
   .mode-switch-button,
-  .meta-source-tab,
   .meta-selection-buttons button {
     flex: 1 1 auto;
   }
 
-  .meta-actions .submit-button {
-    width: 100%;
-  }
 }
