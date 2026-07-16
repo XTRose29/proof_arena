@@ -261,10 +261,20 @@ select {
 }
 
 .rubric-reference {
-  margin: -2px 0 10px;
+  display: grid;
+  gap: 4px;
+  margin: -2px 0 12px;
   color: var(--muted);
-  font-weight: 700;
   line-height: 1.4;
+}
+
+.rubric-reference p {
+  margin: 0;
+}
+
+.rubric-reference strong,
+.rubric-reference a {
+  font-weight: 800;
 }
 
 .fullscreen-instruction {
