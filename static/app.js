@@ -379,8 +379,24 @@ function updateCriterionUi() {
     choiceEl.classList.toggle("selected", index === choiceIndex);
   });
   document.getElementById("submitButton").disabled = !isEvaluationComplete();
+  updateRubricReference();
   renderEvaluationTabs();
   updateVimFocusUi();
+}
+
+function updateRubricReference() {
+  const reference = document.querySelector(".rubric-reference");
+  if (!reference) {
+    return;
+  }
+
+  let hasVisibleLine = false;
+  reference.querySelectorAll("[data-rubric]").forEach((line) => {
+    const isActive = line.dataset.rubric === state.activeTab;
+    line.classList.toggle("hidden", !isActive);
+    hasVisibleLine = hasVisibleLine || isActive;
+  });
+  reference.classList.toggle("hidden", !hasVisibleLine);
 }
 
 function renderScoreMatrix() {
