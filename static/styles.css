@@ -260,6 +260,13 @@ select {
   line-height: 1.5;
 }
 
+.rubric-reference {
+  margin: -2px 0 10px;
+  color: var(--muted);
+  font-weight: 700;
+  line-height: 1.4;
+}
+
 .fullscreen-instruction {
   display: none;
   margin: 0 0 10px;
@@ -270,7 +277,7 @@ select {
 
 .evaluation-tabs {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 10px;
   margin-bottom: 12px;
 }

@@ -9,9 +9,10 @@ const preferenceChoices = [
 ];
 
 const criteria = [
-  ["clarity", "Clarity"],
-  ["conciseness", "Conciseness"],
-  ["idiomaticStructure", "Idiomatic Structure"],
+  ["reuse", "Reuse"],
+  ["naming", "Naming"],
+  ["documentation", "Documentation"],
+  ["proofQuality", "Proof-quality"],
   ["overall", "Overall"],
 ];
 
@@ -25,7 +26,7 @@ const state = {
   preferences: { ...defaultPreferences },
   completedCriteria: new Set(),
   activeCriterionIndex: 0,
-  activeTab: "clarity",
+  activeTab: "reuse",
   codePaneFocus: "A",
   vimFocus: "rating",
   waitingForWindowSwitch: false,
@@ -498,7 +499,7 @@ function resetEvaluationForm() {
   state.preferences = { ...defaultPreferences };
   state.completedCriteria = new Set();
   state.activeCriterionIndex = 0;
-  state.activeTab = "clarity";
+  state.activeTab = "reuse";
   state.codePaneFocus = "A";
   state.vimFocus = "rating";
   state.waitingForWindowSwitch = false;
@@ -693,7 +694,7 @@ async function submitEvaluation() {
     throw new Error("No comparison loaded.");
   }
   if (!isEvaluationComplete()) {
-    throw new Error("Select ratings for all four criteria before submitting.");
+    throw new Error("Select ratings for all five criteria before submitting.");
   }
   await fetchJson("/api/evaluations", {
     method: "POST",
