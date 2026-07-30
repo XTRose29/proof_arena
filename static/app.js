@@ -736,12 +736,12 @@ async function loadRandomMetaReview(force = false) {
     if (force && state.metaSession && !state.metaSubmitted) {
       await saveMetaDraft();
     }
-    setMetaStatus("Generating a new pair from two models…");
+    setMetaStatus("Loading two evaluations of the same submission…");
     const query = state.metaSession ? `?excludeSessionId=${state.metaSession}` : "";
     const result = await fetchJson(`/api/meta-review/random${query}`, { method: "POST" });
     renderMetaReview(result);
     state.metaPairLoaded = true;
-    setMetaStatus("Choose A, Tie, or B for every rubric. Each choice saves automatically.");
+    setMetaStatus("Choose which evaluation is better for every rubric and overall. Each choice saves automatically.");
   } finally {
     nextButton.disabled = false;
   }

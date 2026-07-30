@@ -1,0 +1,20 @@
+import Submission.Generic
+
+open LeanEval.Dynamics.HalmosGenericWeakMixingProblem
+open MeasureTheory Filter Topology
+open scoped symmDiff
+
+variable {X : Type*} [MeasurableSpace X]
+
+namespace Submission
+
+theorem generic_weakly_mixing [StandardBorelSpace X]
+    (m : Measure X) [IsProbabilityMeasure m] [NoAtoms m] :
+    (∃ G : Set (Automorphism m), IsGδ G ∧ Dense G ∧
+      ∀ T ∈ G, IsWeaklyMixing m T) ∧
+    (∀ T : Automorphism m, IsWeaklyMixing m T →
+      Ergodic (T.toEquiv : X → X) m) := by
+  exact ⟨Generic.exists_generic_isWeaklyMixing m,
+    fun T hT ↦ Helpers.ergodic_of_isWeaklyMixing m T hT⟩
+
+end Submission

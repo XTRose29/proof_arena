@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "strong",
+    "reason": "The proof reuses existing `PowerSeries` substitution APIs and the existing Catalan-series and Catalan-number results rather than reproving them. No duplicate helper definitions or parallel local API are introduced in the shown source."
+  },
+  "naming": {
+    "verdict": "needs_work",
+    "reason": "The name `substInv_X_sub_X_sq_eq_catalan` suggests an equality of series with a Catalan object, while the conclusion is specifically a coefficient formula for `substInv`. A conclusion-oriented name mentioning `coeff` would describe the theorem more precisely."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The public theorem has no docstring. The shown source also has no module docstring explaining the purpose of this Catalan/power-series result."
+  },
+  "proof_quality": {
+    "verdict": "needs_work",
+    "reason": "The proof uses `change (catalan n : ℚ) = ...` without a comment explaining the required definitional unfolding, which the rubric identifies as undocumented definitional-equality manipulation. The remaining intermediate facts are named and make the substitution argument reasonably readable."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The theorem effectively reuses the available APIs, but its name and missing documentation should be improved, and the unexplained `change` should be replaced or justified."
+  },
+  "summary": "Good API reuse, but improve the theorem name, add documentation, and avoid or explain the `change` step."
+}

@@ -8,6 +8,7 @@ import random
 import secrets
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
+from itertools import combinations
 from typing import Any
 
 import requests
@@ -15,6 +16,7 @@ from sqlalchemy import func, select, text
 from sqlalchemy.orm import Session
 
 from .config import (
+    META_REVIEW_EVALUATIONS_DIR,
     REPO_ROOT,
     anthropic_api_key,
     anthropic_base_url,
@@ -519,6 +521,58 @@ def _parse_evaluation(content: str) -> dict[str, Any]:
     return normalized
 
 
+def _local_meta_review_candidates(session: Session) -> list[dict[str, Any]]:
+    if not META_REVIEW_EVALUATIONS_DIR.exists():
+        return []
+
+    proofs_by_submission = {
+        (question_key, proof.title): (proof, question_title)
+        for proof, question_key, question_title in session.execute(
+            select(Proof, Question.canonical_key, Question.title).join(
+                Question,
+                Question.id == Proof.question_id,
+            )
+        ).all()
+    }
+    candidates: list[dict[str, Any]] = []
+
+    for submission_dir in sorted(META_REVIEW_EVALUATIONS_DIR.glob("*/*")):
+        if not submission_dir.is_dir():
+            continue
+        question_key = submission_dir.parent.name.strip().lower().replace(" ", "_")
+        proof_record = proofs_by_submission.get((question_key, submission_dir.name))
+        if proof_record is None:
+            continue
+
+        evaluations: list[dict[str, Any]] = []
+        for evaluation_path in sorted(submission_dir.glob("*.txt")):
+            try:
+                evaluation = _parse_evaluation(evaluation_path.read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                continue
+            evaluations.append({"model": evaluation_path.stem, "evaluation": evaluation})
+
+        if len(evaluations) < 2:
+            continue
+        proof, question_title = proof_record
+        candidates.append(
+            {
+                "proof": proof,
+                "question_title": question_title,
+                "evaluations": evaluations,
+            }
+        )
+
+    return candidates
+
+
+def _meta_review_pair_key(proof_id: int | None, model_a: str, model_b: str) -> tuple[int, str, str] | None:
+    if proof_id is None:
+        return None
+    first_model, second_model = sorted((model_a, model_b))
+    return proof_id, first_model, second_model
+
+
 def _generate_anthropic_evaluation(proof_content: str, rubric_text: str) -> tuple[dict[str, Any], str]:
     api_key = anthropic_api_key()
     model = claude_model()
@@ -664,52 +718,119 @@ def build_random_meta_review(
     user: User,
     exclude_session_id: int | None = None,
 ) -> dict[str, Any]:
+    candidates = _local_meta_review_candidates(session)
+    if not candidates:
+        raise LookupError("No pre-generated evaluation pairs are available for meta review.")
+
+    available_pair_keys = {
+        _meta_review_pair_key(candidate["proof"].id, first["model"], second["model"])
+        for candidate in candidates
+        for first, second in combinations(candidate["evaluations"], 2)
+    }
     if exclude_session_id is None:
-        resumable = session.execute(
+        resumable_sessions = session.execute(
             select(MetaReviewSession)
             .join(MetaReviewDraft, MetaReviewDraft.session_id == MetaReviewSession.id)
             .where(MetaReviewDraft.user_id == user.id)
             .order_by(MetaReviewDraft.updated_at.desc(), MetaReviewDraft.id.desc())
-        ).scalars().first()
-        if resumable is not None:
-            return _serialize_meta_review_for_user(session, resumable, user)
+        ).scalars().all()
+        for resumable in resumable_sessions:
+            resumable_key = _meta_review_pair_key(
+                resumable.source_proof_id,
+                resumable.model_a,
+                resumable.model_b,
+            )
+            if resumable_key in available_pair_keys:
+                return _serialize_meta_review_for_user(session, resumable, user)
 
     excluded_question_id: int | None = None
+    excluded_pair_key: tuple[int, str, str] | None = None
     if exclude_session_id is not None:
-        excluded_question_id = session.execute(
-            select(Proof.question_id)
-            .join(MetaReviewSession, MetaReviewSession.source_proof_id == Proof.id)
-            .where(MetaReviewSession.id == exclude_session_id)
+        excluded_session = session.execute(
+            select(MetaReviewSession).where(MetaReviewSession.id == exclude_session_id)
         ).scalar_one_or_none()
+        if excluded_session is not None:
+            excluded_pair_key = _meta_review_pair_key(
+                excluded_session.source_proof_id,
+                excluded_session.model_a,
+                excluded_session.model_b,
+            )
+            if excluded_session.source_proof_id is not None:
+                excluded_question_id = session.execute(
+                    select(Proof.question_id).where(Proof.id == excluded_session.source_proof_id)
+                ).scalar_one_or_none()
 
-    question_ids = list(
-        session.execute(
-            select(Proof.question_id)
-            .where(func.length(func.trim(Proof.content)) > 0)
-            .distinct()
-        ).scalars()
+    reviewed_pair_keys = {
+        pair_key
+        for proof_id, model_a, model_b in session.execute(
+            select(
+                MetaReviewSession.source_proof_id,
+                MetaReviewSession.model_a,
+                MetaReviewSession.model_b,
+            )
+            .join(MetaReviewVote, MetaReviewVote.session_id == MetaReviewSession.id)
+            .where(MetaReviewVote.user_id == user.id)
+        ).all()
+        if (pair_key := _meta_review_pair_key(proof_id, model_a, model_b)) is not None
+    }
+
+    available_pairs: list[dict[str, Any]] = []
+    for candidate in candidates:
+        proof = candidate["proof"]
+        for first, second in combinations(candidate["evaluations"], 2):
+            pair_key = _meta_review_pair_key(proof.id, first["model"], second["model"])
+            if pair_key in reviewed_pair_keys or pair_key == excluded_pair_key:
+                continue
+            available_pairs.append({"candidate": candidate, "evaluations": [first, second]})
+
+    if excluded_question_id is not None:
+        other_question_pairs = [
+            pair
+            for pair in available_pairs
+            if pair["candidate"]["proof"].question_id != excluded_question_id
+        ]
+        if other_question_pairs:
+            available_pairs = other_question_pairs
+
+    if not available_pairs:
+        raise LookupError("You have reviewed all available meta-review pairs.")
+
+    selected_pair = random.choice(available_pairs)
+    candidate = selected_pair["candidate"]
+    proof = candidate["proof"]
+    first, second = selected_pair["evaluations"]
+    if random.choice((True, False)):
+        first, second = second, first
+
+    record = MetaReviewSession(
+        user_id=user.id,
+        source_proof_id=proof.id,
+        source_kind="database",
+        source_title=f"{candidate['question_title']} — {proof.title}",
+        proof_content=proof.content,
+        rubric_text="Pre-generated with the Proof Arena reuse, naming, documentation, proof-quality, and overall rubrics.",
+        evaluation_a=json.dumps(first["evaluation"], ensure_ascii=False),
+        evaluation_b=json.dumps(second["evaluation"], ensure_ascii=False),
+        model_a=first["model"],
+        model_b=second["model"],
+        is_featured=False,
+        selection_reason="",
+        created_at=utc_now(),
+        selected_at=None,
     )
-    eligible_question_ids = [
-        question_id for question_id in question_ids if question_id != excluded_question_id
-    ]
-    if not eligible_question_ids:
-        eligible_question_ids = question_ids
-    if not eligible_question_ids:
-        raise LookupError("No Lean solutions are available for meta review.")
-
-    question_id = random.choice(eligible_question_ids)
-    proof = session.execute(
-        select(Proof)
-        .where(
-            Proof.question_id == question_id,
-            func.length(func.trim(Proof.content)) > 0,
+    session.add(record)
+    session.flush()
+    session.add(
+        MetaReviewDraft(
+            session_id=record.id,
+            user_id=user.id,
+            choices_json="{}",
+            reason="",
+            updated_at=utc_now(),
         )
-        .order_by(func.random())
-    ).scalars().first()
-    if proof is None:
-        raise LookupError("No Lean solutions are available for meta review.")
-
-    return build_meta_review(session, user, MetaReviewGenerateRequest(proofId=proof.id))
+    )
+    session.commit()
+    return _serialize_meta_review_for_user(session, record, user)
 
 
 def _serialize_meta_review(record: MetaReviewSession) -> dict[str, Any]:
