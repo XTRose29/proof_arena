@@ -1,0 +1,80 @@
+/-
+Copyright (c) 2026 Yawara Ishida. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
+-/
+import Mathlib.GroupTheory.Sylow
+import Mathlib.GroupTheory.Nilpotent
+import Mathlib.GroupTheory.SchurZassenhaus
+import Mathlib.Data.SetLike.Fintype
+import Submission.OddOrder.Isaacs.Ch01_Sylow.Main
+
+/-!
+# O_π(G): the π-residual / largest normal π-subgroup (definitional skeleton)
+
+For a set of primes `π` and a finite group `G`, `Subgroup.opPi G π` denotes the
+largest normal `π`-subgroup of `G`.
+
+## Main definitions
+
+* `Subgroup.IsPiSubgroup π N` — `N` is a `π`-subgroup: all primes dividing `|N|`
+  lie in `π`.
+* `Subgroup.opPi G π` — the supremum of all normal `π`-subgroups of `G`.
+
+## BG / Isaacs context
+
+BG §1 Prop 1.4 (`A` coprime auto faithful on `F(G)`) and §6 (Thm 6.4) rely on
+the `O_π` machinery generalizing the single-prime `OddOrder.Isaacs.Ch01.opCore p`.
+
+mathlib v4.29.1 does not define `O_π` for prime sets; this file adds the
+foundational definitions.  Stronger lemmas (Sylow decomposition of `opPi`,
+disjointness with `opPi πᶜ`, etc.) are deferred to follow-up commits.
+-/
+
+namespace Subgroup
+
+variable {G : Type*} [Group G]
+
+/-- A subgroup is a `π`-subgroup if every prime dividing its order lies in `π`. -/
+def IsPiSubgroup (π : Set ℕ) (N : Subgroup G) : Prop :=
+  ∀ p ∈ (Nat.card N).primeFactors, p ∈ π
+
+namespace IsPiSubgroup
+
+variable {π : Set ℕ} {N M : Subgroup G}
+
+@[simp] theorem bot : (⊥ : Subgroup G).IsPiSubgroup π := by
+  intro p hp
+  simp at hp
+
+theorem mono {π₁ π₂ : Set ℕ} (h : π₁ ⊆ π₂) (hN : N.IsPiSubgroup π₁) :
+    N.IsPiSubgroup π₂ :=
+  fun p hp => h (hN p hp)
+
+end IsPiSubgroup
+
+variable (G) in
+/-- The supremum of all normal `π`-subgroups of `G`.  For finite `G`, this is the
+largest normal `π`-subgroup. -/
+noncomputable def opPi (π : Set ℕ) [Finite G] : Subgroup G :=
+  ⨆ N : { N : Subgroup G // N.Normal ∧ N.IsPiSubgroup π }, (N : Subgroup G)
+
+                                                            
+                                                               
+                                                        
+                      
+                                                
+
+                                                                                         
+                                                                            
+                                       
+                   
+                                  
+                    
+                                         
+
+                                                                
+                                                                                   
+                                  
+
+end Subgroup

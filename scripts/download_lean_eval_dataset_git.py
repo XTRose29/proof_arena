@@ -48,7 +48,7 @@ def ensure_clone(url: str, dest: Path) -> None:
 def checkout_ref(repo_dir: Path, ref: str) -> None:
     try:
         run(["git", "checkout", "--detach", ref], cwd=repo_dir)
-    except subprocess.CalledProcessError:
+    except RuntimeError:
         run(["git", "fetch", "origin", ref], cwd=repo_dir)
         run(["git", "checkout", "--detach", ref], cwd=repo_dir)
 

@@ -1,0 +1,973 @@
+import Submission.OddOrder.Peterfalvi.S16_NonExistenceG.TTypeIICoherence
+import Submission.OddOrder.Peterfalvi.S16_NonExistenceG.TGapGalois
+import Submission.OddOrder.Peterfalvi.S16_NonExistenceG.TGapGridAlignment
+import Submission.OddOrder.Peterfalvi.S13_NonGaloisExclusion
+import Submission.OddOrder.Peterfalvi.S15_CharacterDegreeSupply
+
+/-!
+# Peterfalvi (14.9): the T-side Type-II theorem
+
+The T-side type-III character estimate and the deduction that `T` is of Type II.
+Topic-split from `OddOrder.Peterfalvi.S16_NonExistenceG.SubgroupL`.
+-/
+namespace OddOrder.Peterfalvi.S16
+open OddOrder.GroupTheory
+open OddOrder.RepresentationTheory
+open OddOrder.Isaacs
+open scoped Pointwise
+open scoped BigOperators
+
+variable {G : Type*} [Group G]
+
+open scoped Classical in
+/-- **Peterfalvi (14.9), the Γ-Bessel assembly skeleton** — the *proven* structural core of the
+character body, isolating the char-cascade carriers as precisely-named hypotheses.  Coq
+`FTtypeP_min_typeII` (PFsection14.v:764--853): given the coherent `τ₁`-image family `calT1`
+(orthonormal degree-`p` induced characters, whose `|calT1| = (v−1)/p` count is the proven
+`T_typeIII_calT1_card` after the (13.12) `d = 1` substitution `v = |V|`) and the `S`-side `βₛ`
+bridge gap `Γ`, the parity fact `⟨Γ, τ₁ζ⟩ ≡ 1 (mod 2)` per `ζ` (`S09.cfdot_real_vchar_even`) makes
+each integer pairing coefficient `x ζ = ⟨Γ, τ₁ζ⟩` **nonzero**; then the orthogonal-integer Bessel
+bridge `S09.sum_rat_weights_le_of_orthogonal_integer_decomposition` (Coq's `orthogonal_split` +
+Bessel over `‖Γ‖² ≤ (u−1)/q`) gives `∑_{ζ ∈ calT1} 1 ≤ ⟨Γ,Γ⟩ ≤ (u−1)/q`, i.e.
+`|calT1| = (v−1)/p ≤ (u−1)/q`.
+
+This is the **genuinely-available** arithmetic of (14.9): everything downstream of the carriers is
+proven here (the orthonormal-family Bessel step with unit weights `m ζ = 1`, the `∑ 1 = |calT1|`
+count-collapse, and the `⟨Γ,Γ⟩ ≤ (u−1)/q` chaining).  The four hypotheses package exactly the deep
+carriers that the honest §16 build still owes, each cited from its own construction at the
+`T_typeIII_ratio_le` call site:
+
+* `hcount : (calT1.card : ℚ) = (v−1)/p` — the coherent count (proven `T_typeIII_calT1_card` in `|V|`
+  form) **after** the (13.12) `d = 1` substitution `v = |V|`
+  (`Hypothesis.V_inf_centralizer_Q_eq_bot`);
+* `horth` — orthonormality of the `τ₁`-images (the `calT1` **coherence** carrier, proven skeleton
+  `T_typeIII_calT1_coherent` fed a T-side `S07.Hypothesis` Dade package);
+* `hdecomp`/`hΓ₁`/`hx` — the `S`-side `βₛ` bridge gap `Γ = ∑ x_ζ·τ₁ζ + Γ₁` (`Γ₁ ⊥ τ₁ζ`), with the
+  parity nonzeroness `x_ζ ≠ 0` (Coq `nzT1_Ga` via `cfdot_real_vchar_even`);
+* `hnorm : ⟨Γ,Γ⟩.re ≤ (u−1)/q` — the `S`-side norm bound on the bridge gap.
+
+Its output `(v−1)/p ≤ (u−1)/q` is exactly the (14.9) `≤` whose `>` counterpart (14.8)
+`key_inequality` contradicts. -/
+theorem T_typeIII_ratio_le_of_gamma_bridge [Finite G]
+    [Fintype G] [Invertible (Nat.card G : ℂ)] (hyp : Hypothesis (G := G))
+    (calT1 : Finset (ClassFunction G ℂ)) (Γ Γ₁ : ClassFunction G ℂ)
+    (x : ClassFunction G ℂ → ℤ)
+    (hcount : (calT1.card : ℚ) = ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ))
+    (horth : ∀ a ∈ calT1, ∀ b ∈ calT1,
+      ClassFunction.inner a b = if a = b then (1 : ℂ) else 0)
+    (hdecomp : Γ = (∑ a ∈ calT1, (((x a : ℝ) : ℂ) • a)) + Γ₁)
+    (hΓ₁ : ∀ a ∈ calT1, ClassFunction.inner Γ₁ a = 0)
+    (hx : ∀ a ∈ calT1, x a ≠ 0)
+    (hnorm : (ClassFunction.inner Γ Γ).re ≤
+      ((((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) : ℚ) : ℝ)) :
+    ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) ≤
+      ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) := by
+  classical
+  -- Bessel over the orthonormal `calT1` (unit weights `m a = 1`, integer coeffs `x a ≠ 0`),
+  -- against the norm bound `⟨Γ,Γ⟩ ≤ (u−1)/q`: yields `∑_{a ∈ calT1} 1 ≤ (u−1)/q`.
+  have hbessel := OddOrder.Peterfalvi.S09.sum_rat_weights_le_of_orthogonal_integer_decomposition
+    (ι := ClassFunction G ℂ) calT1 (fun a => a) x (fun _ => (1 : ℚ)) Γ Γ₁
+    (((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ))
+    hdecomp
+    (fun a ha b hb => by rw [horth a ha b hb]; split <;> simp)
+    hΓ₁
+    (fun _ _ => zero_le_one)
+    hx
+    hnorm
+  -- `∑_{a ∈ calT1} 1 = |calT1|`, and `|calT1| = (v−1)/p` by the coherent count.
+  rw [Finset.sum_const, nsmul_eq_mul, mul_one, hcount] at hbessel
+  exact hbessel
+
+open scoped Classical in
+/-- **(14.9) Γ-bridge extraction engine.**  Given the `S`-side gap `Γ`, its integral nonzero
+coefficients on the orthonormal coherent family `calT1`, and the orthogonality of that family to the
+η-grid, define the complementary term `Γ₁ := Γ - ∑_ζ x_ζ·ζ`.  Orthonormality makes `Γ₁`
+orthogonal to every family member, hence to the projection sum.  The projection sum is η-grid
+orthogonal by hypothesis, so the genuine **Peterfalvi (13.18.d)** field `BetaData.Y_norm_bound`
+applies to the split `Γ = Γ₁ + ∑_ζ x_ζ·ζ`.
+
+The resulting bound is on the projection sum—not on `Γ` itself—and feeds the proven Bessel skeleton
+`T_typeIII_ratio_le_of_gamma_bridge`.  Thus this theorem exactly matches the corrected (13.18.d)
+statement and assumes no overstrong full-gap norm bound. -/
+theorem T_typeIII_ratio_le_of_sSide_gap [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hyp : Hypothesis (G := G)) (calT1 : Finset (ClassFunction G ℂ))
+    (horth : ∀ a ∈ calT1, ∀ b ∈ calT1,
+      ClassFunction.inner a b = if a = b then (1 : ℂ) else 0)
+    (hcount : (calT1.card : ℚ) = ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ))
+    (Γ : ClassFunction G ℂ) (x : ClassFunction G ℂ → ℤ)
+    (hxcoe : ∀ a ∈ calT1, ClassFunction.inner Γ a = ((x a : ℝ) : ℂ))
+    (hx : ∀ a ∈ calT1, x a ≠ 0)
+    (heta : ∀ a ∈ calT1, ∀ (i : Fin hyp.base.q) (k : Fin hyp.base.p),
+      ClassFunction.inner a (hyp.base.eta i k) = 0)
+    (hYnorm : ∀ (X Y : ClassFunction G ℂ), Γ = X + Y →
+      ClassFunction.inner X Y = 0 →
+      (∀ (i : Fin hyp.base.q) (k : Fin hyp.base.p),
+        ClassFunction.inner Y (hyp.base.eta i k) = 0) →
+      (ClassFunction.inner Y Y).re ≤
+        ((hyp.base.u : ℚ) - 1) / (hyp.base.q : ℚ)) :
+    ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) ≤
+      ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) := by
+  classical
+  set Γ₁ : ClassFunction G ℂ := Γ - ∑ a ∈ calT1, ((x a : ℝ) : ℂ) • a with hΓ₁def
+  have hdecomp : Γ = (∑ a ∈ calT1, (((x a : ℝ) : ℂ) • a)) + Γ₁ := by rw [hΓ₁def]; abel
+  -- `Γ₁` is orthogonal to every member: `⟨Γ₁, b⟩ = ⟨Γ, b⟩ − ∑_a x_a·⟨a,b⟩ = x_b − x_b = 0`
+  -- (inner is linear in the first argument, `inner_smul_left : ⟨c•φ,ψ⟩ = c·⟨φ,ψ⟩`).
+  have hΓ₁ : ∀ a ∈ calT1, ClassFunction.inner Γ₁ a = 0 := by
+    intro b hb
+    have hsum_left : ∀ (s : Finset (ClassFunction G ℂ)),
+        ClassFunction.inner (∑ a ∈ s, ((x a : ℝ) : ℂ) • a) b
+          = ∑ a ∈ s, ClassFunction.inner (((x a : ℝ) : ℂ) • a) b := by
+      intro s
+      induction s using Finset.induction_on with
+      | empty => simp
+      | @insert c s hc ih =>
+          rw [Finset.sum_insert hc, ClassFunction.inner_add_left, ih, Finset.sum_insert hc]
+    rw [hΓ₁def, ClassFunction.inner_sub_left, hsum_left calT1, hxcoe b hb,
+      Finset.sum_eq_single b
+        (fun a ha hab => by
+          rw [ClassFunction.inner_smul_left, horth a ha b hb, if_neg hab, mul_zero])
+        (fun hbni => absurd hb hbni),
+      ClassFunction.inner_smul_left, horth b hb b hb, if_pos rfl, mul_one, sub_self]
+  -- The projection sum is the `Y` in (13.18.d).  Its complement `Γ₁` is orthogonal to it
+  -- because `Γ₁` is orthogonal to every member of `calT1`.
+  have hΓ₁sum : ClassFunction.inner Γ₁
+      (∑ a ∈ calT1, ((x a : ℝ) : ℂ) • a) = 0 := by
+    have hsum_right : ∀ (s : Finset (ClassFunction G ℂ)),
+        ClassFunction.inner Γ₁ (∑ a ∈ s, ((x a : ℝ) : ℂ) • a)
+          = ∑ a ∈ s, ClassFunction.inner Γ₁ (((x a : ℝ) : ℂ) • a) := by
+      intro s
+      induction s using Finset.induction_on with
+      | empty => simp
+      | @insert c s hc ih =>
+          rw [Finset.sum_insert hc, ClassFunction.inner_add_right, ih, Finset.sum_insert hc]
+    rw [hsum_right calT1]
+    apply Finset.sum_eq_zero
+    intro a ha
+    rw [ClassFunction.inner_smul_right, hΓ₁ a ha, mul_zero]
+  have hsum_eta : ∀ (i : Fin hyp.base.q) (k : Fin hyp.base.p),
+      ClassFunction.inner (∑ a ∈ calT1, ((x a : ℝ) : ℂ) • a)
+        (hyp.base.eta i k) = 0 := by
+    intro i k
+    have hsum_left : ∀ (s : Finset (ClassFunction G ℂ)),
+        ClassFunction.inner (∑ a ∈ s, ((x a : ℝ) : ℂ) • a) (hyp.base.eta i k)
+          = ∑ a ∈ s,
+            ClassFunction.inner (((x a : ℝ) : ℂ) • a) (hyp.base.eta i k) := by
+      intro s
+      induction s using Finset.induction_on with
+      | empty => simp
+      | @insert c s hc ih =>
+          rw [Finset.sum_insert hc, ClassFunction.inner_add_left, ih, Finset.sum_insert hc]
+    rw [hsum_left calT1]
+    apply Finset.sum_eq_zero
+    intro a ha
+    rw [ClassFunction.inner_smul_left, heta a ha i k, mul_zero]
+  have hdecomp' : Γ = Γ₁ + ∑ a ∈ calT1, ((x a : ℝ) : ℂ) • a := by
+    rw [hdecomp]
+    abel
+  have hnormRaw := hYnorm Γ₁
+    (∑ a ∈ calT1, ((x a : ℝ) : ℂ) • a) hdecomp' hΓ₁sum hsum_eta
+  have hu1 : 1 ≤ hyp.base.u := by
+    have huc : 0 < hyp.base.u * hyp.base.c := by
+      rw [← hyp.base.card_U_eq_uc]
+      exact Nat.card_pos
+    exact (CanonicallyOrderedAdd.mul_pos.mp huc).1
+  have hsubcast : ((hyp.base.u - 1 : ℕ) : ℚ) = (hyp.base.u : ℚ) - 1 := by
+    rw [Nat.cast_sub hu1]
+    norm_num
+  have hnorm : (ClassFunction.inner
+      (∑ a ∈ calT1, ((x a : ℝ) : ℂ) • a)
+      (∑ a ∈ calT1, ((x a : ℝ) : ℂ) • a)).re ≤
+        ((((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) : ℚ) : ℝ) := by
+    rw [hsubcast]
+    simpa using hnormRaw
+  exact T_typeIII_ratio_le_of_gamma_bridge hyp calT1
+    (∑ a ∈ calT1, ((x a : ℝ) : ℂ) • a) 0 x hcount horth (by simp) (by simp) hx hnorm
+/-- **Peterfalvi (13.4)/(14.4), `T`-side case (9.7.b)**: the `T`-side centralizer parameter
+vanishes and `v` has its full cyclotomic value.  This is obtained directly from the (13.3)
+character-degree package and the (13.4) cross-expansion, before the (14.9) type-II conclusion.
+
+Keeping this producer upstream of `T_typeIII_ratio_le` is essential: (13.4) is an input to the
+(14.9) contradiction, whereas deriving the same facts from `T_typeII` would create the cycle
+`T_isTypeP2 → T_typeIII_ratio_le → T_side_caseB_facts → T_typeII → T_isTypeP2`. -/
+theorem T_side_caseB_facts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    hyp.base.D = ⊥ ∧
+      hyp.base.v = (hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1) := by
+  -- issue 9094 RULING §4 (b proof-only carve-out): the (13.4) `T`-side facts come from the
+  -- honest `CharacterDegreeCore` + (13.3.b) dichotomy (`T_caseB_facts_unconditional`), replacing
+  -- the uninhabitable unconditional-λ producer `character_degree_analysis`.
+  obtain ⟨hD, hv, _hQ⟩ :=
+    OddOrder.Peterfalvi.S15.T_caseB_facts_unconditional hG hyp.base hyp.q_lt_p
+      (pins := hyp.nuGridSupply)
+  exact ⟨hD, hv⟩
+
+/-- **Peterfalvi (13.12), `T`-side `d = 1` in the Section 16 context** (issue 9077):
+`V ⊓ C_G(Q) = ⊥`.  The honest (13.4) character-degree producer supplies `D = ⊥`, and the
+canonical identity `D = V ⊓ C_G(Q)` turns it into the faithful-action statement.  This downstream
+placement avoids the genuine import cycle from `S15_SAndTBasic` to the character-degree layer. -/
+theorem Hypothesis.V_inf_centralizer_Q_eq_bot [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    hyp.base.V ⊓ Subgroup.centralizer (hyp.base.Q : Set G) = ⊥ := by
+  rw [← hyp.base.D_eq]
+  exact (T_side_caseB_facts hG hyp).1
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- The (13.18) gap `Γ` is a virtual character.  Its Dade term is virtual because
+`β_{#1} = Ind_{PW₁}^S 1 - μ_{0,#1}` is virtual and has the (13.18.a) `A₀(S)` support;
+subtracting `1_G` and adding `η_{0,#1}` preserves `ZIrr` membership.
+
+This proof deliberately exposes its existing upstream gate: the only non-formal input is
+`S15.betaGrid_A0_support_of_c_eq_one`, with (13.12) threaded explicitly from the Core
+endpoint. -/
+private theorem sSideGamma_mem_ZIrr_of_c_eq_one [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hc1 : hyp.base.c = 1) :
+    OddOrder.Peterfalvi.S15.GammaGrid hG hyp.base ∈ ZIrr G := by
+  classical
+  let PW1 := (hyp.base.P ⊔ hyp.base.W1).subgroupOf hyp.base.S
+  have htrivZ : trivialClassFunction ↥PW1 ∈ ZIrr ↥PW1 := by
+    simpa [IrreducibleCharacter.coe_trivialIrreducibleCharacter] using
+      (trivialIrreducibleCharacter ↥PW1).mem_ZIrr
+  have hindZ : ClassFunction.induce PW1 (trivialClassFunction ↥PW1) ∈
+      ZIrr ↥hyp.base.S :=
+    ClassFunction.induce_mem_ZIrr PW1 htrivZ
+  let j : Fin hyp.base.p := ⟨1, by have := hyp.base.three_le_p; omega⟩
+  have hbetaZ : OddOrder.Peterfalvi.S15.betaGrid hyp.base j ∈ ZIrr ↥hyp.base.S := by
+    rw [OddOrder.Peterfalvi.S15.betaGrid, OddOrder.Peterfalvi.S15.indPW1]
+    exact (ZIrr ↥hyp.base.S).sub_mem hindZ
+      (hyp.base.mu_irreducible ⟨0, hyp.base.q_prime.pos⟩ j).mem_ZIrr
+  have htauZ : OddOrder.Peterfalvi.S15.tauSbetaGrid hG hyp.base ∈ ZIrr G := by
+    simpa [OddOrder.Peterfalvi.S15.tauSbetaGrid, j] using
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
+        (hyp.base.dadeHypS0 hG) (hyp.base.dadeHypS0_hconj hG)
+        (OddOrder.Peterfalvi.S15.betaGrid_A0_support_of_c_eq_one
+          hG hyp.base hc1 j (by simp [j])) hbetaZ)
+  have honeZ : (trivialIrreducibleCharacter G : ClassFunction G ℂ) ∈ ZIrr G :=
+    (trivialIrreducibleCharacter G).mem_ZIrr
+  have hetaZ : hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ j ∈ ZIrr G :=
+    eta_mem_ZIrr hyp.base _ _
+  change OddOrder.Peterfalvi.S15.tauSbetaGrid hG hyp.base -
+      (trivialIrreducibleCharacter G : ClassFunction G ℂ) + hyp.base.eta _ j ∈ ZIrr G
+  exact (ZIrr G).add_mem ((ZIrr G).sub_mem htauZ honeZ) hetaZ
+
+open scoped Classical in
+/-- **Peterfalvi (14.9), `nzT1_Ga` parity extraction.**  Let `Γ` and every member of the coherent
+`calT1` image be virtual characters.  If each member `a` admits the real virtual residual `Δ_a`
+from the (14.9) expansion, with both `Δ_a` and `Γ` orthogonal to `1_G` and
+`⟨Γ,a⟩ = 1 + ⟨Δ_a,Γ⟩`, then `⟨Γ,a⟩` is an odd integer and hence nonzero.
+
+The parity statement is exactly `RepresentationTheory.cfdot_real_vchar_even`: `⟨Δ_a,Γ⟩` is even because
+trivial coefficients vanish.  This theorem performs all integrality/parity bookkeeping after the
+genuine `Δ_a` construction; no prime-TI or Dade hypothesis is hidden in its conclusion. -/
+theorem gap_coefficients_nonzero_of_delta_parity [Fintype G]
+    [Invertible (Nat.card G : ℂ)] (hodd : Odd (Nat.card G))
+    (calT1 : Finset (ClassFunction G ℂ)) (Γ : ClassFunction G ℂ)
+    (hΓZ : Γ ∈ ZIrr G) (hΓR : ClassFunction.IsReal Γ)
+    (hΓ1 : ClassFunction.inner Γ
+      (trivialIrreducibleCharacter G : ClassFunction G ℂ) = 0)
+    (hmemZ : ∀ a ∈ calT1, a ∈ ZIrr G)
+    (hDelta : ∀ a ∈ calT1, ∃ Δ : ClassFunction G ℂ,
+      Δ ∈ ZIrr G ∧ ClassFunction.IsReal Δ ∧
+        ClassFunction.inner Δ
+          (trivialIrreducibleCharacter G : ClassFunction G ℂ) = 0 ∧
+        ClassFunction.inner Γ a = 1 + ClassFunction.inner Δ Γ) :
+    ∃ x : ClassFunction G ℂ → ℤ,
+      (∀ a ∈ calT1, ClassFunction.inner Γ a = ((x a : ℝ) : ℂ)) ∧
+        ∀ a ∈ calT1, x a ≠ 0 := by
+  let x : ClassFunction G ℂ → ℤ := fun a =>
+    if ha : a ∈ calT1 then
+      (ClassFunction.inner_mem_ZIrr_int hΓZ (hmemZ a ha)).choose
+    else 0
+  have hxcoe : ∀ a ∈ calT1, ClassFunction.inner Γ a = ((x a : ℝ) : ℂ) := by
+    intro a ha
+    rw [show x a = (ClassFunction.inner_mem_ZIrr_int hΓZ (hmemZ a ha)).choose by
+      simp only [x, dif_pos ha]]
+    exact_mod_cast (ClassFunction.inner_mem_ZIrr_int hΓZ (hmemZ a ha)).choose_spec
+  refine ⟨x, hxcoe, ?_⟩
+  intro a ha hxa0
+  obtain ⟨Δ, hΔZ, hΔR, hΔ1, hrelation⟩ := hDelta a ha
+  obtain ⟨m, c, d, hm, hc, hd, heven⟩ :=
+    OddOrder.RepresentationTheory.cfdot_real_vchar_even hodd hΔZ hΔR hΓZ hΓR
+  have hc0 : c = 0 := by
+    rw [hΔ1] at hc
+    exact_mod_cast hc
+  have hd0 : d = 0 := by
+    rw [hΓ1] at hd
+    exact_mod_cast hd
+  have hm_even : Even m := by
+    simpa [hc0, hd0] using heven
+  have hcast : ((x a : ℤ) : ℂ) = ((1 + m : ℤ) : ℂ) := by
+    calc
+      ((x a : ℤ) : ℂ) = ClassFunction.inner Γ a := by
+        exact_mod_cast (hxcoe a ha).symm
+      _ = 1 + ClassFunction.inner Δ Γ := hrelation
+      _ = ((1 + m : ℤ) : ℂ) := by rw [← hm]; push_cast; ring
+  have hxint : x a = 1 + m := by
+    exact_mod_cast hcast
+  rcases hm_even with ⟨k, hk⟩
+  omega
+
+/-- **Peterfalvi (14.9), the character body** — the structural `≤` half of the ratio comparison, the
+sole deep obligation of (14.9).  Coq `PFsection14` `FTtypeP_min_typeII`, lines 737--853: assuming `T`
+is type III, build `calT1 = seqIndD QV T QV Q` (the degree-`p` induced characters of `T`, from
+`T' = Q ⊔ V` via `T_deriv_eq_QV`), coherent by uniform-degree coherence
+(`S07.coherent_of_constant_degree` / Coq `uniform_degree_coherence`).
+
+The T-side family data are constructed: `T_typeIII_calT1_family_galois` and its orbit count give
+`|calT1| = (|V|−1)/p`; `T_typeIII_calT1_isCoherent` supplies the coherent extension; the direct
+(13.4) producer `T_side_caseB_facts` gives `D = ⊥`, hence `|V| = v`; and
+`T_typeIII_coherent_image_inner_eta_eq_zero` proves every coherent image orthogonal to the shared
+`eta`-grid by restricting the full type-P1 Dade map and applying the norm-two rigidity engine.
+
+The prime-TI anchor is fixed by coefficient Galois automorphisms, so the full eta-axis orbits now
+give axis constancy and the sharp norm gives the column-or-row projection dichotomy.  The sole
+remaining local residual in this ratio theorem is Coq (11.8)
+`FTtype34_not_ortho_cycTIiso`, which excludes the wrong zero-row alternative.  After it, the proven
+Γ-Bessel skeleton `T_typeIII_ratio_le_of_sSide_gap` combines orthogonality, the exact count, and
+the concrete (13.18.d) bound `betaData.Y_norm_bound` to obtain
+`(v − 1)/p ≤ (u − 1)/q`, contradicting the strict (14.8) inequality. -/
+theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
+    (hyp : Hypothesis (G := G)) (hIII : OddOrder.GroupTheory.IsTypeIII hyp.base.T) :
+    ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) ≤
+      ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) := by
+  -- Coq `FTtypeP_min_typeII` body (PFsection14.v:737--853): `calT1`/coherence + Γ-Bessel.
+  -- Reduced to the proven Γ-Bessel skeleton `T_typeIII_ratio_le_of_gamma_bridge`; every char-cascade
+  -- carrier is now supplied, so this theorem carries **no local `sorry`**.  The last residual —
+  -- the Coq (11.8) `FTtype34_not_ortho_cycTIiso` non-orthogonality `hnotZeroRowProjection` — is now
+  -- discharged by transporting the canonical narrow-`𝒮(H₀C)` refuter through the global σ/η grid
+  -- identification ((3.9)(a) rigidity).  Upstream gates persist only transitively through the cited
+  -- sorried lemmas (Type-P₁ `A₀`-normed-TI, (13.18.a) β-support, §11 zero-column projection).
+  classical
+  have hc1 : hyp.base.c = 1 :=
+    hyp.base.c_eq_one_of_lambda_dichotomy hG hyp.nuGridSupply
+  haveI : Fintype G := Fintype.ofFinite G
+  haveI : Invertible (Nat.card G : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI := hyp.base.finiteG
+  haveI : Fintype ↥hyp.base.T := Fintype.ofFinite _
+  haveI : Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) := Fintype.ofFinite _
+  haveI : Invertible (Nat.card ↥hyp.base.T : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI : Invertible (Nat.card ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  -- **Carrier 1 (the coherent `τ₁`-image family, now DISCHARGED from the (14.9) coherence).**
+  -- The intrinsic type-III datum builds the degree-`p` `Ind_{QV}^T`-family `calT1_set` with all
+  -- coherence inputs (`T_typeIII_calT1_family`); the T-side Dade package + coherence engine
+  -- (`T_typeIII_calT1_isCoherent`, i.e. `T_typeIII_hyp07` ∘ `T_typeIII_calT1_coherent`) then produce
+  -- the coherent map `τ₁ = hτ.extension`.  Its image `calT1 := τ₁(calT1_set)` is an **orthonormal**
+  -- set of `G`-class functions (`horth`), because `τ₁` is an isometry on `ℤ[calT1_set]`
+  -- (`IsCoherent.extension_inner_eq`) and the source members are orthonormal irreducibles.
+  obtain ⟨𝒯, hinertia, hne, hlinear, hconj𝒯, hgalois𝒯, hcount_V⟩ :=
+    T_typeIII_calT1_family_galois hyp hIII.some
+  set calT1_set : Set (ClassFunction ↥hyp.base.T ℂ) :=
+    ↑(𝒯.image (fun θ => ClassFunction.induce
+      ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction)) with hcalT1
+  -- Members of `calT1_set` are orthonormal irreducibles of `T` (irreducible + pairwise orthogonal
+  -- via `T_typeIII_hyp07`'s family predicates), reused below for `horth`.
+  have hirr : ∀ χ ∈ calT1_set, IsIrreducibleCharacter χ := by
+    intro χ hχ
+    rw [hcalT1, Finset.mem_coe, Finset.mem_image] at hχ
+    obtain ⟨θ, hθ, rfl⟩ := hχ
+    exact isIrreducibleCharacter_induce_of_inertia_eq
+      (G := ↥hyp.base.T) (H := (derivedInG hyp.base.T).subgroupOf hyp.base.T) θ (hinertia θ hθ)
+  -- `hcard2 : 2 ≤ |calT1_set|` — the crude size bound `(|V|−1)/p ≥ 2`, **ungated**: from the
+  -- intrinsic `2p + 1 ≤ |V|` (`T_typeIII_two_p_add_one_le_card_V`, odd-order Frobenius `U ⋊ W₁`)
+  -- and the count `|calT1_set| = (|V|−1)/p` (`hcount_V`), via `2 ≤ (|V|−1)/p ⟺ 2p ≤ |V|−1`.  The
+  -- lane-b `|V|`-lower-bound (`v = (q^p−1)/(q−1)`, 13.15) is only needed for the *exact* count, not
+  -- this `≥ 2`.
+  have hcard2 : 2 ≤ calT1_set.ncard := by
+    have hV := T_typeIII_two_p_add_one_le_card_V hG hyp hIII.some
+    have hncard : calT1_set.ncard = (Nat.card ↥hyp.base.V - 1) / hyp.base.p := by
+      rw [hcalT1, Set.ncard_coe_finset]; exact hcount_V
+    rw [hncard, Nat.le_div_iff_mul_le hyp.base.p_prime.pos]
+    omega
+  -- The T-side coherence: `τ₁ = hτ.extension`, `IsCoherent (tSideDadeMap) calT1_set A₁(T)`.
+  obtain ⟨hyp07, htau, ⟨hτ⟩⟩ :=
+    T_typeIII_calT1_isCoherent hyp hG hIII 𝒯 hinertia hlinear hne hconj𝒯 calT1_set hcalT1 hcard2
+  rw [htau] at hτ
+  -- `calT1 := τ₁(calT1_set)`, the coherent-image `Finset` in `CF(G)`.
+  set calT1 : Finset (ClassFunction G ℂ) :=
+    calT1_set.toFinset.image (⇑hτ.extension) with hcalT1img
+  -- **`horth`: the coherent images are orthonormal** — the discharged coherence carrier.
+  have horth : ∀ a ∈ calT1, ∀ b ∈ calT1,
+      ClassFunction.inner a b = if a = b then (1 : ℂ) else 0 := by
+    intro a ha b hb
+    rw [hcalT1img, Finset.mem_image] at ha hb
+    obtain ⟨ζ, hζT, rfl⟩ := ha
+    obtain ⟨ζ', hζ'T, rfl⟩ := hb
+    rw [Set.mem_toFinset] at hζT hζ'T
+    -- `⟨τ₁ζ, τ₁ζ'⟩ = ⟨ζ, ζ'⟩` (coherent isometry on `ℤ[calT1_set]`).
+    have hiso : ClassFunction.inner (hτ.extension ζ) (hτ.extension ζ')
+        = ClassFunction.inner ζ ζ' :=
+      hτ.extension_inner_eq ζ ζ' (Submodule.subset_span hζT) (Submodule.subset_span hζ'T)
+    -- `⟨ζ, ζ'⟩ = if ζ = ζ' then 1 else 0` (orthonormal irreducibles).
+    have hsrc : ClassFunction.inner ζ ζ' = if ζ = ζ' then (1 : ℂ) else 0 := by
+      by_cases hζζ' : ζ = ζ'
+      · subst hζζ'; rw [if_pos rfl]; exact (hirr ζ hζT).inner_self_eq_one
+      · rw [if_neg hζζ']; exact hyp07.pairwise_orthogonal hζT hζ'T hζζ'
+    rw [hiso, hsrc]
+    -- The image equality `τ₁ζ = τ₁ζ'` iff `ζ = ζ'` (injectivity from the isometry).
+    by_cases hζζ' : ζ = ζ'
+    · rw [if_pos hζζ', if_pos (by rw [hζζ'])]
+    · rw [if_neg hζζ', if_neg ?_]
+      -- if `τ₁ζ = τ₁ζ'` then `⟨ζ,ζ'⟩ = ⟨τ₁ζ,τ₁ζ⟩ = ⟨ζ,ζ⟩ = 1 ≠ 0 = ⟨ζ,ζ'⟩`, contradiction.
+      intro hab
+      have h1 : ClassFunction.inner ζ ζ' = ClassFunction.inner ζ ζ := by
+        rw [← hiso, ← hab,
+          hτ.extension_inner_eq ζ ζ (Submodule.subset_span hζT) (Submodule.subset_span hζT)]
+      rw [hsrc, if_neg hζζ', (hirr ζ hζT).inner_self_eq_one] at h1
+      exact one_ne_zero h1.symm
+  -- The coherent extension is injective on `calT1_set`: equality of two images would turn the
+  -- source cross-inner-product `0` into the source self-inner-product `1`.
+  have hinj : Set.InjOn (⇑hτ.extension) (↑calT1_set.toFinset : Set _) := by
+    intro ζ hζ ζ' hζ' heq
+    have hζS : ζ ∈ calT1_set := by simpa using hζ
+    have hζ'S : ζ' ∈ calT1_set := by simpa using hζ'
+    by_contra hne
+    have hEq : ClassFunction.inner ζ ζ' = ClassFunction.inner ζ ζ := by
+      rw [← hτ.extension_inner_eq ζ ζ' (Submodule.subset_span hζS)
+          (Submodule.subset_span hζ'S), ← heq,
+        hτ.extension_inner_eq ζ ζ (Submodule.subset_span hζS) (Submodule.subset_span hζS)]
+    rw [hyp07.pairwise_orthogonal hζS hζ'S hne, (hirr ζ hζS).inner_self_eq_one] at hEq
+    exact zero_ne_one hEq
+  have hcalcard : calT1.card = calT1_set.toFinset.card := by
+    rw [hcalT1img, Finset.card_image_of_injOn hinj]
+  have hsourcecard :
+      calT1_set.toFinset.card = (Nat.card ↥hyp.base.V - 1) / hyp.base.p := by
+    rw [← Set.ncard_eq_toFinset_card' calT1_set, hcalT1, Set.ncard_coe_finset]
+    exact hcount_V
+  -- (13.4) gives `D = ⊥`; hence `d = |D| = 1` and `|V| = v d = v`.
+  have hDbot : hyp.base.D = ⊥ := (T_side_caseB_facts hG hyp).1
+  have hd1 : hyp.base.d = 1 := by
+    rw [hyp.base.d_eq_card_D, hDbot, Subgroup.card_bot]
+  have hVcard : Nat.card ↥hyp.base.V = hyp.base.v := by
+    rw [hyp.base.card_V_eq_vd, hd1, mul_one]
+  -- The same (13.4) value makes `v ≡ 1 (mod p)`, so the exact Nat quotient casts to the
+  -- rational ratio used by the Bessel engine.
+  have hvfull := (T_side_caseB_facts hG hyp).2
+  have hvodd : Odd hyp.base.v := by
+    rw [hvfull]
+    exact hyp.tSide_cyclotomic_quotient_odd
+  have hvdvd :
+      hyp.base.v ∣ (hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1) := by
+    rw [hvfull]
+  have hvmod : hyp.base.v ≡ 1 [MOD hyp.base.p] :=
+    hyp.tSide_cyclotomic_quotient_divisor_modEq_one
+      hyp.base.v hvodd.pos.ne' hvdvd
+  have hpdiv : hyp.base.p ∣ hyp.base.v - 1 :=
+    (Nat.modEq_iff_dvd' hvodd.pos).mp hvmod.symm
+  have hcount : (calT1.card : ℚ) =
+      ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) := by
+    rw [hcalcard, hsourcecard, hVcard]
+    exact Nat.cast_div hpdiv (Nat.cast_ne_zero.mpr hyp.base.p_prime.ne_zero)
+  -- The genuine (13.18) gap is the concrete `GammaGrid`.  Its virtuality follows from the
+  -- supported S-side Dade image; reality and principal orthogonality are the faithful BetaData
+  -- fields.  The coherent images are virtual characters by the coherent-extension contract.
+  let betaData := OddOrder.Peterfalvi.S15.betaData_of_grid_of_c_eq_one
+    hG hnoV hyp.base hc1 ⟨1, hyp.base.p_prime.one_lt⟩ (by simp)
+  have hGammaZ : betaData.Gamma ∈ ZIrr G := by
+    simpa [betaData, OddOrder.Peterfalvi.S15.betaData_of_grid_of_c_eq_one] using
+      (sSideGamma_mem_ZIrr_of_c_eq_one hG hyp hc1)
+  have hGammaR : ClassFunction.IsReal betaData.Gamma :=
+    betaData.Gamma_real
+  have hGamma1 : ClassFunction.inner betaData.Gamma
+      (trivialIrreducibleCharacter G : ClassFunction G ℂ) = 0 := by
+    exact betaData.Gamma_orthogonal_one
+  have hmemZ : ∀ a ∈ calT1, a ∈ ZIrr G := by
+    intro a ha
+    rw [hcalT1img, Finset.mem_image] at ha
+    obtain ⟨ζ, hζT, rfl⟩ := ha
+    rw [Set.mem_toFinset] at hζT
+    exact hτ.extension_mem_ZIrr ζ (Submodule.subset_span hζT)
+  have hdiff_supp := T_typeIII_calT1_difference_support
+    hyp hG hIII 𝒯 hlinear calT1_set hcalT1
+  have hgaloisT : ∀ (sigma : ℂ ≃+* ℂ) ξ, ξ ∈ calT1_set →
+      ClassFunction.mapRingEquiv sigma ξ ∈ calT1_set := by
+    intro sigma ξ hξ
+    rw [hcalT1] at hξ ⊢
+    exact inducedFamily_mapRingEquiv_mem
+      ((derivedInG hyp.base.T).subgroupOf hyp.base.T) 𝒯 hgalois𝒯 sigma hξ
+  -- This is now the exact remaining (14.9) character construction: for each coherent image
+  -- `a = τ₁ζ`, build `Δ_a = τ_T(ν₀ - ζ) - 1_G + a`, prove it real/virtual and orthogonal
+  -- to `1_G`, and establish the expansion `⟨Γ,a⟩ = 1 + ⟨Δ_a,Γ⟩`.  All integrality and
+  -- parity bookkeeping after this witness is discharged by the theorem below.
+  have hDelta : ∀ a ∈ calT1, ∃ Δ : ClassFunction G ℂ,
+      Δ ∈ ZIrr G ∧ ClassFunction.IsReal Δ ∧
+        ClassFunction.inner Δ
+          (trivialIrreducibleCharacter G : ClassFunction G ℂ) = 0 ∧
+        ClassFunction.inner betaData.Gamma a =
+          1 + ClassFunction.inner Δ betaData.Gamma := by
+    intro a ha
+    rw [hcalT1img, Finset.mem_image] at ha
+    obtain ⟨ζ, hζT, rfl⟩ := ha
+    rw [Set.mem_toFinset] at hζT
+    have hζform := hζT
+    rw [hcalT1, Finset.mem_coe, Finset.mem_image] at hζform
+    obtain ⟨θ, hθ, hζeq⟩ := hζform
+    have hζ1_ind :=
+      typeIII_induced_source_degree hyp θ (hlinear θ hθ)
+    have hζ1 : ζ 1 = (hyp.base.p : ℂ) :=
+      hζeq ▸ hζ1_ind
+    have hζirr_ind : IsIrreducibleCharacter (ClassFunction.induce
+        ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction) := by
+      simpa only [hζeq] using hirr ζ hζT
+    obtain ⟨ν0, hνZ, hνR, hβZ, hβsupp, hτβZ, hτβ1, hβconj,
+        hνinner, hνζ, hνζc, hβnorm, hτβnorm, hνfixed, hν0eq⟩ :=
+      exists_typeIII_induced_primeTIDifference_with_norm_anchor_orthogonality_and_galois
+        hG hyp hIII θ (hne θ hθ) hζirr_ind hζ1_ind
+    rw [hζeq] at hβZ hβsupp hτβZ hτβ1 hβconj hνζ hνζc hβnorm hτβnorm
+    have hζone : ClassFunction.inner ζ
+        (trivialClassFunction ↥hyp.base.T) = 0 := by
+      rw [← hζeq]
+      exact OddOrder.Peterfalvi.S09.Cert.inner_induce_constOne_eq_zero
+        ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ (hne θ hθ)
+    have hβinner : ClassFunction.inner (ν0 - ζ)
+        (trivialClassFunction ↥hyp.base.T) = 1 := by
+      rw [ClassFunction.inner_sub_left, hνinner, hζone, sub_zero]
+    obtain ⟨mT, hmT, hpythT, hboundT, hprincipalT, hrelationT⟩ :=
+      exists_tSide_etaGrid_intProjection_with_relation hG hyp hIII hβsupp hβinner hτβZ hτβnorm
+    have hperpT := tSide_etaGridProjection_residual_ne_zero_of_anchor_orthogonal
+      hG hyp hIII hyp07 hτ
+      (fun ξ hξ => hdiff_supp ξ hξ ξ.conj (hyp07.conjugate_closed hξ))
+      hζT (hirr ζ hζT) hβsupp hνζ hνζc mT
+    have hsumSqT :
+        (∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p, (mT i j) ^ 2 : ℤ) ≤
+          (hyp.base.p : ℤ) :=
+      etaGrid_projection_sum_sq_le_of_residual_ne_zero
+        hyp.base hτβZ hτβnorm mT hmT hperpT
+    have horbits := eta_axis_galois_orbits_of_hypothesis hyp.base
+    have haxis := tSideDadeMap_eta_axis_coefficients_constant
+      hG hyp hβZ hβsupp hτ hζT hgaloisT hdiff_supp
+      (fun ξ hξ i j =>
+        T_typeIII_coherent_image_inner_eta_eq_zero hG hyp hIII
+          hyp07.conjugate_closed hyp07.no_real_characters
+          (fun χ hχ => hdiff_supp χ hχ χ.conj (hyp07.conjugate_closed hχ))
+          hτ hξ (hirr ξ hξ) i j)
+      mT hmT hνfixed horbits.1 horbits.2
+    have hshape := etaGrid_coefficients_eq_column_or_row_of_sum_sq_le
+      hyp.base hyp.q_lt_p mT hprincipalT haxis.1 haxis.2 hrelationT hsumSqT
+    have hτβinner : ClassFunction.inner (tSideDadeMap hyp hG (ν0 - ζ))
+        (trivialIrreducibleCharacter G : ClassFunction G ℂ) = 1 := by
+      change ClassFunction.inner (tSideDadeMap hyp hG (ν0 - ζ))
+        (trivialClassFunction G) = 1
+      rw [tSideDadeMap_inner_trivial hyp hG hβsupp, hβinner]
+    have htrivSelf : ClassFunction.inner
+        (trivialIrreducibleCharacter G : ClassFunction G ℂ)
+        (trivialIrreducibleCharacter G : ClassFunction G ℂ) = 1 :=
+      (trivialIrreducibleCharacter G).isIrreducible.inner_self_eq_one
+    have hζcT : ζ.conj ∈ calT1_set := hyp07.conjugate_closed hζT
+    have hExtOne : ClassFunction.inner (hτ.extension ζ)
+        (trivialIrreducibleCharacter G : ClassFunction G ℂ) = 0 := by
+      change ClassFunction.inner (hτ.extension ζ)
+        (trivialClassFunction G) = 0
+      exact tSideCoherentExtension_inner_trivial hyp hG hyp07 hτ hζT
+        (hirr ζ hζT) hζone
+        (hdiff_supp ζ.conj hζcT ζ hζT)
+    have hExtConj : (hτ.extension ζ).conj = hτ.extension ζ.conj :=
+      tSideCoherentExtension_conj hyp hG hIII 𝒯 hne calT1_set hcalT1
+        hyp07 hτ hirr hζT
+    have hζdiffSupp : (ζ - ζ.conj).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup
+          (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T :=
+      hdiff_supp ζ hζT ζ.conj hζcT
+    let Δ : ClassFunction G ℂ :=
+      tSideDadeMap hyp hG (ν0 - ζ) -
+          (trivialIrreducibleCharacter G : ClassFunction G ℂ) +
+        hτ.extension ζ
+    have hOneZ :
+        (trivialIrreducibleCharacter G : ClassFunction G ℂ) ∈ ZIrr G :=
+      (trivialIrreducibleCharacter G).mem_ZIrr
+    have hExtZ : hτ.extension ζ ∈ ZIrr G :=
+      hτ.extension_mem_ZIrr ζ (Submodule.subset_span hζT)
+    have hΔZ : Δ ∈ ZIrr G := by
+      change tSideDadeMap hyp hG (ν0 - ζ) -
+          (trivialIrreducibleCharacter G : ClassFunction G ℂ) +
+        hτ.extension ζ ∈ ZIrr G
+      exact (ZIrr G).add_mem ((ZIrr G).sub_mem hτβZ hOneZ) hExtZ
+    have hΔreal : ClassFunction.IsReal Δ := by
+      change ClassFunction.IsReal
+        (tSideDadeMap hyp hG (ν0 - ζ) -
+          (trivialIrreducibleCharacter G : ClassFunction G ℂ) +
+          hτ.extension ζ)
+      exact tSideDelta_isReal hyp hG hτ hζT hζcT hβsupp hζdiffSupp
+        hβconj hExtConj
+    have hΔone : ClassFunction.inner Δ
+        (trivialIrreducibleCharacter G : ClassFunction G ℂ) = 0 := by
+      change ClassFunction.inner
+          (tSideDadeMap hyp hG (ν0 - ζ) -
+              (trivialIrreducibleCharacter G : ClassFunction G ℂ) +
+            hτ.extension ζ)
+          (trivialIrreducibleCharacter G : ClassFunction G ℂ) = 0
+      rw [ClassFunction.inner_add_left, ClassFunction.inner_sub_left,
+        hτβinner, htrivSelf]
+      rw [hExtOne]
+      norm_num
+    have hrelation : ClassFunction.inner betaData.Gamma (hτ.extension ζ) =
+        1 + ClassFunction.inner Δ betaData.Gamma := by
+      -- The remaining deep input is now exact: Coq (11.8) rules out the
+      -- zero-row branch of the proven (11.9) column-or-row dichotomy.
+      -- The S/T cross orthogonality is no longer assumed: the landed exact-support
+      -- consumer proves it from prime-TI support, Type-P₁ normed-TI, and order separation.
+      have hnotZeroRowProjection :
+          ¬ ∀ i : Fin hyp.base.q, ∀ j : Fin hyp.base.p,
+            ClassFunction.inner
+                (tSideDadeMap hyp hG (ν0 - ζ) -
+                  ∑ j' : Fin hyp.base.p,
+                    hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ j')
+                (hyp.base.eta i j) = 0 := by
+        -- Coq (11.8) `FTtype34_not_ortho_cycTIiso`: the canonical narrow-`𝒮(H₀C)`
+        -- refuter, transported through the global sigma/eta grid identification
+        -- ((3.9)(a) rigidity) and the Dade-image anchor `ν₀ = Ind_{T'}^T 1`.
+        have hP1' : OddOrder.BG.Ch4.S14.IsTypeP1 hyp.base.T := by
+          obtain ⟨_, _, hcIII_IV, _, _, _⟩ :=
+            OddOrder.BG.Ch4.S16.proposition_type_classification
+              hG hyp.base.T_maximal
+          exact (hcIII_IV.mp (Or.inl hIII)).1
+        obtain ⟨-, hW1spec, hW2spec⟩ :=
+          (OddOrder.Peterfalvi.S15.reconciled_typePData_T hG hyp.base).choose_spec
+        set dataT' :=
+          (OddOrder.Peterfalvi.S15.reconciled_typePData_T hG hyp.base).choose
+          with hdataT'
+        have hW : dataT'.W = hyp.base.W := by
+          rw [dataT'.W_eq, hW1spec, hW2spec, sup_comm, ← hyp.base.W_eq_join]
+        have hV : typePV hyp.base.T dataT' =
+            (hyp.base.W : Set G) \
+              ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G)) := by
+          unfold typePV
+          rw [hW, hW1spec, hW2spec, Set.union_comm]
+        -- `ζ`/`ν₀` were built under the local `haveI : Fintype ↥T := Fintype.ofFinite _`
+        -- instances (`this✝`), which are *definitionally* the scoped
+        -- `S12.FiniteInduce.finiteSubFintype`/`natCardInvC` but appear as opaque fvars, so the
+        -- scoped-instance `inducedFamily` / `s12Tau…` consumers need a `Subsingleton.elim` bridge.
+        have hzetaS : ζ ∈ OddOrder.Peterfalvi.S12.inducedFamily hyp.base.T :=
+          ⟨θ, hne θ hθ, by convert hζeq.symm using 2 <;> exact Subsingleton.elim _ _⟩
+        -- `hν0eq` carries the local `haveI` `Fintype`/`Invertible` diamond (opaque fvars,
+        -- definitionally the scoped `S12.FiniteInduce.*`), bridged by `Subsingleton.elim`.
+        have himage := s12Tau_zeroColumn_sub_eq_tSideDadeMap hG hyp dataT' hP1'
+          hIII ζ ν0
+          (by convert hν0eq using 2 <;> exact Subsingleton.elim _ _) hβsupp
+        have hzeta1 : ζ 1 =
+            ((s12HypothesisOfTypePData hG hyp.base.T_maximal dataT'
+              (Or.inl hIII) hP1').w1 : ℂ) := by
+          rw [show (s12HypothesisOfTypePData hG hyp.base.T_maximal dataT'
+              (Or.inl hIII) hP1').w1 = Nat.card ↥dataT'.W1 from rfl,
+            hW1spec, ← hyp.base.p_eq_card_W2]
+          exact hζ1
+        -- `member_residual…eta`'s `¬∀ … inner[scoped] … = 0` conclusion; the local goal states the
+        -- same `inner` under the `haveI` diamond, so bridge the reindexed `∀` per-entry.
+        have hkey := member_residual_not_orthogonal_eta_of_refuter hG hyp.base
+          (s12HypothesisOfTypePData hG hyp.base.T_maximal dataT'
+            (Or.inl hIII) hP1')
+          hW hW2spec hW1spec hV (Or.inl hIII)
+          (OddOrder.Peterfalvi.S13.secondDerived_eq_fitting_of_base hG
+            (s12HypothesisOfTypePData hG hyp.base.T_maximal dataT'
+              (Or.inl hIII) hP1') (Or.inl hIII)
+            (fun s13 => hncH0C s13))
+          (OddOrder.Peterfalvi.S13.card_H_eq_of_base hG
+            (s12HypothesisOfTypePData hG hyp.base.T_maximal dataT'
+              (Or.inl hIII) hP1') (Or.inl hIII)
+            (fun s13 => hncH0C s13))
+          -- `(11.3)` narrow-`𝒮(H₀C)` noncoherence.  The unconditional heir
+          -- `S_H0C_not_coherent_unconditional` lives behind the `S12_Noncoherence` pair
+          -- machinery, which transitively imports this S16 cluster; from here (upstream of that
+          -- back-edge) the in-DAG refuter is the legacy `S_H0C_not_coherent`, exactly as its
+          -- docstring reserves for consumers above the pair machinery.
+          (fun s13hyp => hncH0C s13hyp)
+          ζ hzetaS (hirr ζ hζT) hzeta1
+          -- `source` is inferred from `himage` (scoped `tSideDadeMap`); the local goal states the
+          -- same `inner (tSideDadeMap …) …` under the `haveI` diamond, bridged per-entry below.
+          _ himage
+        intro hgoal
+        exact hkey (fun i j => by
+          convert hgoal i j <;> exact Subsingleton.elim _ _)
+      have hresidual :
+          (∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p, (mT i j) ^ 2 : ℤ) ≤
+              (hyp.base.p : ℤ) ∧
+          (∀ j : Fin hyp.base.p,
+            ClassFunction.inner
+                (hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ j)
+                (tSideDadeMap hyp hG (ν0 - ζ)) =
+              ClassFunction.inner
+                (hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ j)
+                (∑ i : Fin hyp.base.q,
+                  hyp.base.eta i ⟨0, hyp.base.p_prime.pos⟩)) := by
+        refine ⟨hsumSqT, ?_⟩
+        rcases hshape with hcolumn | hrow
+        · exact etaGrid_zeroColumn_projection_of_coefficients_eq_column
+            hyp.base (tSideDadeMap hyp hG (ν0 - ζ)) mT hmT hcolumn
+        · -- Coq (11.8): exclude the zero-row projection.
+          exfalso
+          apply hnotZeroRowProjection
+          intro i j
+          rw [← etaGridProjection_eq_zeroRow_of_coefficients_eq_row hyp.base mT hrow]
+          exact etaGrid_projection_residual_inner_eta_eq_zero
+            hyp.base (tSideDadeMap hyp hG (ν0 - ζ)) mT hmT i j
+      have hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 hyp.base.T := by
+        obtain ⟨_, _, hcIII_IV, _, _, _⟩ :=
+          OddOrder.BG.Ch4.S16.proposition_type_classification
+            hG hyp.base.T_maximal
+        exact (hcIII_IV.mp (Or.inl hIII)).1
+      let dataT :=
+        (OddOrder.Peterfalvi.S15.reconciled_typePData_T hG hyp.base).choose
+      have hcross :
+          ClassFunction.inner (tSideDadeMap hyp hG (ν0 - ζ))
+            (OddOrder.Peterfalvi.S15.tauSbetaGrid hG hyp.base) = 0 :=
+        tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_c_eq_one
+          hG hnoV hyp hc1 dataT hP1 hβsupp
+      have hτβeta : ClassFunction.inner (tSideDadeMap hyp hG (ν0 - ζ))
+          (hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩
+            ⟨1, by have := hyp.base.three_le_p; omega⟩) = 0 := by
+        have hne0 :
+            (⟨1, by have := hyp.base.three_le_p; omega⟩ : Fin hyp.base.p) ≠
+              ⟨0, hyp.base.p_prime.pos⟩ := by
+          intro h
+          have hv := congrArg Fin.val h
+          norm_num at hv
+        have hrow := tSide_beta_inner_eta_of_zeroColumn_projection
+          hyp.base (tSideDadeMap hyp hG (ν0 - ζ)) hresidual.2
+          ⟨1, by have := hyp.base.three_le_p; omega⟩
+        simpa only [if_neg hne0] using hrow
+      have hΓdef : betaData.Gamma =
+          OddOrder.Peterfalvi.S15.tauSbetaGrid hG hyp.base -
+              (trivialIrreducibleCharacter G : ClassFunction G ℂ) +
+            hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩
+              ⟨1, by have := hyp.base.three_le_p; omega⟩ := by
+        rfl
+      have hΔdef : Δ =
+          tSideDadeMap hyp hG (ν0 - ζ) -
+              (trivialIrreducibleCharacter G : ClassFunction G ℂ) +
+            hτ.extension ζ := by
+        rfl
+      exact gap_cross_inner_identity hGammaZ hExtZ hOneZ hΓdef hΔdef
+        hτβinner hcross hτβeta hGamma1
+    exact ⟨Δ, hΔZ, hΔreal, hΔone, hrelation⟩
+  obtain ⟨x, hxcoe, hx⟩ :
+      ∃ (x : ClassFunction G ℂ → ℤ),
+        (∀ a ∈ calT1, ClassFunction.inner betaData.Gamma a = ((x a : ℝ) : ℂ)) ∧
+        (∀ a ∈ calT1, x a ≠ 0) := by
+    exact gap_coefficients_nonzero_of_delta_parity hG.odd calT1 betaData.Gamma
+      hGammaZ hGammaR hGamma1 hmemZ hDelta
+  have heta : ∀ a ∈ calT1, ∀ (i : Fin hyp.base.q) (k : Fin hyp.base.p),
+      ClassFunction.inner a (hyp.base.eta i k) = 0 := by
+    intro a ha i k
+    rw [hcalT1img, Finset.mem_image] at ha
+    obtain ⟨ζ, hζT, rfl⟩ := ha
+    rw [Set.mem_toFinset] at hζT
+    exact T_typeIII_coherent_image_inner_eta_eq_zero hG hyp hIII
+      hyp07.conjugate_closed hyp07.no_real_characters
+      (fun χ hχ => hdiff_supp χ hχ χ.conj (hyp07.conjugate_closed hχ))
+      hτ hζT (hirr ζ hζT) i k
+  exact T_typeIII_ratio_le_of_sSide_gap hyp calT1 horth hcount
+    betaData.Gamma x hxcoe hx heta betaData.Y_norm_bound
+
+                                                                                                 
+                                                                                               
+                                                                                                  
+                                                                                                      
+                                                                                                    
+                                                                                                   
+
+                                                                                                    
+                                                                                   
+                                                                                                   
+                                                                  
+                                                    
+                                                                       
+                                                   
+                                               
+                                 
+                                                                         
+                                                                 
+                                                         
+                                                  
+                                                         
+                                                   
+                                                                                   
+                                                
+                                                                                         
+                                                                               
+                         
+                                                                             
+                                                                              
+                                                                                      
+                                                                              
+                                                           
+                                                                   
+                        
+                     
+                                                                                              
+                            
+                                                                 
+                                                                                  
+                                           
+                                                                      
+                                                                     
+                                                                                 
+                                   
+                                                                                      
+                                                       
+                                         
+                     
+                                                                               
+                                                    
+                                        
+                                                                                       
+                                                                   
+                                                                                         
+                                                                                       
+                                                                              
+                                      
+                                                                      
+                                                                            
+                                                        
+                                                                                                        
+                                                                 
+                                                                         
+                                                      
+                                                                 
+                                                                                         
+                                                                                                   
+                                                                                         
+                                                                          
+              
+                                               
+                                      
+                                                                                                 
+                                                                                       
+                                                                                
+                                                                                                  
+                                          
+                                                             
+                                                     
+                             
+                                                                             
+                                                                                              
+                                                                                     
+                                                     
+                                                      
+                                 
+                                                                                             
+                                                     
+                                                                        
+                    
+                                                         
+                                                 
+
+/-- **Peterfalvi (11.9)/(14.9), the Type-IV exclusion** — the deep content of the type
+determination, now discharged.  Coq `FTtype34_structure` (Peterfalvi (11.9), `PFsection11.v:1001`,
+consumed at `PFsection14.v:735`) pins a non-type-II type-`P` maximal `T` to Type III (not IV) via
+the character/Galois argument `suffices galM : typeP_Galois MtypeP` (`PFsection11.v:1139`) — the
+`η`-grid projection computation `a₁₁ = a₁₀ = 0`.
+
+Formalised as the universal (11.9.c) Type-IV exclusion `not_isTypeIV_of_mem_maximalSubgroups`
+(`S13_NonGaloisExclusion`, sorry-free): the `IsMulCommutative V` residual that used to live here
+follows from `cyclic V ⟸ typeP_Galois T`, whose full §5–§13 chain
+(`not_isTypeIV_of_hypothesis`/`U_isCyclic_of_hypothesis`) is landed.  The direct cite became
+possible once the §12–16 import inversion (issue 9093) removed `S13_NonGaloisExclusion`'s
+transitive dependency on §16. -/
+theorem T_not_isTypeIV_of_isTypeP1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (_hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 hyp.base.T) :
+    ¬ OddOrder.GroupTheory.IsTypeIV hyp.base.T :=
+  OddOrder.Peterfalvi.S13.not_isTypeIV_of_mem_maximalSubgroups hG hyp.base.T_maximal
+
+/-- **Peterfalvi (14.9), the type determination** — Coq `PFsection14`
+`have [_ _ [Ttype3 _]] := FTtype34_structure maxT TtypeP notTtype2` (line 735): a type-`P` maximal
+subgroup that is *not* type II is type III.  In σ-theoretic terms, `IsTypeP1 T` (equivalently
+`¬ IsTypeP2 T` given `IsTypeP T`) forces `T` to be structurally Type III.
+
+**Fully reduced to the single (11.9) residual `T_not_isTypeIV_of_isTypeP1`.**  The type dictionary
+`proposition_type_classification` (BG Prop 16.1, proven) gives, from `IsTypeP1 T`, either Type III/IV
+(if `M_F ≠ M_σ`) or Type V (if `M_F = M_σ`).  **Type V is excluded outright** by the (10.10)
+hypothesis `hnoV` (instantiate with the axiom-clean `no_typeV_maximal_unconditional`,
+`S12_Noncoherence`; issue 9087), so `M_F ≠ M_σ` and `T` is Type III or IV.  Excluding Type IV — the genuine (11.9) Galois/character
+content — is the isolated residual `T_not_isTypeIV_of_isTypeP1`.  The Type-V exclusion and the III/IV
+structural wiring (incl. the `TypeIIIData.normalizer_le` field, bundled into the clause-(c)
+disjunction) are proven here. -/
+theorem T_isTypeIII_of_isTypeP1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ IsTypeV M)
+    (hyp : Hypothesis (G := G)) (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 hyp.base.T) :
+    OddOrder.GroupTheory.IsTypeIII hyp.base.T := by
+  -- Type dictionary (BG Prop 16.1): `IsTypeP1 T` ⟹ III/IV (`M_F ≠ M_σ`) or V (`M_F = M_σ`).
+  obtain ⟨_, _, hcIII_IV, hdV, _, _⟩ :=
+    OddOrder.BG.Ch4.S16.proposition_type_classification hG hyp.base.T_maximal
+  -- Type V excluded universally by the (10.10) hypothesis `hnoV`, so `M_F ≠ M_σ`.
+  have hMF : OddOrder.BG.Ch4.S15.MF hyp.base.T ≠ OddOrder.BG.Ch3.S10.Msigma hyp.base.T := fun h =>
+    hnoV ⟨hyp.base.T, hyp.base.T_maximal, hdV.mpr ⟨hP1, h⟩⟩
+  -- `T` is Type III or IV; exclude IV by the (11.9) residual.
+  exact (hcIII_IV.mpr ⟨hP1, hMF⟩).resolve_right (T_not_isTypeIV_of_isTypeP1 hG hyp hP1)
+
+/-- **Peterfalvi (14.9), reduced to its canonical residual.**  Starting from the symmetric
+(13.1) non-type-I carrier, `T` is sharpened to BG type `P₂` (`κ(T) ≠ σ'(T)`; Coq `PFsection14`
+`FTtypeP_min_typeII : FTtype T == 2`).  The `IsTypeP T` conjunct is discharged honestly from
+`T_nonI` (`isTypeP_of_isTypeNonI`).
+
+The residual `κ(T) ≠ σ'(T)` is proved by the (14.9) contradiction, following Coq
+`FTtypeP_min_typeII` (`apply: contraLR v1p_gt_u1q => notTtype2`): were `κ(T) = σ'(T)` (i.e.
+`IsTypeP1 T`), then `T` is Type III (`T_isTypeIII_of_isTypeP1`, the `FTtype34_structure`
+determination), whence the character body forces `(v − 1)/p ≤ (u − 1)/q` (`T_typeIII_ratio_le`) —
+contradicting (14.8) `key_inequality`'s `(v − 1)/p > (u − 1)/q`.
+
+The two deep pieces are isolated as `T_typeIII_ratio_le` (character body) and
+`T_isTypeIII_of_isTypeP1` (type determination), both consumed below.  The `>` half is (14.8): its
+pure cyclotomic comparison lives upstream in `KeyInequalityArithmetic`, while the two group-theoretic
+order inputs are the direct (13.4) producer `T_side_caseB_facts` and the (13.15) producer
+`Hypothesis.u_le_cyclotomicQuotient`.  Thus no forward reference through the later
+`key_inequality` theorem is needed. -/
+theorem T_isTypeP2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
+    (hyp : Hypothesis (G := G)) :
+    OddOrder.BG.Ch4.S14.IsTypeP2 hyp.base.T := by
+  have hP : OddOrder.BG.Ch4.S14.IsTypeP hyp.base.T :=
+    OddOrder.BG.Ch4.S16.isTypeP_of_isTypeNonI hG hyp.base.T_maximal hyp.base.T_nonI
+  refine ⟨hP, ?_⟩
+  -- (14.9), by contradiction (Coq `contraLR v1p_gt_u1q => notTtype2`): assume `κ(T) = σ'(T)`.
+  intro hκeq
+  -- Then `T` is type `P₁`, hence (Coq `FTtype34_structure`) structurally Type III.
+  have hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 hyp.base.T := ⟨hP, hκeq⟩
+  have hIII : OddOrder.GroupTheory.IsTypeIII hyp.base.T := T_isTypeIII_of_isTypeP1 hG hnoV hyp hP1
+  -- The character body then gives the type-III Γ-bridge estimate `(v − 1)/p ≤ (u − 1)/q`.
+  have hle : ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) ≤
+      ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) :=
+    T_typeIII_ratio_le hG hnoV hncH0C hyp hIII
+  -- The arithmetic half of (14.8), separated from the later `key_inequality` packaging.
+  have hratio := cyclotomic_ratio_gt_of_q_lt_p
+    hyp.base.p_prime hyp.base.q_prime hyp.base.p_odd hyp.base.q_odd hyp.q_lt_p
+  -- Its T-side order input is the direct (13.4) producer, which is upstream of `T_isTypeP2`.
+  have hvfull := (T_side_caseB_facts hG hyp).2
+  -- The required S-side upper bound is the unconditional cyclotomic quotient estimate.
+  have hu_le_full :
+      hyp.base.u ≤ (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) :=
+    hyp.base.u_le_cyclotomicQuotient hG
+  have hqpos : (0 : ℚ) < hyp.base.q := by
+    exact_mod_cast hyp.base.q_prime.pos
+  have hu_sub : ((hyp.base.u - 1 : ℕ) : ℚ) ≤
+      (((hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) - 1 : ℕ) : ℚ) := by
+    exact_mod_cast Nat.sub_le_sub_right hu_le_full 1
+  have hu_div : ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) ≤
+      (((hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) - 1 : ℕ) : ℚ) /
+        (hyp.base.q : ℚ) :=
+    div_le_div_of_nonneg_right hu_sub (le_of_lt hqpos)
+  have hgt : ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
+      ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) := by
+    rw [hvfull]
+    exact lt_of_le_of_lt hu_div hratio
+  exact absurd hle (not_le.mpr hgt)
+
+/-- **Peterfalvi (14.9)**: the subgroup `T` is of Type II.  `T` is of type `P₂`
+(`T_isTypeP2`), and *every* type-`P₂` maximal subgroup is type II by the proven BG bridge
+`isTypeII_of_isTypeP2`.  That bridge discharges
+the deep `M'`-type-`F` structure — `IsTypeF (derivedInG T)` and `(T')_F = T_F` — internally
+(`isTypeF_derivedInG_of_isTypeP2`), so the sole residual of (14.9) is the type-`P₂` fact `T_isTypeP2`.
+(Placed ahead of `exists_LHypothesis` so the §14 `T`-side chain — `typeII_overNormalizer_frobenius`
+etc. — can cite `IsTypeII T` locally.) -/
+theorem T_typeII [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
+    (hyp : Hypothesis (G := G)) :
+    IsTypeII hyp.base.T :=
+  OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 hG hyp.base.T_maximal (T_isTypeP2 hG hnoV hncH0C hyp)
+
+end OddOrder.Peterfalvi.S16

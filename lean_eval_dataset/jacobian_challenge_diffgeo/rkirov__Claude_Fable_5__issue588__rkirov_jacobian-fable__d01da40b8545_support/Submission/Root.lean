@@ -1,0 +1,36 @@
+-- Root module for the Jacobian challenge project.
+-- Units are added as they are completed.
+import Submission.Init
+import Submission.Surface
+import Submission.LocalMultiplicity
+import Submission.Forms
+import Submission.MappingDegree
+import Submission.ProjectiveLine
+import Submission.ResidueCalculus
+import Submission.Meromorphic
+import Submission.Path
+import Submission.SphereTopology
+import Submission.MeromorphicTrace
+import Submission.ProperDegree
+import Submission.JacobianConstruction
+import Submission.Cech
+import Submission.Finiteness
+import Submission.Dbar
+import Submission.Monodromy
+import Submission.FormTrace
+import Submission.PlanarStokes
+import Submission.SerrePairing
+import Submission.AbelWeak
+import Submission.DolbeaultComparison
+import Submission.ResidueTheorem
+import Submission.CanonicalForms
+import Submission.LaurentTail
+import Submission.JacFunctorial
+import Submission.Abel
+import Submission.TailDuality
+import Submission.H1Genus
+import Submission.RiemannRoch
+import Submission.GenusSphereHeadline
+import Submission.PeriodLattice
+import Submission.CechCount
+import Submission.Challenge

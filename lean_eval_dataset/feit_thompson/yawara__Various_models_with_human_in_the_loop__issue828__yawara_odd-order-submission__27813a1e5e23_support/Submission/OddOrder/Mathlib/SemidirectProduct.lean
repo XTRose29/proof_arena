@@ -1,0 +1,72 @@
+/-
+Copyright (c) 2026 Yawara Ishida. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
+-/
+import Mathlib.GroupTheory.SemidirectProduct
+import Mathlib.GroupTheory.PGroup
+import Mathlib.GroupTheory.Nilpotent
+
+/-!
+# Generic helpers for `SemidirectProduct`
+
+mathlib v4.29.1 `SemidirectProduct` モジュールに対する補足. 順次 upstream 視野.
+
+## 主結果
+
+* `IsPGroup.semidirectProduct`: `N`, `G` 双方が p-group ⇒ `N ⋊[φ] G` も p-group.
+  Isaacs Lem 4.32 (P p-group acts on G p-group ⇒ [G,P] < G + C_G(P) > 1) で
+  `Γ = G ⋊ P` が p-group ⇒ 冪零という議論の核.
+-/
+
+/-- **半直積の Finite instance**. `SemidirectProduct.equivProd` 経由. -/
+instance SemidirectProduct.finite {N G : Type*} [Group N] [Group G] [Finite N] [Finite G]
+    {φ : G →* MulAut N} : Finite (N ⋊[φ] G) :=
+  Finite.of_equiv _ SemidirectProduct.equivProd.symm
+
+                                                                                                  
+
+                                                                             
+                                                      
+                                  
+                                                           
+                                                   
+                                             
+                                  
+                        
+                                                 
+                                                 
+                        
+                                              
+
+                                                                                                 
+                                                     
+                                                           
+                                                   
+                                             
+                                      
+                                                
+
+/-- **`inl.range ⊔ inr.range = ⊤`**: 半直積は `inl` と `inr` の像で生成される.
+
+`inl_left_mul_inr_right` (∀ x, `inl x.left * inr x.right = x`) から従う.
+Γ 内 commutator `⁅inl.range, inr.range⁆` に Isaacs Lem 4.1 (`⁅H, K⁆ ⊴ ⟨H, K⟩`) を
+適用する際の前提. -/
+theorem SemidirectProduct.inl_range_sup_inr_range_eq_top
+    {N G : Type*} [Group N] [Group G] {φ : G →* MulAut N} :
+    (SemidirectProduct.inl : N →* N ⋊[φ] G).range ⊔
+      (SemidirectProduct.inr : G →* N ⋊[φ] G).range = ⊤ := by
+  refine top_le_iff.mp fun x _ => ?_
+  rw [← SemidirectProduct.inl_left_mul_inr_right x]
+  exact Subgroup.mul_mem_sup ⟨x.left, rfl⟩ ⟨x.right, rfl⟩
+
+open scoped commutatorElement in
+/-- **`⁅inl n, inr g⁆ = inl (n * (φ g) n⁻¹)`**: Γ = N ⋊[φ] G 内の commutator は
+`inl` の中で計算できる. これが `actionCommutator φ` の Γ 内 commutator 表示の核. -/
+theorem SemidirectProduct.commutator_inl_inr
+    {N G : Type*} [Group N] [Group G] {φ : G →* MulAut N} (n : N) (g : G) :
+    ⁅(SemidirectProduct.inl n : N ⋊[φ] G), (SemidirectProduct.inr g : N ⋊[φ] G)⁆ =
+      SemidirectProduct.inl (n * (φ g) n⁻¹) := by
+  rw [commutatorElement_def]
+  ext <;> simp [SemidirectProduct.mul_left, SemidirectProduct.mul_right,
+                SemidirectProduct.inv_left, SemidirectProduct.inv_right, mul_assoc]

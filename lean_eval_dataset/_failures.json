@@ -1,10 +1,90 @@
 [
   {
+    "label": "symplectic_matrix_det / rishistyping / GPT-5 Codex + Aristotle",
+    "error": "git clone https://github.com/rishistyping/lean-eval-symplectic-matrix-det-submission.git /private/tmp/lean_eval_download_cache/sources/repo_rishistyping_lean-eval-symplectic-matrix-det-submission failed: Cloning into '/private/tmp/lean_eval_download_cache/sources/repo_rishistyping_lean-eval-symplectic-matrix-det-submission'...\nremote: Repository not found.\nfatal: repository 'https://github.com/rishistyping/lean-eval-symplectic-matrix-det-submission.git/' not found"
+  },
+  {
+    "label": "boone_higman_embedding / rishistyping / Stealth Model",
+    "error": "git clone https://github.com/rishistyping/autoformalization-machine-intelligence.git /private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence failed: Cloning into '/private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence'...\nremote: Repository not found.\nfatal: repository 'https://github.com/rishistyping/autoformalization-machine-intelligence.git/' not found"
+  },
+  {
+    "label": "choquet_representation_theorem / rishistyping / Stealth Model",
+    "error": "git clone https://github.com/rishistyping/autoformalization-machine-intelligence.git /private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence failed: Cloning into '/private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence'...\nremote: Repository not found.\nfatal: repository 'https://github.com/rishistyping/autoformalization-machine-intelligence.git/' not found"
+  },
+  {
     "label": "ci_regenerate_main_check / rishistyping / Stealth Model",
     "error": "git clone https://github.com/rishistyping/autoformalization-machine-intelligence.git /private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence failed: Cloning into '/private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence'...\nremote: Repository not found.\nfatal: repository 'https://github.com/rishistyping/autoformalization-machine-intelligence.git/' not found"
   },
   {
+    "label": "fang_xia_tiling_partition_transitive / rishistyping / Stealth Model",
+    "error": "git clone https://github.com/rishistyping/autoformalization-machine-intelligence.git /private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence failed: Cloning into '/private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence'...\nremote: Repository not found.\nfatal: repository 'https://github.com/rishistyping/autoformalization-machine-intelligence.git/' not found"
+  },
+  {
+    "label": "frobenius_kernel_isNormal / rishistyping / Stealth Model",
+    "error": "git clone https://github.com/rishistyping/lean-eval-frobenius-kernel-isnormal.git /private/tmp/lean_eval_download_cache/sources/repo_rishistyping_lean-eval-frobenius-kernel-isnormal failed: Cloning into '/private/tmp/lean_eval_download_cache/sources/repo_rishistyping_lean-eval-frobenius-kernel-isnormal'...\nremote: Repository not found.\nfatal: repository 'https://github.com/rishistyping/lean-eval-frobenius-kernel-isnormal.git/' not found"
+  },
+  {
+    "label": "jordan_normal_form / rishistyping / Stealth Model",
+    "error": "git clone https://github.com/rishistyping/autoformalization-machine-intelligence.git /private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence failed: Cloning into '/private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence'...\nremote: Repository not found.\nfatal: repository 'https://github.com/rishistyping/autoformalization-machine-intelligence.git/' not found"
+  },
+  {
+    "label": "lindemann_weierstrass / rishistyping / Stealth Model",
+    "error": "git clone https://github.com/rishistyping/autoformalization-machine-intelligence.git /private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence failed: Cloning into '/private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence'...\nremote: Repository not found.\nfatal: repository 'https://github.com/rishistyping/autoformalization-machine-intelligence.git/' not found"
+  },
+  {
+    "label": "liouville_arnold / rishistyping / Stealth Model",
+    "error": "git clone https://github.com/rishistyping/autoformalization-machine-intelligence.git /private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence failed: Cloning into '/private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence'...\nremote: Repository not found.\nfatal: repository 'https://github.com/rishistyping/autoformalization-machine-intelligence.git/' not found"
+  },
+  {
+    "label": "monge_kantorovich / rishistyping / Stealth Model",
+    "error": "git clone https://github.com/rishistyping/autoformalization-machine-intelligence.git /private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence failed: Cloning into '/private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence'...\nremote: Repository not found.\nfatal: repository 'https://github.com/rishistyping/autoformalization-machine-intelligence.git/' not found"
+  },
+  {
+    "label": "morley_theorem / rishistyping / Stealth Model",
+    "error": "git clone https://github.com/rishistyping/autoformalization-machine-intelligence.git /private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence failed: Cloning into '/private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence'...\nremote: Repository not found.\nfatal: repository 'https://github.com/rishistyping/autoformalization-machine-intelligence.git/' not found"
+  },
+  {
+    "label": "pascal / rishistyping / Stealth Model",
+    "error": "git clone https://github.com/rishistyping/autoformalization-machine-intelligence.git /private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence failed: Cloning into '/private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence'...\nremote: Repository not found.\nfatal: repository 'https://github.com/rishistyping/autoformalization-machine-intelligence.git/' not found"
+  },
+  {
+    "label": "peano_existence / rishistyping / Stealth Model",
+    "error": "git clone https://github.com/rishistyping/autoformalization-machine-intelligence.git /private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence failed: Cloning into '/private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence'...\nremote: Repository not found.\nfatal: repository 'https://github.com/rishistyping/autoformalization-machine-intelligence.git/' not found"
+  },
+  {
+    "label": "rado_riemannSurface / rishistyping / Stealth Model",
+    "error": "git clone https://github.com/rishistyping/autoformalization-machine-intelligence.git /private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence failed: Cloning into '/private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence'...\nremote: Repository not found.\nfatal: repository 'https://github.com/rishistyping/autoformalization-machine-intelligence.git/' not found"
+  },
+  {
+    "label": "regular_value_ae / rishistyping / Stealth Model",
+    "error": "git clone https://github.com/rishistyping/lean-eval.git /private/tmp/lean_eval_download_cache/sources/repo_rishistyping_lean-eval failed: Cloning into '/private/tmp/lean_eval_download_cache/sources/repo_rishistyping_lean-eval'...\nremote: Repository not found.\nfatal: repository 'https://github.com/rishistyping/lean-eval.git/' not found"
+  },
+  {
+    "label": "riesz_brothers_theorem / rishistyping / Stealth Model",
+    "error": "git clone https://github.com/rishistyping/autoformalization-machine-intelligence.git /private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence failed: Cloning into '/private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence'...\nremote: Repository not found.\nfatal: repository 'https://github.com/rishistyping/autoformalization-machine-intelligence.git/' not found"
+  },
+  {
+    "label": "shannon_capacity_pentagon / rishistyping / Stealth Model",
+    "error": "git clone https://github.com/rishistyping/autoformalization-machine-intelligence.git /private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence failed: Cloning into '/private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence'...\nremote: Repository not found.\nfatal: repository 'https://github.com/rishistyping/autoformalization-machine-intelligence.git/' not found"
+  },
+  {
+    "label": "sturm / rishistyping / Stealth Model",
+    "error": "git clone https://github.com/rishistyping/lean-eval-sturm-submission.git /private/tmp/lean_eval_download_cache/sources/repo_rishistyping_lean-eval-sturm-submission failed: Cloning into '/private/tmp/lean_eval_download_cache/sources/repo_rishistyping_lean-eval-sturm-submission'...\nremote: Repository not found.\nfatal: repository 'https://github.com/rishistyping/lean-eval-sturm-submission.git/' not found"
+  },
+  {
+    "label": "symplectic_matrix_det / rishistyping / Stealth Model",
+    "error": "git clone https://github.com/rishistyping/lean-eval-symplectic-matrix-det-stealth-submission.git /private/tmp/lean_eval_download_cache/sources/repo_rishistyping_lean-eval-symplectic-matrix-det-stealth-submission failed: Cloning into '/private/tmp/lean_eval_download_cache/sources/repo_rishistyping_lean-eval-symplectic-matrix-det-stealth-submission'...\nremote: Repository not found.\nfatal: repository 'https://github.com/rishistyping/lean-eval-symplectic-matrix-det-stealth-submission.git/' not found"
+  },
+  {
     "label": "two_plus_two / rishistyping / Stealth Model",
     "error": "git clone https://github.com/rishistyping/autoformalization-machine-intelligence.git /private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence failed: Cloning into '/private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence'...\nremote: Repository not found.\nfatal: repository 'https://github.com/rishistyping/autoformalization-machine-intelligence.git/' not found"
+  },
+  {
+    "label": "wiener_levy_analytic_calculus / rishistyping / Stealth Model",
+    "error": "git clone https://github.com/rishistyping/autoformalization-machine-intelligence.git /private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence failed: Cloning into '/private/tmp/lean_eval_download_cache/sources/repo_rishistyping_autoformalization-machine-intelligence'...\nremote: Repository not found.\nfatal: repository 'https://github.com/rishistyping/autoformalization-machine-intelligence.git/' not found"
+  },
+  {
+    "label": "coherent_cohomology_finite_dimensional / Vilin97 / gpt-5.6-Sol",
+    "error": "git clone https://github.com/Vilin97/lean-eval-coherent-cohomology-finite-dimensional.git /private/tmp/lean_eval_download_cache/sources/repo_Vilin97_lean-eval-coherent-cohomology-finite-dimensional failed: Cloning into '/private/tmp/lean_eval_download_cache/sources/repo_Vilin97_lean-eval-coherent-cohomology-finite-dimensional'...\nremote: Repository not found.\nfatal: repository 'https://github.com/Vilin97/lean-eval-coherent-cohomology-finite-dimensional.git/' not found"
   }
 ]

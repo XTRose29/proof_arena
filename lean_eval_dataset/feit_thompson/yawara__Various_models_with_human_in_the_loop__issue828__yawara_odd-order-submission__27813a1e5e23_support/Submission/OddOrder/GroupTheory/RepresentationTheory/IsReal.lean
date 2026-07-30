@@ -1,0 +1,228 @@
+/-
+Copyright (c) 2026 Yawara Ishida. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
+-/
+import Mathlib.Algebra.Star.Basic
+import Mathlib.Algebra.Star.Module
+import Submission.OddOrder.GroupTheory.RepresentationTheory.ClassFunction
+import Submission.OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
+import Submission.OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
+
+/-!
+# Real (self-conjugate) class functions
+
+For a `StarRing k` (typically `k = ℂ` with complex conjugation), the **conjugate**
+of a class function `φ : ClassFunction G k` is the class function `φ.conj` defined
+by `φ.conj g = star (φ g)`. A class function `φ` is **real** when `φ.conj = φ`.
+
+Peterfalvi §3 (1.1) Odd-order theorem: `|G|` odd, `χ ∈ Irr(G), χ ≠ 1_G ⇒ χ̄ ≠ χ`.
+Statement-level handling of `χ̄ = χ` (`IsReal χ`) は本モジュールの目的.
+
+## mathlib v4.29.1 状況
+
+mathlib に「class function の複素共役」を直接扱う API は不在 (`StarRingEnd` は
+ringhom レベルのみ). 本モジュールで `ClassFunction.conj` と `IsReal` を提供.
+
+## Main definitions
+
+* `ClassFunction.conj` — `φ ↦ (g ↦ star (φ g))`. Involutive `StarAddMonoid` 操作.
+* `ClassFunction.IsReal` — `φ.conj = φ`.
+
+## TODO
+
+- trivial character API 完成後, (1.1) の pointwise statement
+  (`|G| odd → ∀ χ ∈ Irr G, χ ≠ 1 → ¬ IsReal χ`).
+- Brauer permutation lemma ([Is] Thm 6.32) → (1.1) の証明には別 module 要.
+
+## References
+
+* Peterfalvi §3 (1.1), §2 (`χ̄`).
+* Audit: §3 (1.1) bucket = "new helper 要".
+
+-/
+
+namespace OddOrder.RepresentationTheory
+
+namespace ClassFunction
+
+variable {G : Type*} [Group G] {k : Type*} [CommRing k] [StarRing k]
+
+/-- **Conjugate** of a class function: `φ.conj g = star (φ g)`.
+
+Over `k = ℂ` this is the usual `χ ↦ χ̄`. -/
+def conj (φ : ClassFunction G k) : ClassFunction G k :=
+  ⟨fun g => star (φ g), fun g h => by
+    change star (φ (h * g * h⁻¹)) = star (φ g)
+    rw [φ.conj_eq]⟩
+
+@[simp] theorem conj_apply (φ : ClassFunction G k) (g : G) :
+    φ.conj g = star (φ g) := rfl
+
+@[simp] theorem conj_conj (φ : ClassFunction G k) : φ.conj.conj = φ := by
+  ext g
+  simp
+
+/-- Conjugation does not move the support: `star x = 0 ↔ x = 0`. -/
+@[simp] theorem conj_support (φ : ClassFunction G k) : φ.conj.support = φ.support := by
+  ext g
+  simp [ClassFunction.mem_support, star_eq_zero]
+
+/-- `ClassFunction.conj` **is** the coefficientwise complex conjugation
+(`mapRingEquiv Complex.conjAe`): both are pointwise `star`. -/
+theorem conj_eq_mapRingEquiv_conjAe {G : Type*} [Group G] (φ : ClassFunction G ℂ) :
+    φ.conj = ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv φ :=
+  ClassFunction.ext fun _ => rfl
+
+@[simp] theorem conj_zero : (0 : ClassFunction G k).conj = 0 := by
+  ext g
+  simp
+
+theorem conj_add (φ ψ : ClassFunction G k) : (φ + ψ).conj = φ.conj + ψ.conj := by
+  ext g
+  simp [star_add]
+
+theorem conj_neg (φ : ClassFunction G k) : (-φ).conj = -(φ.conj) := by
+  ext g
+  simp
+
+theorem conj_sub (φ ψ : ClassFunction G k) : (φ - ψ).conj = φ.conj - ψ.conj := by
+  ext g
+  simp [star_sub]
+
+/-- A class function `φ` is **real** if it equals its conjugate (`φ̄ = φ`).
+
+Over `k = ℂ` this means `φ(g) ∈ ℝ` for all `g : G`. -/
+def IsReal (φ : ClassFunction G k) : Prop := φ.conj = φ
+
+                                                    
+                                                 
+             
+              
+                                                           
+                    
+            
+         
+                   
+
+                                                                 
+
+                                                                                    
+                          
+                    
+                         
+
+                                                                                  
+                    
+                    
+
+                                                                                    
+                          
+                    
+                         
+
+section InnerConj
+
+variable [Fintype G]
+
+/-- Conjugating both arguments of the class-function inner product swaps them:
+`⟨φ̄, ψ̄⟩ = ⟨ψ, φ⟩` (equivalently `⟨φ̄, ψ̄⟩ = star ⟨φ, ψ⟩` via `inner_star_comm`). -/
+theorem inner_conj_conj [Invertible (Nat.card G : k)] (φ ψ : ClassFunction G k) :
+    ClassFunction.inner φ.conj ψ.conj = ClassFunction.inner ψ φ := by
+  rw [ClassFunction.inner, ClassFunction.inner, ClassFunction.innerSum,
+    ClassFunction.innerSum]
+  congr 1
+  exact Finset.sum_congr rfl fun g _ => by
+    rw [conj_apply, conj_apply, star_star, mul_comm]
+
+/-- Over `ℂ`, the self inner product `⟨φ, φ⟩` is the manifestly real (and nonnegative) value
+`|G|⁻¹ · ∑ |φ(g)|²`. -/
+theorem inner_self_eq_ofReal [Invertible (Nat.card G : ℂ)] (φ : ClassFunction G ℂ) :
+    ClassFunction.inner φ φ
+      = (((Nat.card G : ℝ)⁻¹ * ∑ g : G, Complex.normSq (φ g) : ℝ) : ℂ) := by
+  rw [ClassFunction.inner, ClassFunction.innerSum, invOf_eq_inv]
+  have hterm : ∀ g : G, φ g * star (φ g) = ((Complex.normSq (φ g) : ℝ) : ℂ) := fun g => by
+    rw [show star (φ g) = starRingEnd ℂ (φ g) from rfl, Complex.mul_conj]
+  simp only [hterm]
+  push_cast
+  ring
+
+/-- The self inner product has nonnegative real part. -/
+theorem inner_self_re_nonneg [Invertible (Nat.card G : ℂ)] (φ : ClassFunction G ℂ) :
+    0 ≤ (ClassFunction.inner φ φ).re := by
+  rw [inner_self_eq_ofReal, Complex.ofReal_re]
+  exact mul_nonneg (inv_nonneg.mpr (Nat.cast_nonneg _))
+    (Finset.sum_nonneg fun g _ => Complex.normSq_nonneg _)
+
+/-- The self inner product is real: it equals the `ℂ`-cast of its own real part. -/
+theorem inner_self_eq_re [Invertible (Nat.card G : ℂ)] (φ : ClassFunction G ℂ) :
+    ClassFunction.inner φ φ = ((ClassFunction.inner φ φ).re : ℂ) := by
+  rw [inner_self_eq_ofReal]
+  simp
+
+end InnerConj
+
+end ClassFunction
+
+variable {G : Type*} [Group G]
+
+@[simp] theorem trivialClassFunction_isReal :
+    ClassFunction.IsReal (trivialClassFunction G) := by
+  unfold ClassFunction.IsReal
+  ext g
+  simp [trivialClassFunction]
+
+/-- The type of real irreducible complex characters of `G`.
+
+This is Peterfalvi's `χ ∈ Irr(G)` with `χ̄ = χ`, named so that Brauer's
+permutation lemma and the odd-order specializations do not repeat the raw
+subtype expression. -/
+abbrev RealIrreducibleCharacter (G : Type*) [Group G] :=
+  {χ : IrreducibleCharacter G // ClassFunction.IsReal (χ : ClassFunction G ℂ)}
+
+/-- The trivial real irreducible character of `G`. -/
+def trivialRealIrreducibleCharacter (G : Type*) [Group G] :
+    RealIrreducibleCharacter G :=
+  ⟨trivialIrreducibleCharacter G, by simp⟩
+
+namespace RealIrreducibleCharacter
+
+variable {G : Type*} [Group G]
+
+instance : Coe (RealIrreducibleCharacter G) (IrreducibleCharacter G) :=
+  ⟨fun χ => χ.1⟩
+
+instance : Coe (RealIrreducibleCharacter G) (ClassFunction G ℂ) :=
+  ⟨fun χ => (χ.1 : ClassFunction G ℂ)⟩
+
+@[simp] theorem coe_mk (χ : IrreducibleCharacter G)
+    (hχ : ClassFunction.IsReal (χ : ClassFunction G ℂ)) :
+    ((⟨χ, hχ⟩ : RealIrreducibleCharacter G) : IrreducibleCharacter G) = χ :=
+  rfl
+
+@[simp] theorem coe_trivialRealIrreducibleCharacter :
+    ((trivialRealIrreducibleCharacter G : RealIrreducibleCharacter G) :
+      IrreducibleCharacter G) = trivialIrreducibleCharacter G :=
+  rfl
+
+@[simp] theorem coe_mk_classFunction (χ : IrreducibleCharacter G)
+    (hχ : ClassFunction.IsReal (χ : ClassFunction G ℂ)) :
+    ((⟨χ, hχ⟩ : RealIrreducibleCharacter G) : ClassFunction G ℂ) =
+      (χ : ClassFunction G ℂ) :=
+  rfl
+
+@[simp] theorem isReal (χ : RealIrreducibleCharacter G) :
+    ClassFunction.IsReal (χ : ClassFunction G ℂ) :=
+  χ.2
+
+@[simp] theorem isIrreducible (χ : RealIrreducibleCharacter G) :
+    IsIrreducibleCharacter (χ : ClassFunction G ℂ) :=
+  χ.1.isIrreducible
+
+@[ext] theorem ext {χ ψ : RealIrreducibleCharacter G}
+    (h : (χ : IrreducibleCharacter G) = (ψ : IrreducibleCharacter G)) : χ = ψ :=
+  Subtype.ext h
+
+end RealIrreducibleCharacter
+
+end OddOrder.RepresentationTheory
