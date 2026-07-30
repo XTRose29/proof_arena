@@ -34,6 +34,9 @@ build/
 dist/
 *.egg-info/
 
+# Raw dataset archive (kept on archive/lean-eval-dataset-2026-07-30)
+lean_eval_dataset/
+
 # OS and editor files
 .DS_Store
 .idea/
