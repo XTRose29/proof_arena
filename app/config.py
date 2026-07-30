@@ -39,3 +39,19 @@ def anthropic_base_url() -> str:
 
 def claude_model() -> str:
     return os.environ.get("CLAUDE_MODEL", "").strip()
+
+
+def cornell_gateway_api_key() -> str:
+    return os.environ.get("CORNELL_AI_GATEWAY_API_KEY", "").strip() or anthropic_api_key()
+
+
+def cornell_gateway_base_url() -> str:
+    configured = os.environ.get("CORNELL_AI_GATEWAY_BASE_URL", "").strip().rstrip("/")
+    if configured:
+        return configured
+    existing_gateway = anthropic_base_url()
+    return existing_gateway if existing_gateway != "https://api.anthropic.com" else ""
+
+
+def cornell_gateway_model() -> str:
+    return os.environ.get("CORNELL_AI_GATEWAY_MODEL", "gpt-5.4-mini").strip()

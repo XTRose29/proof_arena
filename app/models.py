@@ -151,4 +151,48 @@ class MetaReviewVote(Base):
     created_at: Mapped[str] = mapped_column(Text, nullable=False)
 
 
+class MetaReviewCriterionVote(Base):
+    __tablename__ = "meta_review_criterion_votes"
+    __table_args__ = (
+        Index("idx_meta_review_criterion_votes_vote_id", "vote_id"),
+        UniqueConstraint("vote_id", "criterion", name="uq_meta_review_criterion_vote"),
+        CheckConstraint(
+            "criterion IN ('reuse', 'naming', 'documentation', 'proof_quality', 'overall')",
+            name="ck_meta_review_criterion_votes_criterion",
+        ),
+        CheckConstraint(
+            "choice IN ('a', 'b', 'tie')",
+            name="ck_meta_review_criterion_votes_choice",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    vote_id: Mapped[int] = mapped_column(
+        ForeignKey("meta_review_votes.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    criterion: Mapped[str] = mapped_column(Text, nullable=False)
+    choice: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[str] = mapped_column(Text, nullable=False)
+
+
+class MetaReviewDraft(Base):
+    __tablename__ = "meta_review_drafts"
+    __table_args__ = (
+        Index("idx_meta_review_drafts_session_id", "session_id"),
+        Index("idx_meta_review_drafts_user_id", "user_id"),
+        UniqueConstraint("session_id", "user_id", name="uq_meta_review_drafts_session_user"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    session_id: Mapped[int] = mapped_column(
+        ForeignKey("meta_review_sessions.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    choices_json: Mapped[str] = mapped_column(Text, nullable=False, default="{}")
+    reason: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    updated_at: Mapped[str] = mapped_column(Text, nullable=False)
+
+
 Index("idx_proofs_question_id", Proof.question_id)

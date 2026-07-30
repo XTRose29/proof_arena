@@ -14,6 +14,7 @@ from .database import Base, SessionLocal, engine, ensure_models_imported, get_db
 from .schemas import (
     GoogleAuthRequest,
     LoginRequest,
+    MetaReviewDraftRequest,
     MetaReviewGenerateRequest,
     MetaReviewSelectionRequest,
     PreferenceEvaluationCreate,
@@ -23,6 +24,7 @@ from .schemas import (
 from .services import (
     auth_user_from_token,
     build_random_comparison,
+    build_random_meta_review,
     build_meta_review,
     database_proof_options,
     create_user,
@@ -33,6 +35,7 @@ from .services import (
     login_user,
     save_preference_evaluation,
     save_meta_review_selection,
+    save_meta_review_draft,
     serialize_user,
     summary_payload,
     update_user_profile,
@@ -218,6 +221,38 @@ def generate_meta_review(
         raise HTTPException(status_code=401, detail=str(exc)) from exc
     except (KeyError, ValueError) as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post("/api/meta-review/random", status_code=201)
+def generate_random_meta_review(
+    exclude_session_id: int | None = Query(default=None, alias="excludeSessionId", ge=1),
+    authorization: str | None = Header(default=None),
+    db: Session = Depends(get_db),
+) -> dict:
+    try:
+        user = auth_user_from_token(db, authorization)
+        return build_random_meta_review(db, user, exclude_session_id)
+    except PermissionError as exc:
+        raise HTTPException(status_code=401, detail=str(exc)) from exc
+    except (KeyError, LookupError, ValueError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.put("/api/meta-review/{session_id}/draft")
+def save_meta_review_progress(
+    session_id: int,
+    payload: MetaReviewDraftRequest,
+    authorization: str | None = Header(default=None),
+    db: Session = Depends(get_db),
+) -> dict[str, bool]:
+    try:
+        user = auth_user_from_token(db, authorization)
+        save_meta_review_draft(db, user, session_id, payload)
+    except PermissionError as exc:
+        raise HTTPException(status_code=401, detail=str(exc)) from exc
+    except (KeyError, ValueError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return {"ok": True}
 
 
 @app.post("/api/meta-review/{session_id}/selection")

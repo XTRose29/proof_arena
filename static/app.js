@@ -22,8 +22,14 @@ const tabItems = [...criteria, ["comment", "Comment"]];
 const state = {
   comparison: null,
   activeMode: "reviewer",
-  featuredMetaReviewLoaded: false,
+  metaPairLoaded: false,
   metaSession: null,
+  metaEvaluationA: null,
+  metaEvaluationB: null,
+  metaChoices: Object.fromEntries(criteria.map(([key]) => [key, null])),
+  metaSubmitted: false,
+  metaSaveTimer: null,
+  metaSavePromise: Promise.resolve(),
   authToken: localStorage.getItem(AUTH_TOKEN_KEY),
   currentUser: null,
   preferences: { ...defaultPreferences },
@@ -567,8 +573,12 @@ function clearCurrentUser() {
   state.currentUser = null;
   state.authToken = null;
   state.comparison = null;
-  state.featuredMetaReviewLoaded = false;
+  state.metaPairLoaded = false;
   state.metaSession = null;
+  state.metaEvaluationA = null;
+  state.metaEvaluationB = null;
+  state.metaChoices = Object.fromEntries(criteria.map(([key]) => [key, null]));
+  state.metaSubmitted = false;
   localStorage.removeItem(AUTH_TOKEN_KEY);
   document.getElementById("accountCardTitle").textContent = "Google Login";
   document.getElementById("googleLoginMount").classList.remove("hidden");
@@ -707,101 +717,216 @@ function setArenaMode(mode) {
   setStatus("");
 
   if (!reviewerActive && state.currentUser) {
-    loadFeaturedMetaReview().catch((error) => setMetaStatus(error.message, true));
+    loadRandomMetaReview().catch((error) => setMetaStatus(error.message, true));
   }
 }
 
-async function loadFeaturedMetaReview() {
-  if (!state.currentUser || state.featuredMetaReviewLoaded) {
+async function loadRandomMetaReview(force = false) {
+  if (!state.currentUser) {
+    throw new Error("Log in with Google to generate a meta-review pair.");
+  }
+  if (state.metaPairLoaded && !force) {
     return;
   }
-  const result = await fetchJson("/api/meta-review/featured");
-  renderMetaReview(result);
-  state.featuredMetaReviewLoaded = true;
-  setMetaStatus(
-    result.userChoice
-      ? "Your selection has already been recorded."
-      : "Choose the evaluation you find more accurate and useful.",
-  );
+  const nextButton = document.getElementById("metaNextButton");
+  const submitButton = document.getElementById("metaSubmitButton");
+  nextButton.disabled = true;
+  submitButton.disabled = true;
+  try {
+    if (force && state.metaSession && !state.metaSubmitted) {
+      await saveMetaDraft();
+    }
+    setMetaStatus("Generating a new pair from two models…");
+    const query = state.metaSession ? `?excludeSessionId=${state.metaSession}` : "";
+    const result = await fetchJson(`/api/meta-review/random${query}`, { method: "POST" });
+    renderMetaReview(result);
+    state.metaPairLoaded = true;
+    setMetaStatus("Choose A, Tie, or B for every rubric. Each choice saves automatically.");
+  } finally {
+    nextButton.disabled = false;
+  }
 }
 
-function renderMetaEvaluation(label, evaluation) {
-  const card = document.createElement("article");
-  card.className = "panel meta-evaluation-card";
-
-  const header = document.createElement("header");
-  header.className = "meta-evaluation-header";
-  const heading = document.createElement("h3");
-  heading.textContent = `Evaluation ${label}`;
-  const summary = document.createElement("p");
-  summary.className = "meta-summary";
-  summary.textContent = evaluation.summary;
-  header.append(heading, summary);
-  card.appendChild(header);
-
-  criteria.forEach(([clientKey, labelText]) => {
-    const apiKey = clientKey === "proofQuality" ? "proof_quality" : clientKey;
-    const item = evaluation[apiKey];
-    const section = document.createElement("section");
-    section.className = "meta-criterion";
-    const title = document.createElement("h4");
-    title.textContent = labelText;
-    const verdict = document.createElement("span");
-    verdict.className = `meta-verdict ${item.verdict}`;
-    verdict.textContent = item.verdict.replace("_", " ");
-    const reason = document.createElement("p");
-    reason.textContent = item.reason;
-    section.append(title, verdict, reason);
-    card.appendChild(section);
+function renderLeanSource(container, source) {
+  container.innerHTML = "";
+  const syntaxState = { blockCommentDepth: 0 };
+  source.split("\n").forEach((text, index) => {
+    container.appendChild(createCodeLine({ lineNumber: index + 1, text }, syntaxState));
   });
-  return card;
+}
+
+function createMetaEvaluationCell(item, summary = "") {
+  const cell = document.createElement("div");
+  cell.className = "meta-evaluation-cell";
+  cell.setAttribute("role", "cell");
+  const verdict = document.createElement("span");
+  verdict.className = `meta-verdict ${item.verdict}`;
+  verdict.textContent = item.verdict.replace("_", " ");
+  const reason = document.createElement("p");
+  reason.textContent = item.reason;
+  cell.append(verdict, reason);
+  if (summary) {
+    const takeaway = document.createElement("p");
+    takeaway.className = "meta-summary";
+    takeaway.textContent = `Takeaway: ${summary}`;
+    cell.appendChild(takeaway);
+  }
+  return cell;
+}
+
+function renderMetaVoteButtons(criterionKey) {
+  const cell = document.createElement("div");
+  cell.className = "meta-vote-cell";
+  cell.setAttribute("role", "cell");
+  cell.setAttribute("aria-label", `Vote for ${criterionKey}`);
+  [["a", "A"], ["tie", "Tie"], ["b", "B"]].forEach(([choice, label]) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "meta-vote-button";
+    button.textContent = label;
+    button.dataset.criterion = criterionKey;
+    button.dataset.choice = choice;
+    const selected = state.metaChoices[criterionKey] === choice;
+    button.classList.toggle("selected", selected);
+    button.setAttribute("aria-pressed", String(selected));
+    button.disabled = state.metaSubmitted;
+    button.addEventListener("click", () => chooseMetaCriterion(criterionKey, choice));
+    cell.appendChild(button);
+  });
+  return cell;
+}
+
+function renderMetaEvaluationTable(evaluationA, evaluationB) {
+  const table = document.getElementById("metaEvaluationTable");
+  table.innerHTML = "";
+  const header = document.createElement("div");
+  header.className = "meta-table-row meta-table-header";
+  header.setAttribute("role", "row");
+  ["Rubric", "Evaluation A", "Evaluation B", "Your vote"].forEach((label) => {
+    const cell = document.createElement("div");
+    cell.setAttribute("role", "columnheader");
+    cell.textContent = label;
+    header.appendChild(cell);
+  });
+  table.appendChild(header);
+
+  criteria.forEach(([clientKey, label]) => {
+    const apiKey = clientKey === "proofQuality" ? "proof_quality" : clientKey;
+    const row = document.createElement("div");
+    row.className = "meta-table-row";
+    row.setAttribute("role", "row");
+    const rubric = document.createElement("div");
+    rubric.className = "meta-rubric-cell";
+    rubric.setAttribute("role", "rowheader");
+    rubric.textContent = label;
+    const summaryA = clientKey === "overall" ? evaluationA.summary : "";
+    const summaryB = clientKey === "overall" ? evaluationB.summary : "";
+    row.append(
+      rubric,
+      createMetaEvaluationCell(evaluationA[apiKey], summaryA),
+      createMetaEvaluationCell(evaluationB[apiKey], summaryB),
+      renderMetaVoteButtons(clientKey),
+    );
+    table.appendChild(row);
+  });
+}
+
+function metaVoteCount() {
+  return criteria.filter(([key]) => Boolean(state.metaChoices[key])).length;
+}
+
+function updateMetaProgress() {
+  const count = metaVoteCount();
+  document.getElementById("metaProgress").textContent = state.metaSubmitted ? "Submitted · pair locked" : `${count} of ${criteria.length} votes`;
+  document.getElementById("metaSubmitButton").disabled = state.metaSubmitted || count !== criteria.length;
+}
+
+function metaDraftPayload() {
+  return {
+    choices: state.metaChoices,
+    reason: document.getElementById("metaSelectionReason").value.trim(),
+  };
+}
+
+async function saveMetaDraft() {
+  if (!state.metaSession || state.metaSubmitted) {
+    return;
+  }
+  if (state.metaSaveTimer) {
+    window.clearTimeout(state.metaSaveTimer);
+    state.metaSaveTimer = null;
+  }
+  const sessionId = state.metaSession;
+  const payload = metaDraftPayload();
+  setMetaStatus("Saving draft…");
+  state.metaSavePromise = state.metaSavePromise.catch(() => {}).then(async () => {
+    await fetchJson(`/api/meta-review/${sessionId}/draft`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (state.metaSession === sessionId) {
+      setMetaStatus("Draft saved. Submit when all five rubric votes are ready.");
+    }
+  });
+  await state.metaSavePromise;
+}
+
+function queueMetaDraftSave() {
+  if (state.metaSaveTimer) {
+    window.clearTimeout(state.metaSaveTimer);
+  }
+  state.metaSaveTimer = window.setTimeout(() => {
+    saveMetaDraft().catch((error) => setMetaStatus(error.message, true));
+  }, 450);
+}
+
+function chooseMetaCriterion(criterionKey, choice) {
+  if (state.metaSubmitted) {
+    return;
+  }
+  state.metaChoices[criterionKey] = choice;
+  renderMetaEvaluationTable(state.metaEvaluationA, state.metaEvaluationB);
+  updateMetaProgress();
+  queueMetaDraftSave();
 }
 
 function renderMetaReview(result) {
   state.metaSession = result.sessionId;
+  state.metaEvaluationA = result.a;
+  state.metaEvaluationB = result.b;
+  state.metaChoices = Object.fromEntries(criteria.map(([key]) => [key, result.draft?.choices?.[key] || null]));
+  state.metaSubmitted = Boolean(result.submitted);
   const results = document.getElementById("metaResults");
   document.getElementById("metaProofHeading").textContent = result.source.title;
-  document.getElementById("metaProofPreview").textContent = result.source.proof;
+  renderLeanSource(document.getElementById("metaProofPreview"), result.source.proof);
   const selectionReason = document.getElementById("metaSelectionReason");
-  selectionReason.value = "";
-  selectionReason.disabled = Boolean(result.userChoice);
-  const grid = document.getElementById("metaEvaluationGrid");
-  grid.innerHTML = "";
-  grid.append(renderMetaEvaluation("A", result.a), renderMetaEvaluation("B", result.b));
-  document.querySelectorAll("[data-meta-choice]").forEach((button) => {
-    const isSelected = button.dataset.metaChoice === result.userChoice;
-    button.disabled = Boolean(result.userChoice);
-    button.classList.toggle("selected", isSelected);
-  });
+  selectionReason.value = result.draft?.reason || "";
+  selectionReason.disabled = state.metaSubmitted;
+  renderMetaEvaluationTable(result.a, result.b);
+  updateMetaProgress();
   results.classList.remove("hidden");
 }
 
-async function selectMetaReview(choice, button) {
+async function submitMetaReview() {
   if (!state.metaSession) {
-    throw new Error("The featured evaluation is not available yet.");
+    throw new Error("No evaluation pair is available yet.");
   }
-  const buttons = [...document.querySelectorAll("[data-meta-choice]")];
-  buttons.forEach((choiceButton) => {
-    choiceButton.disabled = true;
+  if (metaVoteCount() !== criteria.length) {
+    throw new Error("Vote on all five rubric rows before submitting.");
+  }
+  document.getElementById("metaSubmitButton").disabled = true;
+  await saveMetaDraft();
+  await fetchJson(`/api/meta-review/${state.metaSession}/selection`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(metaDraftPayload()),
   });
-  try {
-    await fetchJson(`/api/meta-review/${state.metaSession}/selection`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        choice,
-        reason: document.getElementById("metaSelectionReason").value.trim(),
-      }),
-    });
-    button.classList.add("selected");
-    document.getElementById("metaSelectionReason").disabled = true;
-    setMetaStatus("Your selection has been recorded.");
-  } catch (error) {
-    buttons.forEach((choiceButton) => {
-      choiceButton.disabled = false;
-    });
-    throw error;
-  }
+  state.metaSubmitted = true;
+  document.getElementById("metaSelectionReason").disabled = true;
+  renderMetaEvaluationTable(state.metaEvaluationA, state.metaEvaluationB);
+  updateMetaProgress();
+  setMetaStatus("Submitted. This evaluation pair is now permanently locked.");
 }
 
 function buildEvaluationPayload() {
@@ -1043,11 +1168,13 @@ async function main() {
   });
   document.getElementById("reviewerModeButton").addEventListener("click", () => setArenaMode("reviewer"));
   document.getElementById("metaReviewerModeButton").addEventListener("click", () => setArenaMode("meta"));
-  document.querySelectorAll("[data-meta-choice]").forEach((button) => {
-    button.addEventListener("click", () => {
-      selectMetaReview(button.dataset.metaChoice, button).catch((error) => setMetaStatus(error.message, true));
-    });
+  document.getElementById("metaNextButton").addEventListener("click", () => {
+    loadRandomMetaReview(true).catch((error) => setMetaStatus(error.message, true));
   });
+  document.getElementById("metaSubmitButton").addEventListener("click", () => {
+    submitMetaReview().catch((error) => setMetaStatus(error.message, true));
+  });
+  document.getElementById("metaSelectionReason").addEventListener("input", queueMetaDraftSave);
   document.addEventListener("fullscreenchange", updateFullscreenButton);
   window.addEventListener("keydown", handleKeyboardShortcuts);
 

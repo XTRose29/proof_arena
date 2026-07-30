@@ -139,14 +139,13 @@ p {
   padding: 8px 14px;
 }
 
-.mode-switch-button.active,
-.meta-selection-buttons .selected {
+.mode-switch-button.active {
   background: var(--accent);
   color: white;
 }
 
 .meta-workspace {
-  max-width: 1120px;
+  max-width: 1380px;
 }
 
 .meta-results {
@@ -164,70 +163,111 @@ p {
   margin-bottom: 0;
 }
 
-.meta-proof-details {
-  margin: 16px 0;
+.meta-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-.meta-proof-details summary {
-  cursor: pointer;
+.meta-progress {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: var(--accent-soft);
   color: var(--accent);
+  padding: 6px 10px;
+  font-size: 0.82rem;
   font-weight: 800;
 }
 
+.meta-proof-panel {
+  margin: 16px 0 20px;
+}
+
+.meta-proof-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.meta-proof-label-row h4,
+.meta-proof-label-row span {
+  margin: 0;
+}
+
+.meta-proof-label-row span {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
 .meta-proof-viewer {
-  margin-top: 10px;
-  max-height: 34vh;
-  padding: 14px;
-  white-space: pre-wrap;
+  max-height: 38vh;
 }
 
-.meta-evaluation-grid {
+.meta-table-scroll {
+  overflow-x: auto;
+  border: 1px solid rgba(99, 86, 70, 0.16);
+  border-radius: 16px;
+}
+
+.meta-evaluation-table {
+  min-width: 1040px;
+  background: rgba(255, 253, 249, 0.72);
+}
+
+.meta-table-row {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-}
-
-.meta-evaluation-card {
-  min-height: 0;
-  gap: 14px;
-  padding: 18px;
-}
-
-.meta-evaluation-header {
-  padding-bottom: 12px;
+  grid-template-columns: minmax(120px, 0.55fr) minmax(300px, 1.5fr) minmax(300px, 1.5fr) minmax(200px, 0.75fr);
   border-bottom: 1px solid rgba(99, 86, 70, 0.16);
 }
 
-.meta-evaluation-header h3 {
-  margin-bottom: 6px;
+.meta-table-row:last-child {
+  border-bottom: 0;
 }
 
-.meta-summary {
+.meta-table-row > * {
+  padding: 14px;
+  border-right: 1px solid rgba(99, 86, 70, 0.12);
+}
+
+.meta-table-row > *:last-child {
+  border-right: 0;
+}
+
+.meta-table-header {
+  background: rgba(219, 236, 232, 0.62);
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.meta-rubric-cell {
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.meta-evaluation-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.meta-evaluation-cell p {
   margin: 0;
-  color: var(--muted);
-  line-height: 1.45;
-}
-
-.meta-criterion {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 6px 10px;
-}
-
-.meta-criterion h4,
-.meta-criterion p {
-  margin: 0;
-}
-
-.meta-criterion h4 {
-  font-size: 0.94rem;
-}
-
-.meta-criterion p {
-  grid-column: 1 / -1;
   color: var(--muted);
   font-size: 0.92rem;
   line-height: 1.45;
+}
+
+.meta-evaluation-cell .meta-summary {
+  padding-top: 8px;
+  border-top: 1px dashed rgba(99, 86, 70, 0.18);
+  color: var(--ink);
+  font-weight: 700;
 }
 
 .meta-verdict {
@@ -254,11 +294,35 @@ p {
   color: #8f2d18;
 }
 
+.meta-vote-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.meta-vote-button {
+  min-width: 48px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fffdf9;
+  color: var(--ink);
+  padding: 8px 10px;
+  font-weight: 800;
+}
+
+.meta-vote-button.selected {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 6px 14px rgba(15, 94, 83, 0.18);
+}
+
 .meta-selection {
   display: grid;
   gap: 12px;
-  max-width: 720px;
-  margin: 22px auto 0;
+  max-width: 820px;
+  margin: 22px 0 0;
   padding-top: 20px;
   border-top: 1px solid rgba(99, 86, 70, 0.16);
 }
@@ -266,12 +330,6 @@ p {
 .meta-selection > p {
   margin: 0;
   font-weight: 800;
-}
-
-.meta-selection-buttons {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
 }
 
 .section-heading {
@@ -843,8 +901,7 @@ select {
 @media (max-width: 1200px) {
   .arena-grid,
   .matrix-row-single,
-  .evaluation-layout,
-  .meta-evaluation-grid {
+  .evaluation-layout {
     grid-template-columns: 1fr;
   }
 
@@ -858,6 +915,10 @@ select {
 
   .section-heading {
     flex-direction: column;
+  }
+
+  .meta-actions {
+    width: 100%;
   }
 
   .matrix-progress-block {
@@ -883,12 +944,12 @@ select {
   }
 
   .mode-switch,
-  .meta-selection-buttons {
+  .meta-actions {
     width: 100%;
   }
 
   .mode-switch-button,
-  .meta-selection-buttons button {
+  .meta-actions button {
     flex: 1 1 auto;
   }
 

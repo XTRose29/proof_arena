@@ -104,6 +104,10 @@
             <p class="eyebrow small">Evaluation Comparison</p>
             <h2>Meta Reviewer</h2>
           </div>
+          <div class="meta-actions">
+            <button id="metaNextButton" class="secondary-button" type="button">Next Random Problem</button>
+            <button id="metaSubmitButton" class="submit-button" type="button" disabled>Submit &amp; Lock Pair</button>
+          </div>
         </div>
 
         <section id="metaResults" class="meta-results hidden" aria-live="polite">
@@ -112,20 +116,21 @@
               <p class="eyebrow small">Generated Evaluations</p>
               <h3 id="metaProofHeading"></h3>
             </div>
+            <span id="metaProgress" class="meta-progress">0 of 5 votes</span>
           </div>
-          <details class="meta-proof-details">
-            <summary>Proof source</summary>
-            <pre id="metaProofPreview" class="code-viewer meta-proof-viewer"></pre>
-          </details>
-          <div id="metaEvaluationGrid" class="meta-evaluation-grid"></div>
-          <div class="meta-selection">
-            <p>Which evaluation is more accurate and useful?</p>
-            <div class="meta-selection-buttons" role="group" aria-label="Choose a better evaluation">
-              <button class="secondary-button" type="button" data-meta-choice="a">Evaluation A</button>
-              <button class="secondary-button" type="button" data-meta-choice="b">Evaluation B</button>
-              <button class="ghost-button" type="button" data-meta-choice="tie">No difference</button>
+          <section class="meta-proof-panel" aria-labelledby="metaProofLabel">
+            <div class="meta-proof-label-row">
+              <h4 id="metaProofLabel">Lean solution</h4>
+              <span>Syntax highlighted</span>
             </div>
-            <label for="metaSelectionReason">Reason (optional)<textarea id="metaSelectionReason" rows="3" placeholder="What made this evaluation better?"></textarea></label>
+            <div id="metaProofPreview" class="code-viewer meta-proof-viewer" role="region" aria-label="Lean solution source"></div>
+          </section>
+          <div class="meta-table-scroll">
+            <div id="metaEvaluationTable" class="meta-evaluation-table" role="table" aria-label="A and B evaluation comparison"></div>
+          </div>
+          <div class="meta-selection">
+            <p>Your rubric votes save automatically. Submit only when you are ready to permanently lock this pair.</p>
+            <label for="metaSelectionReason">Overall note (optional)<textarea id="metaSelectionReason" rows="3" placeholder="What made either evaluation more accurate or useful?"></textarea></label>
           </div>
         </section>
         <p id="metaStatusText" class="status-text" role="status"></p>

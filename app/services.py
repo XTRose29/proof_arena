@@ -6,6 +6,7 @@ import hmac
 import json
 import random
 import secrets
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from typing import Any
 
@@ -13,9 +14,20 @@ import requests
 from sqlalchemy import func, select, text
 from sqlalchemy.orm import Session
 
-from .config import anthropic_api_key, anthropic_base_url, claude_model, REPO_ROOT, google_client_id
+from .config import (
+    REPO_ROOT,
+    anthropic_api_key,
+    anthropic_base_url,
+    claude_model,
+    cornell_gateway_api_key,
+    cornell_gateway_base_url,
+    cornell_gateway_model,
+    google_client_id,
+)
 from .models import (
     AuthToken,
+    MetaReviewCriterionVote,
+    MetaReviewDraft,
     MetaReviewSession,
     MetaReviewVote,
     PreferenceEvaluation,
@@ -28,6 +40,7 @@ from .parsing import guess_author, humanize_slug, question_key_for_path, source_
 from .schemas import (
     GoogleAuthRequest,
     LoginRequest,
+    MetaReviewDraftRequest,
     MetaReviewGenerateRequest,
     MetaReviewSelectionRequest,
     PreferenceEvaluationCreate,
@@ -470,6 +483,11 @@ def _messages_url() -> str:
     return f"{base_url}/messages" if base_url.endswith("/v1") else f"{base_url}/v1/messages"
 
 
+def _chat_completions_url() -> str:
+    base_url = cornell_gateway_base_url()
+    return f"{base_url}/chat/completions" if base_url.endswith("/v1") else f"{base_url}/v1/chat/completions"
+
+
 def _parse_evaluation(content: str) -> dict[str, Any]:
     cleaned = content.strip()
     if cleaned.startswith("```"):
@@ -501,7 +519,7 @@ def _parse_evaluation(content: str) -> dict[str, Any]:
     return normalized
 
 
-def _generate_llm_evaluation(proof_content: str, rubric_text: str, temperature: float) -> tuple[dict[str, Any], str]:
+def _generate_anthropic_evaluation(proof_content: str, rubric_text: str) -> tuple[dict[str, Any], str]:
     api_key = anthropic_api_key()
     model = claude_model()
     if not api_key or not model:
@@ -518,7 +536,7 @@ def _generate_llm_evaluation(proof_content: str, rubric_text: str, temperature: 
             json={
                 "model": model,
                 "max_tokens": 1800,
-                "temperature": temperature,
+                "temperature": 0.35,
                 "messages": [{"role": "user", "content": _evaluation_prompt(proof_content, rubric_text)}],
             },
             timeout=120,
@@ -539,12 +557,64 @@ def _generate_llm_evaluation(proof_content: str, rubric_text: str, temperature: 
     return _parse_evaluation(content), model
 
 
+def _generate_cornell_gateway_evaluation(proof_content: str, rubric_text: str) -> tuple[dict[str, Any], str]:
+    api_key = cornell_gateway_api_key()
+    base_url = cornell_gateway_base_url()
+    model = cornell_gateway_model()
+    if not api_key or not base_url or not model:
+        raise ValueError(
+            "Cornell AI Gateway is not configured. Set CORNELL_AI_GATEWAY_API_KEY, "
+            "CORNELL_AI_GATEWAY_BASE_URL, and CORNELL_AI_GATEWAY_MODEL."
+        )
+
+    try:
+        response = requests.post(
+            _chat_completions_url(),
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": model,
+                "max_completion_tokens": 3000,
+                "messages": [{"role": "user", "content": _evaluation_prompt(proof_content, rubric_text)}],
+                "response_format": {"type": "json_object"},
+            },
+            timeout=120,
+        )
+        response.raise_for_status()
+        response_payload = response.json()
+        content = response_payload["choices"][0]["message"]["content"]
+    except (KeyError, IndexError, requests.RequestException, TypeError, ValueError) as exc:
+        raise ValueError("The Cornell AI Gateway request failed. Please try again.") from exc
+
+    if not isinstance(content, str) or not content.strip():
+        raise ValueError("The Cornell model returned an empty evaluation. Please generate another pair.")
+    return _parse_evaluation(content), model
+
+
+def _generate_evaluation_pair(
+    proof_content: str,
+    rubric_text: str,
+) -> tuple[dict[str, Any], str, dict[str, Any], str]:
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        anthropic_future = executor.submit(_generate_anthropic_evaluation, proof_content, rubric_text)
+        cornell_future = executor.submit(_generate_cornell_gateway_evaluation, proof_content, rubric_text)
+        generated = [anthropic_future.result(), cornell_future.result()]
+
+    random.shuffle(generated)
+    (evaluation_a, model_a), (evaluation_b, model_b) = generated
+    return evaluation_a, model_a, evaluation_b, model_b
+
+
 def build_meta_review(session: Session, user: User, payload: MetaReviewGenerateRequest) -> dict[str, Any]:
     if payload.proofId is not None:
         proof = proof_payload(session, payload.proofId)
         source_proof_id = payload.proofId
         source_kind = "database"
-        source_title = str(proof["title"])
+        question_title = str(proof.get("question_title", "")).strip()
+        proof_title = str(proof["title"])
+        source_title = f"{question_title} — {proof_title}" if question_title else proof_title
         proof_content = str(proof["content"])
     else:
         source_proof_id = None
@@ -556,8 +626,7 @@ def build_meta_review(session: Session, user: User, payload: MetaReviewGenerateR
         raise ValueError("The Lean proof cannot be empty.")
 
     rubric_text = _rubric_text()
-    evaluation_a, model_a = _generate_llm_evaluation(proof_content, rubric_text, temperature=0.25)
-    evaluation_b, model_b = _generate_llm_evaluation(proof_content, rubric_text, temperature=0.85)
+    evaluation_a, model_a, evaluation_b, model_b = _generate_evaluation_pair(proof_content, rubric_text)
 
     record = MetaReviewSession(
         user_id=user.id,
@@ -576,8 +645,71 @@ def build_meta_review(session: Session, user: User, payload: MetaReviewGenerateR
         selected_at=None,
     )
     session.add(record)
+    session.flush()
+    session.add(
+        MetaReviewDraft(
+            session_id=record.id,
+            user_id=user.id,
+            choices_json="{}",
+            reason="",
+            updated_at=utc_now(),
+        )
+    )
     session.commit()
     return _serialize_meta_review(record)
+
+
+def build_random_meta_review(
+    session: Session,
+    user: User,
+    exclude_session_id: int | None = None,
+) -> dict[str, Any]:
+    if exclude_session_id is None:
+        resumable = session.execute(
+            select(MetaReviewSession)
+            .join(MetaReviewDraft, MetaReviewDraft.session_id == MetaReviewSession.id)
+            .where(MetaReviewDraft.user_id == user.id)
+            .order_by(MetaReviewDraft.updated_at.desc(), MetaReviewDraft.id.desc())
+        ).scalars().first()
+        if resumable is not None:
+            return _serialize_meta_review_for_user(session, resumable, user)
+
+    excluded_question_id: int | None = None
+    if exclude_session_id is not None:
+        excluded_question_id = session.execute(
+            select(Proof.question_id)
+            .join(MetaReviewSession, MetaReviewSession.source_proof_id == Proof.id)
+            .where(MetaReviewSession.id == exclude_session_id)
+        ).scalar_one_or_none()
+
+    question_ids = list(
+        session.execute(
+            select(Proof.question_id)
+            .where(func.length(func.trim(Proof.content)) > 0)
+            .distinct()
+        ).scalars()
+    )
+    eligible_question_ids = [
+        question_id for question_id in question_ids if question_id != excluded_question_id
+    ]
+    if not eligible_question_ids:
+        eligible_question_ids = question_ids
+    if not eligible_question_ids:
+        raise LookupError("No Lean solutions are available for meta review.")
+
+    question_id = random.choice(eligible_question_ids)
+    proof = session.execute(
+        select(Proof)
+        .where(
+            Proof.question_id == question_id,
+            func.length(func.trim(Proof.content)) > 0,
+        )
+        .order_by(func.random())
+    ).scalars().first()
+    if proof is None:
+        raise LookupError("No Lean solutions are available for meta review.")
+
+    return build_meta_review(session, user, MetaReviewGenerateRequest(proofId=proof.id))
 
 
 def _serialize_meta_review(record: MetaReviewSession) -> dict[str, Any]:
@@ -590,7 +722,46 @@ def _serialize_meta_review(record: MetaReviewSession) -> dict[str, Any]:
         },
         "a": json.loads(record.evaluation_a),
         "b": json.loads(record.evaluation_b),
+        "draft": {"choices": {}, "reason": ""},
+        "submitted": False,
     }
+
+
+def _serialize_meta_review_for_user(
+    session: Session,
+    record: MetaReviewSession,
+    user: User,
+) -> dict[str, Any]:
+    payload = _serialize_meta_review(record)
+    vote = session.execute(
+        select(MetaReviewVote).where(
+            MetaReviewVote.session_id == record.id,
+            MetaReviewVote.user_id == user.id,
+        )
+    ).scalar_one_or_none()
+    if vote is not None:
+        criterion_votes = session.execute(
+            select(MetaReviewCriterionVote).where(MetaReviewCriterionVote.vote_id == vote.id)
+        ).scalars().all()
+        payload["submitted"] = True
+        payload["draft"] = {
+            "choices": {
+                ("proofQuality" if item.criterion == "proof_quality" else item.criterion): item.choice
+                for item in criterion_votes
+            },
+            "reason": vote.reason,
+        }
+        return payload
+
+    draft = session.execute(
+        select(MetaReviewDraft).where(
+            MetaReviewDraft.session_id == record.id,
+            MetaReviewDraft.user_id == user.id,
+        )
+    ).scalar_one_or_none()
+    if draft is not None:
+        payload["draft"] = {"choices": json.loads(draft.choices_json), "reason": draft.reason}
+    return payload
 
 
 def _meta_review_system_user(session: Session) -> User:
@@ -629,8 +800,7 @@ def build_featured_meta_review(session: Session) -> dict[str, Any]:
         raise LookupError("No proofs are available for the featured meta review.")
 
     rubric_text = _rubric_text()
-    evaluation_a, model_a = _generate_llm_evaluation(proof.content, rubric_text, temperature=0.25)
-    evaluation_b, model_b = _generate_llm_evaluation(proof.content, rubric_text, temperature=0.85)
+    evaluation_a, model_a, evaluation_b, model_b = _generate_evaluation_pair(proof.content, rubric_text)
     record = MetaReviewSession(
         user_id=_meta_review_system_user(session).id,
         source_proof_id=proof.id,
@@ -660,16 +830,54 @@ def featured_meta_review(session: Session, user: User | None = None) -> dict[str
     ).scalars().first()
     if record is None:
         raise LookupError("The featured meta review has not been generated yet.")
-    payload = _serialize_meta_review(record)
-    if user is not None:
-        vote = session.execute(
-            select(MetaReviewVote).where(
-                MetaReviewVote.session_id == record.id,
-                MetaReviewVote.user_id == user.id,
-            )
-        ).scalar_one_or_none()
-        payload["userChoice"] = vote.choice if vote is not None else None
-    return payload
+    return _serialize_meta_review_for_user(session, record, user) if user is not None else _serialize_meta_review(record)
+
+
+def save_meta_review_draft(
+    session: Session,
+    user: User,
+    session_id: int,
+    payload: MetaReviewDraftRequest,
+) -> None:
+    record = session.execute(
+        select(MetaReviewSession).where(MetaReviewSession.id == session_id)
+    ).scalar_one_or_none()
+    if record is None:
+        raise KeyError("Unknown meta-review session.")
+    submitted = session.execute(
+        select(MetaReviewVote).where(
+            MetaReviewVote.session_id == record.id,
+            MetaReviewVote.user_id == user.id,
+        )
+    ).scalar_one_or_none()
+    if submitted is not None:
+        raise ValueError("This meta-review pair is locked and cannot be changed.")
+
+    choices = {
+        key: value
+        for key, value in payload.choices.model_dump().items()
+        if value is not None
+    }
+    draft = session.execute(
+        select(MetaReviewDraft).where(
+            MetaReviewDraft.session_id == record.id,
+            MetaReviewDraft.user_id == user.id,
+        )
+    ).scalar_one_or_none()
+    if draft is None:
+        draft = MetaReviewDraft(
+            session_id=record.id,
+            user_id=user.id,
+            choices_json=json.dumps(choices),
+            reason=payload.reason.strip(),
+            updated_at=utc_now(),
+        )
+        session.add(draft)
+    else:
+        draft.choices_json = json.dumps(choices)
+        draft.reason = payload.reason.strip()
+        draft.updated_at = utc_now()
+    session.commit()
 
 
 def save_meta_review_selection(
@@ -696,11 +904,35 @@ def save_meta_review_selection(
         MetaReviewVote(
             session_id=record.id,
             user_id=user.id,
-            choice=payload.choice,
+            choice=payload.choices.overall,
             reason=payload.reason.strip(),
             created_at=utc_now(),
         )
     )
+    session.flush()
+    vote = session.execute(
+        select(MetaReviewVote).where(
+            MetaReviewVote.session_id == record.id,
+            MetaReviewVote.user_id == user.id,
+        )
+    ).scalar_one()
+    for client_criterion, choice in payload.choices.model_dump().items():
+        session.add(
+            MetaReviewCriterionVote(
+                vote_id=vote.id,
+                criterion="proof_quality" if client_criterion == "proofQuality" else client_criterion,
+                choice=choice,
+                created_at=utc_now(),
+            )
+        )
+    draft = session.execute(
+        select(MetaReviewDraft).where(
+            MetaReviewDraft.session_id == record.id,
+            MetaReviewDraft.user_id == user.id,
+        )
+    ).scalar_one_or_none()
+    if draft is not None:
+        session.delete(draft)
     session.commit()
 
 

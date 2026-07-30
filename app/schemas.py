@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field, model_validator
 
 
 PreferenceValue = Literal["a_way_better", "a_better", "no_difference", "b_better", "b_way_better"]
+MetaReviewChoice = Literal["a", "b", "tie"]
 
 
 class RegisterRequest(BaseModel):
@@ -86,6 +87,27 @@ class MetaReviewGenerateRequest(BaseModel):
         return self
 
 
+class MetaReviewDraftChoices(BaseModel):
+    reuse: MetaReviewChoice | None = None
+    naming: MetaReviewChoice | None = None
+    documentation: MetaReviewChoice | None = None
+    proofQuality: MetaReviewChoice | None = None
+    overall: MetaReviewChoice | None = None
+
+
+class MetaReviewChoices(BaseModel):
+    reuse: MetaReviewChoice
+    naming: MetaReviewChoice
+    documentation: MetaReviewChoice
+    proofQuality: MetaReviewChoice
+    overall: MetaReviewChoice
+
+
+class MetaReviewDraftRequest(BaseModel):
+    choices: MetaReviewDraftChoices
+    reason: str = Field(default="", max_length=5000)
+
+
 class MetaReviewSelectionRequest(BaseModel):
-    choice: Literal["a", "b", "tie"]
+    choices: MetaReviewChoices
     reason: str = Field(default="", max_length=5000)

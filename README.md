@@ -32,6 +32,8 @@ Current API surface:
 - `GET /api/meta-review/proofs`
 - `GET /api/meta-review/featured`
 - `POST /api/meta-review/generate`
+- `POST /api/meta-review/random`
+- `PUT /api/meta-review/{session_id}/draft`
 - `POST /api/meta-review/{session_id}/selection`
 
 ## Repository Layout
@@ -128,11 +130,17 @@ Optional:
 - `PROOF_ARENA_GOOGLE_CLIENT_ID`
   - Google OAuth web client ID used by the frontend sign-in button and backend ID token verification
 - `ANTHROPIC_API_KEY`
-  - API key used to generate the two meta-review evaluations
+  - API key used to generate the Claude meta-review evaluation
 - `CLAUDE_MODEL`
-  - Claude model identifier used for both independent evaluation calls
+  - Claude model identifier used for one side of each meta-review pair
 - `ANTHROPIC_BASE_URL`
   - Optional Anthropic-compatible API base URL; defaults to `https://api.anthropic.com`
+- `CORNELL_AI_GATEWAY_API_KEY`
+  - Cornell AI API Gateway key used for the OpenAI evaluation; falls back to `ANTHROPIC_API_KEY` when the same gateway key serves both providers
+- `CORNELL_AI_GATEWAY_BASE_URL`
+  - OpenAI-compatible Cornell gateway base URL, normally ending in `/v1`; falls back to a non-default `ANTHROPIC_BASE_URL`
+- `CORNELL_AI_GATEWAY_MODEL`
+  - Cornell gateway model identifier; defaults to `gpt-5.4-mini`
 
 See [`.env.example`](/Users/xutianruo/Documents/proof_arena/.env.example).
 
@@ -156,6 +164,9 @@ export PROOF_ARENA_AUTO_SEED=false
 export PROOF_ARENA_GOOGLE_CLIENT_ID='your-google-web-client-id.apps.googleusercontent.com'
 export ANTHROPIC_API_KEY='your-api-key'
 export CLAUDE_MODEL='your-claude-model'
+export CORNELL_AI_GATEWAY_API_KEY='your-cornell-gateway-key'
+export CORNELL_AI_GATEWAY_BASE_URL='your-cornell-openai-compatible-base-url'
+export CORNELL_AI_GATEWAY_MODEL='gpt-5.4-mini'
 ```
 
 ### 3. Run the app
@@ -243,6 +254,9 @@ For Vercel, set these environment variables in Project Settings:
 - `ANTHROPIC_API_KEY`
 - `CLAUDE_MODEL`
 - `ANTHROPIC_BASE_URL` (only when using a compatible proxy or gateway)
+- `CORNELL_AI_GATEWAY_API_KEY`
+- `CORNELL_AI_GATEWAY_BASE_URL`
+- `CORNELL_AI_GATEWAY_MODEL` (defaults to `gpt-5.4-mini`)
 
 Recommended:
 
