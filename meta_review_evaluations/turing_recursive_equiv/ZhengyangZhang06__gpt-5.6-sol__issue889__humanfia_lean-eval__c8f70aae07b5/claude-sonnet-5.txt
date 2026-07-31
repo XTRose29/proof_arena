@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "strong",
+    "reason": "The proof does not re-derive anything; it assembles the iff directly from two already-proved directional lemmas, Helpers.Forward.tm2_of_computable and Helpers.Machine.computable_of_tm2, which is the expected way to combine existing results."
+  },
+  "naming": {
+    "verdict": "needs_work",
+    "reason": "The theorem states a plain `↔` (propositional equivalence) but is named with 'equiv', a term Mathlib reserves for the `Equiv` bijection structure; the standard Mathlib convention for `P ↔ Q` results is a `_iff` suffix, which better matches the statement and avoids the misleading suggestion of an `Equiv`/bijective correspondence."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The file has no module docstring explaining what this equivalence file provides, and the main theorem `turing_recursive_equiv` itself has no docstring despite being the file's sole public declaration."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is short, uses `constructor`/`exact`/`rintro` cleanly to dispatch each direction via a single named lemma, with no `change`/`show`, brittle rewrite chains, or undocumented defeq tricks."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The mathematical assembly and proof are clean and reuse existing lemmas well, but the file lacks any documentation and the theorem name's use of 'equiv' for a mere `↔` statement is inconsistent with Mathlib naming conventions."
+  },
+  "summary": "Solid, minimal proof that reuses existing directional lemmas, but the file needs a module/theorem docstring and a name better reflecting that the result is an `Iff`, not an `Equiv`."
+}

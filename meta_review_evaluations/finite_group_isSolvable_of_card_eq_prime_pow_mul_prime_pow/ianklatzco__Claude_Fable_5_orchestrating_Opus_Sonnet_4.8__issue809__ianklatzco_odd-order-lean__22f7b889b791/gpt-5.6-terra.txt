@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The theorem is a very thin wrapper around `burnside_solvable`, adding only `Fintype.card` to `Nat.card` conversion and local `Fact` instances. Its extra `hpq` argument is not used to strengthen or enable the call, so the wrapper's distinct API value is unclear."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The name describes the stated finite-group cardinality hypothesis and the `IsSolvable` conclusion. It does not overstate the result or introduce nonstandard notation."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The source has no module docstring, and the new public theorem has no docstring explaining that it is the `Fintype.card` formulation of Burnside solvability."
+  },
+  "proof_quality": {
+    "verdict": "needs_work",
+    "reason": "The proof is short and directly invokes `burnside_solvable`, but `have _ := hpq` is dead code and exposes that the `hpq` hypothesis is unused. Remove the redundant hypothesis and placeholder, or use it if it is genuinely required by the intended statement."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The implementation is concise, but it adds an undocumented near-wrapper with an unused assumption; the API and proof should be simplified or justified."
+  },
+  "summary": "A concise adapter proof, but the unused distinct-prime assumption and missing documentation should be addressed."
+}

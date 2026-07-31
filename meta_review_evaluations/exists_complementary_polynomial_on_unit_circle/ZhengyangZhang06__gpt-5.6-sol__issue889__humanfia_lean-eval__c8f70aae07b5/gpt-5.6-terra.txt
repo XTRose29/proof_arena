@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "The theorem is a direct public wrapper around `Helpers.complementary_polynomial P hP`. The visible code does not establish whether that helper is intended as an internal implementation or whether this wrapper duplicates an existing exported API, so no stronger reuse finding is supported."
+  },
+  "naming": {
+    "verdict": "strong",
+    "reason": "`exists_complementary_polynomial_on_unit_circle` accurately describes the existential conclusion and its unit-circle hypothesis. No notation is introduced."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The public theorem has no docstring. The snippet also contains no module docstring, although whether this is a substantive standalone file cannot be determined from the excerpt."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a single direct application of `Helpers.complementary_polynomial`, with no brittle rewrite chains, undocumented definitional-equality manipulation, or unnecessary intermediate reasoning."
+  },
+  "overall": {
+    "verdict": "adequate",
+    "reason": "The wrapper is concise and clearly named, but its lack of documentation is a visible issue. Its necessity relative to the imported helper cannot be assessed from this snippet alone."
+  },
+  "summary": "A concise, readable forwarding theorem that should add documentation; the excerpt alone cannot verify whether the wrapper is necessary."
+}

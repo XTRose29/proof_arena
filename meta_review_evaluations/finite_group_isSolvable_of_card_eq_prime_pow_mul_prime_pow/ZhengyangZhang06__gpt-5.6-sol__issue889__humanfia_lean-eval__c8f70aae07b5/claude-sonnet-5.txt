@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "strong",
+    "reason": "The theorem is a thin, appropriate specialization that reuses the existing BurnsideCharacter.isSolvable_of_card_dvd_prime_pow_mul_prime_pow lemma via a direct rw/apply, rather than re-deriving solvability logic."
+  },
+  "naming": {
+    "verdict": "needs_work",
+    "reason": "The name is prefixed with 'finite_group_' before the conclusion 'isSolvable', breaking the pattern of the sibling lemma BurnsideCharacter.isSolvable_of_card_dvd_prime_pow_mul_prime_pow, which correctly leads with the conclusion; consistency with that adjacent declaration is not maintained."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "There is no module docstring and the theorem itself has no docstring explaining its statement or relation to the underlying Burnside-type lemma it invokes."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The two-line proof (apply plus rw) is short, robust, and free of brittle rewriting chains or undocumented defeq tricks."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The proof itself is sound and reuses prior work well, but the missing documentation and inconsistent naming relative to the lemma it wraps need to be addressed."
+  },
+  "summary": "A correct, minimal wrapper around an existing Burnside-based solvability lemma, but it lacks any documentation and its name deviates from the naming pattern of the lemma it directly invokes."
+}

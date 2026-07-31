@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The theorem is a one-line wrapper that just restates Helpers.not_H1_closedComplemented under a new top-level name, adding no new content beyond the existing lemma in Submission.Helpers."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The name describes the conclusion (¬ H1.ClosedComplemented) reasonably well, though it duplicates the underlying Helpers lemma's name almost verbatim, which is consistent but suggests the wrapper adds no naming value."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "There is no module docstring and no docstring on the theorem explaining what H1 is or why closed-complementedness fails, despite this being a substantive standalone file."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "The single `exact` line is simple and not brittle, but the whole proof is just forwarding an existing result with no new reasoning, so there's nothing to assess beyond a trivial delegation."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The file is essentially a thin, undocumented re-export of an existing Helpers lemma, which duplicates material without adding documentation or new content."
+  },
+  "summary": "This is a thin, undocumented wrapper around an existing Helpers lemma rather than a genuine new contribution."
+}

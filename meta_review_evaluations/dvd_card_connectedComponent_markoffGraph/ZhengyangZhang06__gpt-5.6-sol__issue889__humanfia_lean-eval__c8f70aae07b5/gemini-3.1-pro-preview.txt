@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "The proof simply delegates to a helper lemma, with no visible duplication of Mathlib components."
+  },
+  "naming": {
+    "verdict": "strong",
+    "reason": "The theorem name accurately and conventionally describes its conclusion."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The file lacks a module docstring, and the main public theorem is completely undocumented."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "The proof is a single exact application of a helper lemma, which is robust, though it hides the actual proof logic."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The theorem needs a descriptive docstring explaining its mathematical result."
+  },
+  "summary": "A trivial wrapper file that requires a module and theorem docstring."
+}

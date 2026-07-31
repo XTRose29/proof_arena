@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The theorem is a public thin wrapper: each direction is exactly supplied by `Helpers.momentConfiguration_hausdorffBounded a` and `Helpers.hausdorffBounded_momentConfiguration a`. The displayed code provides no additional specialization, abstraction, or use beyond bundling those two existing results into an iff."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "`hausdorff_hildebrandt_schoenberg` names the relationship asserted by the iff and does not overstate the conclusion. No new notation is introduced."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The file introduces the public theorem `hausdorff_hildebrandt_schoenberg` without a docstring, and the displayed substantive source has no module docstring explaining its purpose."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "The proof is short, explicit, and uses the two existing directional lemmas directly; it contains no undocumented `change`/`show` or brittle rewrite chain."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "Although the proof is readable, the declaration appears to duplicate an existing bidirectional API through a thin wrapper and lacks documentation."
+  },
+  "summary": "A concise wrapper proof, but it should justify or avoid the redundant public iff and document the exported result."
+}

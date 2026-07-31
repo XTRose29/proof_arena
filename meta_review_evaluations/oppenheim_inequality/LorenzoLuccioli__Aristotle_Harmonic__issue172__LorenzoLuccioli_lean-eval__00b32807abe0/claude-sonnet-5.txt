@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The theorem is a thin wrapper that just renames Submission.Helpers.oppenheim_general with no added generality or new content, which the rubric explicitly flags as unnecessary duplication via thin wrappers."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "oppenheim_inequality accurately describes the conclusion (a determinant inequality) and is consistent with the underlying oppenheim_general it wraps."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The file has no module docstring explaining its purpose, and the public theorem oppenheim_inequality itself has no docstring despite being the main exported result."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a single direct application of an existing helper lemma with no brittle rewriting, defeq tricks, or unnecessary length."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The core issues are the undocumented file/theorem and the unmotivated thin-wrapper duplication of an existing helper lemma."
+  },
+  "summary": "A trivially correct but undocumented thin wrapper around Submission.Helpers.oppenheim_general that duplicates existing material rather than adding new content."
+}

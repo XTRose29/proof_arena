@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The theorem `jordan_curve` is a thin wrapper that just calls `Transport.jordan_curve_euclidean` with the same arguments and produces the identical statement, so it duplicates an existing declaration rather than adding new content."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The name `jordan_curve` accurately reflects the conclusion and mirrors the wrapped `Transport.jordan_curve_euclidean`, though its only role is to re-export that lemma under a shorter name."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "There is no module docstring for the file and no docstring on the public theorem `jordan_curve`, despite it being the main exported result of this file."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a single, direct `exact` call to the underlying lemma with matching arguments, which is clear and free of any defeq tricks or brittle rewriting."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The file adds no new mathematical content beyond re-exporting `Transport.jordan_curve_euclidean` under a new name, and lacks any documentation explaining its purpose."
+  },
+  "summary": "A clean but content-free wrapper around `Transport.jordan_curve_euclidean` that needs justification for its existence and basic documentation."
+}

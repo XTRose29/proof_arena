@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "The code simply aliases a theorem from an imported module, which is typical for a submission wrapper."
+  },
+  "naming": {
+    "verdict": "strong",
+    "reason": "The theorem name appropriately reflects the mathematical problem it solves, aligning with the opened namespace."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The file lacks a module docstring, and the main public theorem `chebyshev_sign_change` is missing a docstring."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a direct, robust exact term reference to the imported lemma."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The code is clean and the proof is trivial, but it violates documentation requirements by omitting docstrings."
+  },
+  "summary": "Clean wrapper file missing required documentation."
+}

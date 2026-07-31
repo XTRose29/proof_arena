@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "The theorem is a thin instantiation of Helpers.exists_multiply_recurrent_of_continuous for the homeomorphism case; without visibility into that helper's exact statement it's unclear whether this wrapper adds anything beyond specializing an already general lemma, but no direct duplication is evident in the shown code."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The name furstenberg_topological_recurrence identifies the theorem by its mathematician/topic rather than by its conclusion (existence of a point satisfying IsMultiplyRecurrent), which is a less standard Mathlib naming pattern though not clearly wrong."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "There is no module docstring and no docstring on the public theorem explaining what IsMultiplyRecurrent means or the significance of the result."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "The proof is a concise single simpa only step reusing a helper lemma, which is acceptable per the rubric's allowance for a single explicit simp step, though the unfolding of IsMultiplyRecurrent via simp is undocumented."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The proof itself is clean and appropriately delegates to a helper, but the complete absence of documentation and the person-named theorem title are notable gaps."
+  },
+  "summary": "A short, well-delegated proof let down by missing documentation and a naming choice that emphasizes the named theorem rather than its conclusion."
+}

@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "Delegates to a helper but appears as a thin wrapper; unclear if this is necessary public API or duplication."
+  },
+  "naming": {
+    "verdict": "strong",
+    "reason": "Name matches namespace and describes the result; conventional parameter naming."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "No module or theorem docstrings; public results must be documented per the rubric."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "Clean single-line delegation to a helper lemma, avoiding brittle tactics."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "Documentation is mandatory; the wrapper pattern may also be unnecessary duplication."
+  },
+  "summary": "Add documentation and justify the wrapper's necessity."
+}

@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "The proof directly delegates to an existing helper lemma, avoiding unnecessary duplication."
+  },
+  "naming": {
+    "verdict": "strong",
+    "reason": "The theorem name accurately reflects the conclusion and conforms to standard naming conventions."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The file is missing a module docstring, and the public theorem lacks a descriptive docstring."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof consists of a single exact tactic delegating to a helper, which is robust and trivial."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The code correctly delegates the proof but is missing the required documentation for public declarations."
+  },
+  "summary": "A clean wrapper delegating to a helper lemma, but needs a module docstring and a theorem docstring."
+}

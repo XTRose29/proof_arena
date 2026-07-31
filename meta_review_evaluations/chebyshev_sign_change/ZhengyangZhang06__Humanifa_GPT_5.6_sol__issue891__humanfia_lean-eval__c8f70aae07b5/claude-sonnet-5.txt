@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The theorem `chebyshev_sign_change` is a verbatim thin wrapper around `BoundaryContradiction.chebyshev_sign_change`, adding no new content and directly duplicating the existing declaration it imports."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The name matches the underlying theorem it wraps and states its conjunctive conclusion accurately, though its existence is only justified if the wrapper itself is justified."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "There is no module docstring explaining why this file exists, and the theorem has no docstring despite being the file's sole public declaration."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The one-line proof simply invokes the existing theorem term directly, which is honest and non-brittle for what it is doing."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The file is an undocumented thin wrapper that duplicates an existing theorem from `BoundaryContradiction` without adding new material."
+  },
+  "summary": "This file is a bare re-export of `BoundaryContradiction.chebyshev_sign_change` with no docstring and no added content, which is exactly the kind of unnecessary wrapper the reuse and documentation guidelines flag."
+}

@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The theorem is a thin wrapper that directly duplicates Helpers.contractibleSpace_houseWithTwoRooms without adding value. If the helper is accessible, this declaration is unnecessary duplication."
+  },
+  "naming": {
+    "verdict": "strong",
+    "reason": "The name contractibleSpace_houseWithTwoRooms clearly describes its conclusion using standard Mathlib terminology for a property-instance theorem."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "Public theorem contractibleSpace_houseWithTwoRooms lacks a docstring. The purpose is clear from the name, but the rubric requires documentation for public theorems."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "Proof is concise and robust using exact, but it entirely delegates the reasoning to a helper lemma without explanation, obscuring why the result holds."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The submission creates an undocumented wrapper that duplicates existing material and obscures the actual proof reasoning."
+  },
+  "summary": "Unnecessary wrapper theorem lacks documentation and obscures proof reasoning behind helper delegation."
+}

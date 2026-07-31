@@ -37,6 +37,10 @@ dist/
 # Raw dataset archive (kept on archive/lean-eval-dataset-2026-07-30)
 lean_eval_dataset/
 
+# Local model-generation accounting and temporary responses
+meta_review_evaluations/_generation_*.jsonl
+meta_review_evaluations/**/*.tmp
+
 # OS and editor files
 .DS_Store
 .idea/

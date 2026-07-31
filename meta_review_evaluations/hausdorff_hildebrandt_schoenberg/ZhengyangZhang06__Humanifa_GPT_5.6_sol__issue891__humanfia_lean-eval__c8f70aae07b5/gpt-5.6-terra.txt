@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "The theorem is a thin public equivalence assembled from the two directional helper lemmas `Helpers.momentConfiguration_hausdorffBounded` and `Helpers.hausdorffBounded_momentConfiguration`; the source itself does not reprove either direction. No repository-search evidence is supplied here to establish that an existing single iff theorem directly replaces it."
+  },
+  "naming": {
+    "verdict": "strong",
+    "reason": "`hausdorff_hildebrandt_schoenberg` names the stated equivalence and does not overstate it; no new notation is introduced."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "This public theorem has no docstring, and the file contains no module docstring explaining the material it provides."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is short and explicit: it constructs the iff from the two named directional helper lemmas without fragile rewriting, `change`/`show`, or substantial duplicated reasoning."
+  },
+  "overall": {
+    "verdict": "adequate",
+    "reason": "The declaration is concise and cleanly reuses existing helper results, but its public API lacks documentation and the wrapper's necessity cannot be established from the provided source alone."
+  },
+  "summary": "A minimal, readable iff wrapper over two helper lemmas; add module and theorem documentation."
+}

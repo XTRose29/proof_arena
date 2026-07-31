@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The theorem is a thin wrapper that does nothing but invoke Helpers.not_H1_closedComplemented, so it duplicates that declaration's statement and proof content without adding anything new."
+  },
+  "naming": {
+    "verdict": "needs_work",
+    "reason": "The theorem name 'H1_not_closedComplemented' reverses the word order used by the very lemma it wraps (Helpers.not_H1_closedComplemented), creating an inconsistent naming pattern between adjacent/related declarations for the same conclusion."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "There is no module docstring for the file and no docstring on the public theorem explaining what H1 or ClosedComplemented mean or why the result matters."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "The single `exact` call is simple and not brittle, though it fully re-derives an existing lemma rather than factoring or extending it."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The file adds no new mathematical content beyond restating an existing Helpers lemma under an inconsistent name, with no documentation to justify the wrapper."
+  },
+  "summary": "A one-line wrapper theorem that duplicates Helpers.not_H1_closedComplemented under a differently-ordered name and lacks any documentation."
+}

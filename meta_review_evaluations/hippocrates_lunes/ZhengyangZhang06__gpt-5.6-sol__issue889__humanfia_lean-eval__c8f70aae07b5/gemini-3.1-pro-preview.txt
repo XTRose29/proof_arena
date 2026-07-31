@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "The proof effectively reuses a pre-proven lemma (`Helpers.hippocrates_lunes_measure`), avoiding any duplicated logical effort within this file."
+  },
+  "naming": {
+    "verdict": "needs_work",
+    "reason": "The theorem name `hippocrates_lunes` does not follow Mathlib's convention of describing the conclusion (e.g., `volume_horizontalLune_add_verticalLune_eq`)."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The file is missing a module docstring explaining its purpose, and the main public theorem `hippocrates_lunes` lacks a docstring."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a direct, robust `exact` application of a helper lemma, containing no brittle chains or undocumented defeqs."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "While the proof delegates cleanly to a helper, the file lacks required documentation and uses a non-standard name for the theorem."
+  },
+  "summary": "Clean delegation to a helper lemma, but requires module/theorem documentation and a convention-compliant name."
+}

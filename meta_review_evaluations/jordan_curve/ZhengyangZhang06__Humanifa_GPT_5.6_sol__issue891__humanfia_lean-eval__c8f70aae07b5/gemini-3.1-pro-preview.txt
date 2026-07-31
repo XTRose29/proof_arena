@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The theorem `jordan_curve` is a direct duplicate and unnecessary thin wrapper around `Transport.jordan_curve_euclidean`."
+  },
+  "naming": {
+    "verdict": "needs_work",
+    "reason": "The parameters `_hcont` and `_hinj` start with an underscore, which indicates in Lean that they are unused, yet they are explicitly passed in the proof."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The file lacks a module docstring explaining its purpose, and the main public theorem `jordan_curve` is missing a docstring describing the result."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "The proof is trivially correct by directly applying the underlying theorem, though it uses misleadingly named variables."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The file introduces an undocumented and redundant thin wrapper while misusing Lean's underscore naming convention for variables."
+  },
+  "summary": "Remove the redundant wrapper, or properly document it and rename the variables to remove the leading underscores."
+}

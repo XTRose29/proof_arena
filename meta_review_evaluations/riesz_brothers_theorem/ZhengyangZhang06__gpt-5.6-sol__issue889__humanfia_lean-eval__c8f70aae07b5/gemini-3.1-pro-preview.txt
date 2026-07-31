@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "The file acts as a wrapper to surface a main theorem from a helper module, which is acceptable for submission structuring as long as the underlying work is correctly attributed."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The name 'riesz_brothers_theorem' accurately describes the established mathematical result being proved."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The file lacks a module docstring, and the main public theorem 'riesz_brothers_theorem' is completely undocumented."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "The proof is a direct and robust delegation to the underlying helper theorem."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The code requires a module docstring and a descriptive docstring for the main theorem before it can be approved."
+  },
+  "summary": "Please add appropriate documentation for both the file and the public theorem."
+}

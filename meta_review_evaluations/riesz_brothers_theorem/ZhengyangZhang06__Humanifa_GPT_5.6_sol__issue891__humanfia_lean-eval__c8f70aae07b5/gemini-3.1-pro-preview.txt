@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "strong",
+    "reason": "The code effectively delegates to an existing helper without introducing redundant or duplicated logic."
+  },
+  "naming": {
+    "verdict": "strong",
+    "reason": "The name `riesz_brothers_theorem` correctly identifies the result and follows standard Mathlib naming conventions for named theorems."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The main public theorem `riesz_brothers_theorem` lacks a docstring describing its mathematical statement. A module docstring is also missing."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a direct, robust exact term that safely delegates to the helper."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The proof is correct and effectively structured, but the file fails to provide any documentation for the main theorem."
+  },
+  "summary": "Provide a module docstring and a docstring for the main theorem."
+}

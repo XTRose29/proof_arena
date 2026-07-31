@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "The proof directly applies existing lemmas and certificates without re-deriving results, though the necessity of this specific combination as a separate declaration is not evident from the visible code."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The name describes the conclusion but is slightly ambiguous about whether 'nonlinear' refers to the manifold or its fundamental group; it could be more precise."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "Missing docstring for this public theorem, which appears to be a main result that is not self-explanatory."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is extremely concise and robust, using a single exact tactic with no brittle rewrite chains or undocumented definitional manipulations."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "While the proof is concise and makes good use of existing results, the lack of documentation for a main theorem is a significant gap."
+  },
+  "summary": "Concise proof leveraging existing results, but lacks required documentation."
+}

@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "strong",
+    "reason": "Effectively reuses a helper lemma to close the goal without unnecessary duplication."
+  },
+  "naming": {
+    "verdict": "strong",
+    "reason": "The theorem name is clear and standard, accurately reflecting the mathematical concept of Hippocrates' lunes."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The file lacks a module docstring, and the main public theorem `hippocrates_lunes` is missing a docstring explaining the result."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a single, clean delegation to an external helper lemma, making it extremely robust."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The logic and proof structure are perfect, but the missing documentation needs to be addressed."
+  },
+  "summary": "Robust proof delegation, but missing required documentation for the file and main theorem."
+}

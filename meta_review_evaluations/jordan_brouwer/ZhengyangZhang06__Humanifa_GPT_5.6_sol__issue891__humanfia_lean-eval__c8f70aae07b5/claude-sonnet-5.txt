@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The theorem is a thin wrapper that forwards the exact same arguments to `Helpers.jordan_brouwer_of_stable_commutation` with an identical conclusion, so it duplicates that existing declaration rather than adding new content."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "`jordan_brouwer` names the classical result being stated and its conclusion (two connected components) matches the theorem name in spirit, though no adjacent declarations are visible to confirm namespace consistency."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "There is no module docstring and no docstring on the public theorem `jordan_brouwer` explaining the statement or its hypotheses."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "The proof is a single, direct `exact` call with no unexplained defeq tricks or brittle rewriting, though its entire content is just forwarding to another lemma."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "Missing documentation and an undermotivated thin-wrapper structure around an existing helper lemma outweigh the otherwise clean one-line proof."
+  },
+  "summary": "A short, clean wrapper theorem that lacks any documentation and appears to duplicate the helper lemma it directly calls with identical arguments."
+}

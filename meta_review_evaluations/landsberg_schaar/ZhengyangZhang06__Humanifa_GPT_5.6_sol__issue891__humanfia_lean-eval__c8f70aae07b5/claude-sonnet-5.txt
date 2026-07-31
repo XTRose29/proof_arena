@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The theorem `landsberg_schaar` is a thin wrapper that just forwards to `Helpers.landsberg_schaar_aux p q hp hq` with the same signature, adding no new content beyond exposing it under a different namespace."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The name `landsberg_schaar` matches the mathematical result it states and is consistent with the aux lemma name `landsberg_schaar_aux` it wraps, so it does not overstate or misdescribe the conclusion."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "There is no module docstring for this file and no docstring on the public theorem `landsberg_schaar` explaining the statement or its role."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "The proof is a single term-mode application of `Helpers.landsberg_schaar_aux`, which is simple and not brittle, though its triviality is itself evidence of the wrapper issue flagged under reuse."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The file is an undocumented thin wrapper around an existing helper lemma, raising both reuse and documentation concerns despite the proof itself being clean."
+  },
+  "summary": "Sound but redundant: the submission merely re-exposes `Helpers.landsberg_schaar_aux` without added value or documentation."
+}

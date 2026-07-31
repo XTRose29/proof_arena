@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "the theorem is a direct application of Submission.Helpers.hippocrates_from_lemmas with identical arguments, suggesting unnecessary duplication"
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "hippocrates_lunes follows the opened namespace and describes the geometric result, though it could be more explicit per Mathlib conventions"
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "public theorem lacks a docstring explaining the Hippocrates lunes result and its geometric interpretation"
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "the one-line proof is concise and avoids brittle tactics, though it delegates all work to a helper"
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "missing documentation and likely duplication of an existing helper lemma"
+  },
+  "summary": "undocumented theorem that appears to duplicate existing work"
+}

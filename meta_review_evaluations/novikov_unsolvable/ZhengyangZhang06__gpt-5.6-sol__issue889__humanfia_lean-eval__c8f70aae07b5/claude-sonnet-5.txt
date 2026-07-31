@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "The theorem is assembled from an existing 'sound' certificate lemma and a certificate object, so no obvious duplication is visible in this file; deeper duplication cannot be assessed without seeing AffineCertificate or SubgroupMembershipCertificate."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "novikov_unsolvable directly names the conclusion (unsolvability of the word problem, i.e. Novikov's theorem) and matches standard terminology for this classical result."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "There is no module docstring for this substantive file and no docstring on the main theorem novikov_unsolvable explaining what the statement asserts."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "The proof is a single direct `exact` application of a named 'sound' lemma to a certificate, which is terse but not obviously hiding brittle reasoning or undocumented defeq within this file."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The core theorem statement and proof look reasonable, but the complete absence of documentation on a key result file is a clear gap."
+  },
+  "summary": "A minimal, clean assembly of the main theorem from existing certificate machinery, but it lacks any documentation."
+}

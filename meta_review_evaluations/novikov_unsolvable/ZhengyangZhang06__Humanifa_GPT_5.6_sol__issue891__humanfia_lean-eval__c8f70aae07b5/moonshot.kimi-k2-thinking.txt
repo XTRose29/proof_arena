@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "Proof appropriately delegates to existing soundness and certificate infrastructure, showing good compositional reuse, though the underlying AffineCertificate cannot be assessed for Mathlib duplication from visible code alone."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "Theorem name follows Mathlib convention of describing the conclusion, but 'certificate.certificate' is redundant and the name could be more specific about the word problem context."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "Missing module docstring and theorem docstring; a public theorem establishing Novikov's unsolvability result requires documentation of what is being proved and why it matters."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "The single-line exact proof is direct and robust against lemma renaming, but offers no insight into the reduction strategy or explanation of how the affine certificate witnesses the unsolvability."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The proof structure is sound and appropriately reuses infrastructure, but lacks essential documentation for a major theorem, making it inaccessible to users without deep context."
+  },
+  "summary": "Core formalization is well-structured but undocumented; a theorem of this significance requires clear docstrings."
+}

@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The theorem is a one-line wrapper around `oppenheim_general` with no visible specialization; this pattern suggests potential duplication with Mathlib or redundancy within the submission that requires verification against existing sources."
+  },
+  "naming": {
+    "verdict": "strong",
+    "reason": "The theorem name uses standard snake_case, accurately describes the conclusion (Oppenheim's inequality), and avoids overstating the result."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "Public theorem lacks a docstring explaining the statement; per the rubric, main theorems require documentation even when the name is suggestive."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "Proof is concise and factored into a helper lemma, but relies on explicit named lemma application rather than robust automation; acceptable for a wrapper but not exemplary."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "Missing documentation and the thin-wrapper pattern without visible specialization raises duplication concerns and leaves the contribution's purpose unclear."
+  },
+  "summary": "Concise but undocumented wrapper theorem that may duplicate existing results."
+}

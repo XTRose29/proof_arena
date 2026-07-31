@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "The theorem cleanly delegates its proof to a predefined helper lemma without unnecessary duplication of the mathematical logic."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The name `hippocrates_lunes` reflects the traditional mathematical name for the theorem, which is appropriate for a top-level challenge submission."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The file is missing a module docstring, and the public main theorem `hippocrates_lunes` lacks a docstring explaining its mathematical statement."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a direct, robust `exact` application of a helper lemma, which is clean and maintainable."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The code correctly factors out the proof, but needs standard documentation (module and theorem docstrings) to meet library standards."
+  },
+  "summary": "Clean delegation to a helper lemma, but missing required documentation."
+}

@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The new theorem is an exact thin wrapper around `Helpers.landsberg_schaar_aux p q hp hq`, with the same visible parameters and conclusion. Unless this exported name is required by an external interface, the wrapper duplicates the helper rather than adding reusable content."
+  },
+  "naming": {
+    "verdict": "strong",
+    "reason": "The name `landsberg_schaar` directly describes the stated identity and is consistent with the imported `LeanEval.NumberTheory.LandsbergSchaar` namespace."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The public theorem has no docstring, and the provided substantive source contains no module docstring describing its purpose."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a direct application of the auxiliary result, with no brittle rewriting, undocumented definitional-equality manipulation, or unnecessary proof steps."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The proof itself is concise, but the declaration appears to be a redundant wrapper over `Helpers.landsberg_schaar_aux` and lacks documentation."
+  },
+  "summary": "Concise proof, but avoid the duplicate wrapper unless its public API role is necessary and document the exported result."
+}

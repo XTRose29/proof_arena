@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The theorem is a thin specialization of `Helpers.exists_multiply_recurrent_of_continuous`: its proof only supplies `T.continuous` and unfolds `IsMultiplyRecurrent`. The existing helper can be used directly whenever the homeomorphism is viewed as its underlying continuous map, so the added public wrapper should be justified by a distinct API need."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The name identifies the topological recurrence result and the conclusion establishes existence of a multiply recurrent point. No new notation is introduced."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The public theorem `furstenberg_topological_recurrence` has no docstring, and the supplied file content has no module docstring describing the material."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is short and directly reuses the continuous-map result, with an explicit `simpa only [IsMultiplyRecurrent]` to align the conclusion."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The implementation is concise, but it introduces an undocumented public thin wrapper around an existing helper without visible additional API value."
+  },
+  "summary": "Concise reuse is good, but document the public result and justify or remove the near-wrapper."
+}

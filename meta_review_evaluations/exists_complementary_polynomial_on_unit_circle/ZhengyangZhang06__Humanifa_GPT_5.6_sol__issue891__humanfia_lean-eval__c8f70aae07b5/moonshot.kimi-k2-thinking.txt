@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "strong",
+    "reason": "The proof delegates entirely to Helpers.complementary_polynomial, a dedicated helper lemma, without re-deriving any intermediate facts."
+  },
+  "naming": {
+    "verdict": "strong",
+    "reason": "The name exists_complementary_polynomial_on_unit_circle follows Mathlib conventions: exists prefix, descriptive object, and domain suffix."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The public theorem exists_complementary_polynomial_on_unit_circle is undocumented despite being a main result where the term 'complementary polynomial' may not be self-explanatory."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a single-line application of a helper lemma, avoiding brittle chains, undocumented definitional manipulations, or unnecessary complexity."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The only required change is adding a docstring to the main public theorem; all other aspects demonstrate good practice."
+  },
+  "summary": "Missing docstring on the main public theorem; otherwise good reuse, naming, and proof structure."
+}

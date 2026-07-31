@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "strong",
+    "reason": "The proof perfectly reuses an existing helper lemma without duplicating any logic."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The theorem name `jordan_brouwer` is standard and clearly matches the well-known mathematical result being formalized."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The file is missing a module docstring, and the main public theorem `jordan_brouwer` lacks a docstring explaining the result."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "The proof is a direct and robust application of a helper lemma, though using term mode instead of `by exact` would be slightly more idiomatic."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "While the code is concise and correctly delegates to existing helpers, it fails the documentation requirements of the rubric."
+  },
+  "summary": "A correct and robust application of a helper lemma that requires module and theorem docstrings."
+}

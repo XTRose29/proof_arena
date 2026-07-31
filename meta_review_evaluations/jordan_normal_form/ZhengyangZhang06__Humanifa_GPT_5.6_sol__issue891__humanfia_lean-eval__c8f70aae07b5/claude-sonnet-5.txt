@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "The theorem simply delegates to Helpers.jordanChainBasis, reusing an existing development rather than re-proving it, which matches the intended pattern of separating computation into Helpers."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "`jordan_normal_form` names the mathematical result (existence of a Jordan chain basis) and follows standard terminology, though it could more explicitly reflect the existence/nonemptiness nature of the conclusion."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "There is no module docstring explaining the file's purpose and no docstring on the public theorem `jordan_normal_form` describing what it asserts."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "The proof is a single trivial application of an existing helper with no brittle chains, `change`/`show`, or undocumented defeq tricks visible in this file."
+  },
+  "overall": {
+    "verdict": "adequate",
+    "reason": "The code is a clean, minimal wrapper reusing an existing helper, but it lacks any documentation for a public theorem and module."
+  },
+  "summary": "A concise, correctly delegating theorem statement that would benefit from a module and theorem docstring."
+}

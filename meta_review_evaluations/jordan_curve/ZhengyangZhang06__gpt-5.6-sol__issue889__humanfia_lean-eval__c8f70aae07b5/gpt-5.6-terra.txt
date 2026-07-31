@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "The theorem is a thin namespace-level wrapper around the explicitly reused `Transport.jordan_curve_euclidean`; the code makes that dependency clear. No evidence in the supplied source establishes that the wrapper itself is required by consumers or duplicates an already available `Submission.jordan_curve`."
+  },
+  "naming": {
+    "verdict": "strong",
+    "reason": "`jordan_curve` names the visible conclusion at an appropriate level, and the theorem is placed in the `Submission` namespace. No notation or misleading strength claims are introduced."
+  },
+  "documentation": {
+    "verdict": "adequate",
+    "reason": "The file is very small and introduces only a forwarding theorem, so a module docstring is not clearly necessary from the visible code. The public theorem has no docstring, but its name and statement are self-descriptive."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a single explicit application of `Transport.jordan_curve_euclidean`, with all arguments supplied directly. It contains no brittle rewrite chain, undocumented definitional-equality manipulation, or unnecessary intermediate steps."
+  },
+  "overall": {
+    "verdict": "adequate",
+    "reason": "This is a clean, minimal forwarding declaration that directly reuses the imported result. Its only visible concern is whether the additional public wrapper is necessary, which cannot be resolved from this snippet alone."
+  },
+  "summary": "A concise and robust wrapper around the existing transport theorem, with no visible proof-quality or naming issues."
+}

@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The sole declaration is a thin wrapper: its statement is identical to the invoked `Helpers.riesz_brothers_theorem μ hμ`, so callers can use that existing theorem directly."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The name describes the stated result and uses conventional theorem-style naming; no new notation is introduced."
+  },
+  "documentation": {
+    "verdict": "adequate",
+    "reason": "This is a very small wrapper-only file, and the source introduces no substantive new definition requiring separate documentation."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "The proof is a direct application of the existing helper theorem, with no brittle rewriting, definitional-equality manipulation, or unnecessary proof scaffolding."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "Although the wrapper is concise and readable, it duplicates the existing `Helpers.riesz_brothers_theorem` API without adding visible specialization or behavior."
+  },
+  "summary": "Remove the redundant wrapper or justify a distinct public API need for it."
+}

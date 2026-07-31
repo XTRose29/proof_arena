@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "strong",
+    "reason": "Directly and effectively delegates to an existing helper lemma without reinventing logic."
+  },
+  "naming": {
+    "verdict": "strong",
+    "reason": "The theorem name accurately and descriptively captures the conclusion using standard terminology."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The main public theorem `exists_complementary_polynomial_on_unit_circle` is entirely undocumented. It requires a docstring explaining the result."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a perfectly clean one-liner that applies the appropriate helper."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The code is clean and delegates well, but lacks required documentation for a public declaration."
+  },
+  "summary": "Clean delegation to helper lemmas, but missing required docstrings."
+}

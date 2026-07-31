@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "strong",
+    "reason": "Effectively reuses existing helper lemmas to establish both directions of the equivalence without unnecessary duplication."
+  },
+  "naming": {
+    "verdict": "needs_work",
+    "reason": "The theorem proves an `↔` (iff) but is named with the `_equiv` suffix, which in Mathlib is reserved for the `Equiv` type (`≃`). It should be renamed to something like `computable_iff_tm2Computable`."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The file is missing a module docstring, and the main public theorem `turing_recursive_equiv` lacks a docstring."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is concise, robust, and clean, properly utilizing `constructor` and directly applying the appropriate helper lemmas."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The mathematical structure and proof quality are strong, but the file requires fixes to align with standard naming conventions and documentation requirements."
+  },
+  "summary": "A clean and correct proof that relies on helpers, but requires a rename to use the `_iff` suffix and the addition of mandatory docstrings."
+}

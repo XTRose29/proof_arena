@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "The proof cleanly delegates to a helper lemma via `simpa only`, but we cannot verify from the visible code whether `Helpers.exists_multiply_recurrent_of_continuous` duplicates existing Mathlib lemmas on recurrent points in dynamical systems."
+  },
+  "naming": {
+    "verdict": "strong",
+    "reason": "Theorem name `furstenberg_topological_recurrence` follows Mathlib conventions by describing the conclusion and using standard terminology; `IsMultiplyRecurrent` appropriately names the predicate."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The main theorem lacks a docstring explaining its statement and mathematical significance, which is required for public-facing theorems per the rubric."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is concise (single `simpa only` step), robust, and delegates the core reasoning to a reusable helper lemma without brittle rewrite chains."
+  },
+  "overall": {
+    "verdict": "adequate",
+    "reason": "Good naming and proof quality, but missing documentation for a main theorem, and uncertainty about potential duplication of the helper lemma contents."
+  },
+  "summary": "Clean, concise proof with good structure but missing theorem documentation."
+}

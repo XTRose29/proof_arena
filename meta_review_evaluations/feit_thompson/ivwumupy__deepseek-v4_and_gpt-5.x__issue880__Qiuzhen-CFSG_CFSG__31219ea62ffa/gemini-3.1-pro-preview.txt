@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The theorem `feit_thompson` is an unnecessary thin wrapper around the existing `odd_order_theorem`, directly duplicating its content."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The name `feit_thompson` accurately reflects standard terminology for the theorem."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The file lacks a module docstring, and the public theorem `feit_thompson` is missing a docstring describing the result."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "The proof is trivial, though it could be slightly condensed to a single `exact odd_order_theorem h`."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The submission introduces an undocumented, exact duplicate of an existing theorem under a different name."
+  },
+  "summary": "Remove the unnecessary wrapper and add documentation if keeping any genuinely new material."
+}

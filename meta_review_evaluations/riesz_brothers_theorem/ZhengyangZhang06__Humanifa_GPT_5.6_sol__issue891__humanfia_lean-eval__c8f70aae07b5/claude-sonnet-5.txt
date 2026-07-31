@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The theorem is a one-line wrapper that calls Helpers.riesz_brothers_theorem with the exact same signature and arguments, adding no new content; this looks like an unnecessary thin wrapper around an existing declaration rather than genuine new material."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The name mirrors the underlying Helpers.riesz_brothers_theorem exactly and the '_theorem' suffix is consistent with naming a classical named result, so there is no evident naming problem introduced by this file."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "There is no module docstring explaining the file's purpose and no docstring on the public theorem describing the conclusion, both required by the rubric for substantive files and public declarations."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "The single-line proof directly applies the helper theorem with matching hypotheses, with no brittle rewriting chains, unjustified `change`/`show`, or hidden defeq tricks visible in the code."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The declaration appears to be a bare re-export of Helpers.riesz_brothers_theorem with no accompanying documentation, so it duplicates existing material without adding justified value."
+  },
+  "summary": "This file is essentially a thin, undocumented pass-through to Helpers.riesz_brothers_theorem, which raises duplication and documentation concerns despite the proof itself being simple and clean."
+}

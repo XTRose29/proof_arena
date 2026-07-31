@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "strong",
+    "reason": "The theorem directly reuses `Helpers.jordan_brouwer_of_stable_commutation` rather than rederiving the result. The proof is a transparent one-step application of the imported development."
+  },
+  "naming": {
+    "verdict": "strong",
+    "reason": "The name `jordan_brouwer` describes the stated conclusion about the complement of the image having two connected components. No new notation or misleading strength claims are introduced."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The public theorem `jordan_brouwer` has no docstring. The shown file also has no module docstring explaining the purpose of this exported result."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is concise and readable, with no brittle rewrite chains, undocumented definitional-equality manipulation, or duplicated intermediate reasoning."
+  },
+  "overall": {
+    "verdict": "adequate",
+    "reason": "The implementation cleanly exposes an existing helper result, but the exported theorem and shown module lack documentation."
+  },
+  "summary": "A clean thin public wrapper around an existing result; add documentation for the module and theorem."
+}

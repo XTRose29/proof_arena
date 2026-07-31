@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The theorem is a one-line wrapper around `Helpers.landsberg_schaar_aux`, so no reasoning is visible here to assess reuse of Mathlib; the entire mathematical content is hidden in the Helpers file, making it impossible to confirm the wrapper is not a redundant restatement of an existing Mathlib Gauss-sum/Landsberg–Schaar lemma."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "`landsberg_schaar` names the conclusion after the classical identity it states and is consistent with the opened `LeanEval.NumberTheory.LandsbergSchaar` namespace; no notation is introduced."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The file has no module docstring and the `landsberg_schaar` theorem itself has no docstring explaining the statement (e.g. what `gaussS` represents or the meaning of the parity hypotheses)."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "The proof is a clean, single-term delegation to `Helpers.landsberg_schaar_aux` with no brittle rewriting, `simp` chains, or undocumented `change`/`show`, though all substantive reasoning is deferred to the unseen helper file."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The visible code is a minimal, structurally sound wrapper, but the total absence of documentation and the opacity of the delegated proof prevent confidence in its non-duplication and completeness."
+  },
+  "summary": "A terse, well-named wrapper theorem that defers all proof content to an external helper, but it lacks any docstrings and offers no visible basis to confirm it isn't duplicating existing material."
+}

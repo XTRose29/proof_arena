@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "The theorem is assembled from two existing directions in Submission.Helpers with no visible re-derivation, but no search evidence is given to confirm this iff isn't already stated elsewhere in Helpers or Mathlib."
+  },
+  "naming": {
+    "verdict": "needs_work",
+    "reason": "The name 'hausdorff_hildebrandt_schoenberg' names the theorem after mathematicians rather than describing its conclusion (an iff between IsMomentConfiguration and HausdorffBounded), which departs from the Mathlib convention of reading names from the conclusion outward (e.g. isMomentConfiguration_iff_hausdorffBounded)."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "There is no module docstring for this file and no docstring on the exported theorem explaining what IsMomentConfiguration/HausdorffBounded equivalence means."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a clean two-line `constructor; exact ...` combining two already-proved directions, with no brittle chains, defeq tricks, or unexplained tactics."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The proof itself is fine and reuse is plausible, but the file lacks any documentation and uses a non-descriptive, mathematician-named theorem name instead of a conclusion-based Mathlib-style name."
+  },
+  "summary": "A short, structurally sound proof let down by missing documentation and a non-standard, authorship-based theorem name."
+}

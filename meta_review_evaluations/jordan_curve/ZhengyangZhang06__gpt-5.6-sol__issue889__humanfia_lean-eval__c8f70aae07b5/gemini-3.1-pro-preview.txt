@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The theorem `jordan_curve` is an unnecessary thin wrapper around `Transport.jordan_curve_euclidean`."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The theorem name `jordan_curve` correctly identifies the conclusion. However, prefixing explicitly used variables like `_hcont` and `_hinj` with an underscore is nonstandard."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The file is missing a module docstring describing its purpose, and the main public theorem `jordan_curve` lacks a docstring."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "The proof is a direct, robust application of an existing lemma, though it explicitly references variables intended by their naming to be unused."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The file needs standard module and declaration documentation, and the necessity of the thin wrapper should be addressed."
+  },
+  "summary": "Missing documentation for the main theorem and file, alongside a potentially unnecessary thin wrapper and nonstandard variable names."
+}

@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "The code effectively delegates the two directions of the equivalence to previously established helper lemmas without duplicating their internal logic."
+  },
+  "naming": {
+    "verdict": "needs_work",
+    "reason": "The name `hausdorff_hildebrandt_schoenberg` does not describe the conclusion. It should be named `isMomentConfiguration_iff_hausdorffBounded` following standard Mathlib conventions."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The file lacks a module docstring, and the main public theorem `hausdorff_hildebrandt_schoenberg` is entirely undocumented."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is concise and robust, cleanly breaking down the logical equivalence and directly applying the exact helper lemmas for each direction."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "While the proof is simple and correct, the code requires proper documentation and a name that describes the mathematical conclusion rather than its historical authors."
+  },
+  "summary": "Solid structural reuse, but missing essential documentation and standard naming conventions."
+}

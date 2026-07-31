@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "The theorem is a thin composition of two already-proved directional lemmas (Helpers.Forward.tm2_of_computable and Helpers.Machine.computable_of_tm2); this is legitimate assembly rather than duplication, though it cannot be fully verified without seeing whether an equivalent iff already exists in the Helpers files."
+  },
+  "naming": {
+    "verdict": "needs_work",
+    "reason": "The name 'turing_recursive_equiv' does not read as an iff conclusion and 'equiv' risks confusion with Mathlib's `Equiv` structure; a name like `computable_iff_tm2Computable` would better describe the stated biconditional."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "There is no module docstring explaining the file's purpose and no docstring on the main theorem, despite it being the file's central result."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is short, uses `constructor`/`rintro`/`exact` cleanly to dispatch each direction to existing lemmas, with no brittle rewriting chains or undocumented defeq tricks."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The proof itself is clean and reuses existing lemmas well, but the file lacks any documentation and the theorem name does not clearly convey the biconditional it proves."
+  },
+  "summary": "A concise, well-composed proof let down by missing documentation and an imprecise name for an iff statement."
+}

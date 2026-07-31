@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "The code effectively reuses the existing `burnside_solvable` theorem, providing a helpful thin wrapper for when group cardinality is expressed via `Fintype.card`."
+  },
+  "naming": {
+    "verdict": "strong",
+    "reason": "The theorem name accurately describes its conclusion and hypotheses in standard Mathlib terminology (`isSolvable_of_card_eq_prime_pow_mul_prime_pow`)."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The file lacks a module docstring, and the main public theorem is undocumented."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "The proof is concise and effectively bridges the statement to the core theorem using standard rewrites, though `have _ := hpq` is slightly unidiomatic."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The code is functionally fine and well-named, but the missing documentation needs to be addressed."
+  },
+  "summary": "Well-implemented wrapper theorem that needs a module docstring and a theorem docstring."
+}

@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The declaration is a thin equality-hypothesis wrapper around `BurnsideCharacter.isSolvable_of_card_dvd_prime_pow_mul_prime_pow`: its entire proof applies that theorem and rewrites `hcard`. Unless this exact equality-form convenience lemma has established consumers, callers can use the existing theorem directly after rewriting."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The name states the `IsSolvable` conclusion and the cardinality condition in a readable way. No new notation is introduced."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The supplied substantive source has no module docstring, and the public theorem has no docstring describing the equality-cardinality specialization it provides."
+  },
+  "proof_quality": {
+    "verdict": "needs_work",
+    "reason": "The proof is short and directly reuses the imported Burnside result, but `_hpq` is a redundant hypothesis: it is not used by the proof and the applied theorem is invoked only with `hp` and `hq`."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The code is concise, but it adds an undocumented thin wrapper and retains an unused distinctness assumption."
+  },
+  "summary": "A small wrapper around an existing Burnside theorem; document or justify it and remove the unused hypothesis."
+}

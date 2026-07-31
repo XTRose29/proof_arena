@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "The proof appropriately delegates to a helper lemma. Without seeing the helper's implementation, we cannot verify if it duplicates existing Mathlib results, but the structure is sound."
+  },
+  "naming": {
+    "verdict": "strong",
+    "reason": "The theorem name clearly describes the mathematical result (Furstenberg's topological recurrence theorem) using standard terminology."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The theorem lacks a docstring explaining what it proves and its significance, and there's no visible module docstring for the file."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is concise and robust, using `simpa` to simplify the goal and applying a helper lemma without brittle chains of rewrites."
+  },
+  "overall": {
+    "verdict": "adequate",
+    "reason": "The mathematical content is well-named and the proof is clean, but it requires documentation to explain the result."
+  },
+  "summary": "Clean, concise proof that needs documentation."
+}

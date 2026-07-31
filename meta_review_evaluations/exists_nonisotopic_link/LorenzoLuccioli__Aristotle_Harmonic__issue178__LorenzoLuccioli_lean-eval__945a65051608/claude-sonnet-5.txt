@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "strong",
+    "reason": "The theorem is assembled directly from existing helper declarations (theUnlink, theHopfLink, unlink_not_isotopic_hopf) with no re-derivation or thin wrapping visible in this file."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "exists_nonisotopic_link follows the standard Mathlib exists_ prefix convention and accurately describes the ∃ L₁ L₂, ¬Isotopic conclusion without overclaiming uniqueness or additional structure."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The file has no module docstring explaining its purpose and the theorem itself is undocumented, despite being a substantive top-level result."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a single, transparent anonymous-constructor term directly citing the three relevant facts, with no brittle rewriting, defeq tricks, or unjustified tactics."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The proof and reuse of helpers are clean, but the complete absence of documentation on a substantive file/theorem is a clear rubric violation."
+  },
+  "summary": "A concise, well-composed existence proof let down entirely by missing module and theorem documentation."
+}

@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "strong",
+    "reason": "The theorem is a thin, named entry point that directly reuses `Helpers.jordanChainBasis f` rather than rederiving the result. No duplicated proof machinery is introduced in this source."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The name `jordan_normal_form` is broadly aligned with the conclusion about existence of a `JordanChainBasis`, though the conclusion itself is phrased in terms of a basis rather than an explicit normal-form object."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "This substantive public theorem has no docstring, and the file has no module docstring explaining the exported Jordan-normal-form existence result."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a direct application of `Helpers.jordanChainBasis f`, with no brittle rewriting, definitional-equality manipulation, or unnecessary intermediate steps."
+  },
+  "overall": {
+    "verdict": "adequate",
+    "reason": "The implementation is concise and appropriately reuses the helper theorem, but the public theorem and file lack documentation."
+  },
+  "summary": "A clean forwarding theorem with good proof economy; add module and declaration documentation."
+}

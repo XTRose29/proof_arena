@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "strong",
+    "reason": "The proof effectively reuses a helper lemma (`Helpers.exists_multiply_recurrent_of_continuous`) to close the goal immediately."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The theorem name uses standard mathematical terminology for this result, which is acceptable for notable named theorems."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The theorem `furstenberg_topological_recurrence` is a public declaration and lacks a docstring explaining the result."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a clean and robust one-liner using `simpa`."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The code is clean and mathematically sound but requires proper documentation for the public theorem."
+  },
+  "summary": "Add a descriptive docstring to the main theorem."
+}

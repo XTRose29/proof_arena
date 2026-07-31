@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "Theorem directly duplicates Mathlib's `odd_order_theorem` with no added value or specialization."
+  },
+  "naming": {
+    "verdict": "needs_work",
+    "reason": "Name `feit_thompson` describes the mathematical result rather than the conclusion `IsSolvable G`, violating Mathlib naming conventions."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "No module docstring or theorem docstring explaining purpose or relationship to existing API."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "Proof is concise but serves only to forward to `odd_order_theorem`, highlighting the unnecessary duplication."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "Direct duplication of existing Mathlib theorem with non-standard naming and no documentation."
+  },
+  "summary": "Unnecessary thin wrapper around Mathlib's odd order theorem."
+}

@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "The proof efficiently delegates to an existing helper lemma without unnecessary duplication."
+  },
+  "naming": {
+    "verdict": "needs_work",
+    "reason": "The name `oppenheim_inequality` does not follow Mathlib's conclusion-based naming convention; a name like `det_mul_prod_le_det_hadamard` would better describe the theorem's statement."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The main theorem `oppenheim_inequality` is missing a docstring explaining the result."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a clean and robust single-line delegation to a more general helper lemma."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The submission correctly abstracts the proof but requires a docstring for the main theorem and a name that aligns with Mathlib conventions."
+  },
+  "summary": "The proof is robust and well-delegated, but the theorem needs documentation and a conclusion-based name."
+}

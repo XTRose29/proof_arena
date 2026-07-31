@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "No evidence of duplication; the theorem relies cleanly on an auxiliary lemma."
+  },
+  "naming": {
+    "verdict": "strong",
+    "reason": "The name `nash_equilibrium_exists` accurately describes the conclusion of the theorem using standard terminology."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The theorem `nash_equilibrium_exists` is a main result and requires a docstring describing its mathematical meaning. The file is also missing a module docstring."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "The proof is a clean, one-line application of an auxiliary lemma."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The submission lacks required documentation for a main theorem."
+  },
+  "summary": "Please add a module docstring and document the main theorem."
+}

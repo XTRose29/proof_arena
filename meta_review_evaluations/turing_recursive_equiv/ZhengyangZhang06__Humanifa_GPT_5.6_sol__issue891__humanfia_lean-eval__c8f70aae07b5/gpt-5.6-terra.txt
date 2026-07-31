@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The new public theorem is a thin `↔` wrapper whose two directions are exactly discharged by the imported `Helpers.Forward.tm2_of_computable` and `Helpers.Machine.computable_of_tm2`. The code does not show a consumer or additional abstraction that justifies adding this parallel API rather than using those existing directional lemmas."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The name identifies an equivalence theorem and is consistent with the theorem's `↔` conclusion. No new notation or mechanically unconventional casing is introduced."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "There is no module docstring and the public theorem `turing_recursive_equiv` has no docstring. The source provides no documentation of the equivalence or its intended role."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is short, direct, and uses the two imported directional results explicitly. It contains no undocumented `change`/`show`, unfolding-dependent `simpa`, or long rewrite chain."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "Although the proof itself is clear, the declaration appears to be an unnecessary public packaging of two already imported lemmas and lacks documentation."
+  },
+  "summary": "A concise proof built from existing lemmas, but the added wrapper and its public API are undocumented and need justification."
+}

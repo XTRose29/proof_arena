@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "strong",
+    "reason": "The code perfectly reuses the existing result from `BoundaryContradiction` without duplicating logic."
+  },
+  "naming": {
+    "verdict": "strong",
+    "reason": "The name `chebyshev_sign_change` is accurate and standard for this result."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The file lacks a module docstring, and the main public theorem `chebyshev_sign_change` is undocumented."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a direct, robust exact application of the underlying theorem."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The code is technically sound and cleanly structured, but it is missing required documentation."
+  },
+  "summary": "A clean top-level wrapper for the main result that requires a docstring."
+}

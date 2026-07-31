@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The theorem `pick` is a thin wrapper that just calls `InductiveSolution.pick hn v hsimple` with the same hypotheses and conclusion, duplicating an existing declaration rather than adding new material."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The name `pick` matches the source declaration `InductiveSolution.pick` and describes the conclusion (area formula), consistent with the wrapped theorem's naming."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "There is no module docstring for the file and no docstring on the public theorem `pick`, despite it being the file's sole exported declaration."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "The proof is a single direct application of the existing lemma with no undocumented defeq tricks or brittle rewriting, though it contributes no new reasoning of its own."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The file only re-exports `InductiveSolution.pick` under a new name without documentation, which is a duplication and documentation gap even though the proof itself is unobjectionable."
+  },
+  "summary": "This is a thin, undocumented wrapper around an existing theorem rather than a genuine new contribution."
+}

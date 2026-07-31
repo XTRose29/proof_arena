@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "strong",
+    "reason": "The theorem reuses `Submission.SubgroupReduction.SubgroupMembershipCertificate.sound` applied to `AffineCertificate.certificate` rather than rederiving the reduction or certificate argument."
+  },
+  "naming": {
+    "verdict": "strong",
+    "reason": "The name `novikov_unsolvable` concisely describes the existential unsolvability conclusion, and the file introduces no notation."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The public theorem `novikov_unsolvable` has no docstring, and the file has no module docstring describing the material it contains."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a direct `exact` application of the certificate soundness theorem and contains no brittle rewriting, definitional-equality manipulation, or duplicated intermediate reasoning."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The implementation is concise and effectively reuses the existing certificate API, but the exported theorem and file lack documentation."
+  },
+  "summary": "A clean one-line reuse proof that needs basic module and public-theorem documentation."
+}

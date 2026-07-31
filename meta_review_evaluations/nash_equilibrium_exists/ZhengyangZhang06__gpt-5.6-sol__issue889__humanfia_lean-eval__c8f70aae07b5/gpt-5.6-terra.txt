@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "strong",
+    "reason": "The theorem is a thin public forwarding declaration to `nash_equilibrium_exists_aux u` imported from `Submission.Nash`; no proof logic or parallel construction is duplicated in this file."
+  },
+  "naming": {
+    "verdict": "strong",
+    "reason": "The name `nash_equilibrium_exists` directly describes the existential conclusion for `IsNashEquilibrium` and is placed consistently in the `Submission` namespace."
+  },
+  "documentation": {
+    "verdict": "adequate",
+    "reason": "The file contains only a short public theorem wrapper, so the absence of a module docstring is not clearly problematic from the visible scope; however, the public theorem has no docstring."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a direct application of the imported auxiliary theorem, with no brittle rewriting, definitional-equality manipulation, or unnecessary proof scaffolding."
+  },
+  "overall": {
+    "verdict": "strong",
+    "reason": "This is a concise, readable exported theorem that reuses the existing auxiliary result directly."
+  },
+  "summary": "A minimal and clean wrapper around the imported Nash-equilibrium existence result."
+}

@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The theorem `feit_thompson` is an unnecessary thin wrapper that directly aliases `OddOrder.feitThompson`, which violates the rule against duplicating existing material."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The name accurately identifies the Feit-Thompson theorem using standard terminology (casing issues are left to the linter)."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The file lacks a module docstring and the public theorem `feit_thompson` is completely undocumented."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "The proof is a straightforward, robust exact application of the existing theorem, though this emphasizes its redundancy."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The submission consists of an undocumented, unnecessary wrapper around an already existing library theorem."
+  },
+  "summary": "The PR introduces an undocumented and unnecessary alias for an existing theorem."
+}

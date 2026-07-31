@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "The theorem is proved purely by composing two existing Helpers lemmas (momentConfiguration_hausdorffBounded and hausdorffBounded_momentConfiguration) rather than re-deriving the argument, which is appropriate reuse, though without visibility into Helpers/Explore it cannot be confirmed this iff isn't already stated elsewhere."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The name hausdorff_hildebrandt_schoenberg follows a person-named convention rather than describing the conclusion (e.g. isMomentConfiguration_iff_hausdorffBounded), but Mathlib does retain such attributions for classical named theorems, so this is a borderline rather than clear violation."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "There is no module docstring for this file and no docstring on the theorem explaining what IsMomentConfiguration/HausdorffBounded mean or why the equivalence matters, despite it being the file's sole substantive declaration."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a short, clear constructor/exact pair directly discharging each direction via named Helpers lemmas, with no defeq tricks, brittle rewrite chains, or unjustified change/show."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The proof itself is clean and reuses Helpers appropriately, but the complete absence of a module docstring and theorem documentation is a clear rubric violation."
+  },
+  "summary": "A concise, well-composed proof let down by missing documentation."
+}

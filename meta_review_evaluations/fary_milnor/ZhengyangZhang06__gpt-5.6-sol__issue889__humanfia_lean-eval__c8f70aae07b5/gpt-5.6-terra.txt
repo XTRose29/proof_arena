@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "strong",
+    "reason": "The proof directly reuses `Helpers.isUnknotted_of_nontrivial_curvature_gt` and `Helpers.totalCurvature_gt_four_pi_of_not_unknotted` rather than reproving the curvature argument."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The theorem name identifies the Fary--Milnor context and the total-curvature hypothesis, while the statement concludes `IsUnknotted r` without overstating a converse or equality."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The shown substantive source has no module docstring, and the public theorem `fary_milnor_total_curvature` has no docstring describing its result."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is short and readable, applying the existing helper implication and then supplying its curvature premise explicitly. It contains no undocumented `change`/`show` steps or brittle rewrite chain."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The implementation effectively reuses the available helper API, but the missing module and public-theorem documentation do not meet the documentation rubric."
+  },
+  "summary": "A concise helper-based proof whose main deficiency is missing documentation."
+}

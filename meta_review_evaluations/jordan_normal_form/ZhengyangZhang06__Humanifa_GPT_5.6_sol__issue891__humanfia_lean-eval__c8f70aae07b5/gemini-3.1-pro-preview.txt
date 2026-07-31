@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "strong",
+    "reason": "Appropriately delegates the main proof to a helper lemma without duplicating logic."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The name describes the conclusion well and aligns with the expected mathematical result, although the linter will enforce the Lean 4 casing convention."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The file lacks a module docstring, and the main public theorem `jordan_normal_form` is missing a docstring explaining what it asserts."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a direct, robust one-line application of the helper lemma."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The logic and delegation are sound, but the required file-level and theorem-level documentation is completely missing."
+  },
+  "summary": "Solid proof delegation but missing all documentation."
+}

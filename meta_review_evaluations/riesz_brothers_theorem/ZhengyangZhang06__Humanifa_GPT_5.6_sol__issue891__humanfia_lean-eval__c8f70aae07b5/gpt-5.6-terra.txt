@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The sole declaration is a thin wrapper: `Submission.riesz_brothers_theorem` has exactly the same parameters, hypothesis, and conclusion as `Helpers.riesz_brothers_theorem`, and its proof is only a direct application of that existing theorem."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The name describes the stated result and is consistent with the reused `Helpers.riesz_brothers_theorem`; no notation is introduced."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "This substantive file has no module docstring, and the new public theorem has no docstring explaining the result or why this namespace-level alias is needed."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "The proof is concise and explicit, consisting solely of the direct reuse of `Helpers.riesz_brothers_theorem`; there are no brittle rewrites or undocumented definitional-equality manipulations."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "Although the proof is clean, the file adds only an undocumented namespace wrapper around an already available theorem, with no visible specialization or additional API value."
+  },
+  "summary": "Remove or justify the duplicate wrapper, and add appropriate module and declaration documentation if it remains."
+}

@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "strong",
+    "reason": "The theorem directly reuses `Helpers.exists_multiply_recurrent_of_continuous` and supplies the homeomorphism's continuity via `T.continuous`, rather than reproving recurrence."
+  },
+  "naming": {
+    "verdict": "strong",
+    "reason": "The name `furstenberg_topological_recurrence` describes the recurrence conclusion and does not overstate the existential theorem."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The substantive public theorem has no docstring, and the shown file has no module docstring explaining the result or its role."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a short, explicit reuse proof; `simpa only [IsMultiplyRecurrent]` makes the required unfolding visible and avoids a brittle rewrite chain."
+  },
+  "overall": {
+    "verdict": "adequate",
+    "reason": "The implementation is concise and effectively reuses the available helper, but documentation is missing for the public result and module."
+  },
+  "summary": "A clean wrapper around an existing continuity-based recurrence result, needing documentation."
+}

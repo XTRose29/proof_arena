@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "strong",
+    "reason": "The theorem delegates directly to `Submission.Helpers.hippocrates_from_lemmas` rather than re-deriving the result. No duplicate proof machinery is introduced in this file."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "`hippocrates_lunes` describes the subject of the stated volume identity, though it is less explicit than a name mentioning the volume equation would be."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The file has no module docstring, and the new public theorem `hippocrates_lunes` has no docstring."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a single explicit application of the helper theorem with all arguments supplied; it contains no brittle rewriting, undocumented definitional-equality manipulation, or duplicated reasoning."
+  },
+  "overall": {
+    "verdict": "adequate",
+    "reason": "The implementation is concise and reuses an existing helper effectively, but the substantive public declaration lacks the documentation required by the rubric."
+  },
+  "summary": "A clean one-line wrapper around an existing helper, but missing module and theorem documentation."
+}

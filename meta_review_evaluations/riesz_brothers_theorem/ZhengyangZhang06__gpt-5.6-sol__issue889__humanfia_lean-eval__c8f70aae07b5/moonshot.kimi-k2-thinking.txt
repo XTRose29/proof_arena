@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The theorem is a thin wrapper that directly calls Helpers.riesz_brothers_theorem with identical signature, creating unnecessary duplication."
+  },
+  "naming": {
+    "verdict": "needs_work",
+    "reason": "Uses lowercase 'riesz' for a proper name theorem and the nonstandard 'brothers_theorem' suffix that doesn't describe the mathematical conclusion in standard Mathlib terminology."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "No module docstring and the public theorem lacks a docstring, despite its purpose not being clear from the nonstandard name."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "Proof is a single robust application of the helper theorem, avoiding brittle rewriting chains."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "Unnecessary wrapper duplication, nonstandard naming, and missing documentation need addressing despite the clean proof structure."
+  },
+  "summary": "Redundant wrapper with nonstandard naming and no documentation."
+}

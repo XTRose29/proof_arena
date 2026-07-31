@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "strong",
+    "reason": "The theorem is proved by directly invoking an existing `SubgroupMembershipCertificate.sound` lemma applied to `AffineCertificate.certificate`, reusing prior infrastructure rather than re-deriving it."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "`novikov_unsolvable` matches its conclusion (existence of an unsolvable word problem instance) in plain terms consistent with the imported `NovikovUnsolvableProblem` namespace."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The file has no module docstring and the theorem itself carries no docstring explaining the statement, despite being the capstone result of the submission."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a single `exact` application of an existing sound-certificate lemma, with no brittle rewrite chains, `change`/`show` tricks, or unjustified defeq reliance."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The proof and reuse are clean, but the total absence of documentation on this key theorem and file is a clear gap."
+  },
+  "summary": "Solid, minimal proof that reuses existing certificate machinery, but it lacks any documentation for the file or the main theorem."
+}

@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "The code efficiently reuses an existing helper lemma (`Helpers.exists_multiply_recurrent_of_continuous`) rather than duplicating the recurrence logic."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The theorem name `furstenberg_topological_recurrence` correctly and clearly identifies the standard mathematical result being formalized."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The file is missing a module docstring, and the main public theorem is completely undocumented."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a concise and robust one-liner that effectively uses `simpa only` to apply the continuous function helper lemma."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "While the proof and naming are well-executed, the complete lack of documentation for the file and main theorem needs to be addressed."
+  },
+  "summary": "Robust and concise proof that relies on a helper lemma, but requires module and theorem docstrings."
+}

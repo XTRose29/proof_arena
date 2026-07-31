@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "strong",
+    "reason": "The theorem is proved by directly applying an existing helper (`Helpers.DoubleQuaternionManifoldCertificate.exists_nonlinear`) to an existing certificate (`ConnectedSumCertificate.certificate`), which is exactly the kind of composition of existing developments the rubric asks for, with no visible re-derivation of plumbing."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The name `nonlinear_three_manifold_group` roughly matches the conclusion (existence of a 3-manifold whose fundamental group has no injective representation into GL(4,ℝ)), and there is no overclaiming of uniqueness or a missing converse in the statement."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "There is no module docstring for this file and no docstring on the theorem itself explaining the statement or its significance, despite it being the substantive result of the file."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a single `exact` applying an existing lemma to an existing certificate, with no brittle rewrite chains, `change`/`show` tricks, or undocumented defeq reliance."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The proof itself is clean and reuses existing infrastructure well, but the complete absence of documentation on a public, substantive theorem is a clear rubric violation."
+  },
+  "summary": "A well-factored one-line proof reusing existing certificates, but it lacks any docstring explaining the theorem or the file's purpose."
+}

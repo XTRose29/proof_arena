@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "The theorem is a thin public-facing wrapper around `Helpers.jordan_brouwer_of_stable_commutation`, but the wrapper gives the result a concise domain-level name and introduces no duplicated proof."
+  },
+  "naming": {
+    "verdict": "strong",
+    "reason": "`jordan_brouwer` names the stated separation result directly, and the argument names are conventional and proportionate to their roles."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The new public theorem `jordan_brouwer` has no docstring, and the file contains no module docstring describing the exposed result."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a single explicit application of the helper theorem, with no brittle rewriting, definitional-equality manipulation, or unnecessary intermediate steps."
+  },
+  "overall": {
+    "verdict": "adequate",
+    "reason": "The code is concise and readable, but the exported theorem should be documented."
+  },
+  "summary": "A clean one-line wrapper with appropriate naming; add documentation for the public API."
+}

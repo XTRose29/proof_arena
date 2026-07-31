@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "Clean wrapper around auxiliary lemma; cannot verify necessity without searching Mathlib."
+  },
+  "naming": {
+    "verdict": "strong",
+    "reason": "Descriptive name follows standard conventions."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "No docstring on theorem or module."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "Simple, robust delegation to auxiliary lemma."
+  },
+  "overall": {
+    "verdict": "adequate",
+    "reason": "Well-structured but undocumented."
+  },
+  "summary": "Needs documentation; otherwise clean."
+}

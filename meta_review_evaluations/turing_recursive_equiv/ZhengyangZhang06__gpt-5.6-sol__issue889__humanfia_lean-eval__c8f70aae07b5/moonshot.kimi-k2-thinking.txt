@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "The proof appropriately uses existing helper lemmas via `exact` without re-deriving their content, but I cannot verify from the visible code whether the overall equivalence duplicates existing Mathlib results."
+  },
+  "naming": {
+    "verdict": "needs_work",
+    "reason": "`turing_recursive_equiv` is misleading: the statement involves `Computable` and `TM2Computable`, not 'recursive' functions. A standard name like `computable_iff_tm2computable` would describe the conclusion accurately."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "Missing module docstring for the file and missing theorem docstring. The equivalence between two computability notions requires explanation of what each side represents and why the result matters."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is concise (4 lines), uses robust tactics (`constructor`, `exact`, `rintro`), avoids brittle rewrite chains, and doesn't rely on undocumented definitional equality."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "Solid proof structure but blocked by poor naming and completely missing documentation. The naming violates the 'describe the conclusion' convention and overstates by mentioning 'recursive'."
+  },
+  "summary": "Concise proof with good structure undermined by misleading naming and missing documentation."
+}

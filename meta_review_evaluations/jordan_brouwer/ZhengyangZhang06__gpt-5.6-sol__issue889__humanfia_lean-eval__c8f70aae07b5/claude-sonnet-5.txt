@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "The theorem is a thin wrapper delegating to Helpers.jordan_brouwer_of_stable_commutation, but since that helper appears to be part of the same submission (imported via Submission.StableUniqueness) rather than an existing Mathlib/TauCeti lemma, this reads as intended final-assembly structuring rather than duplication."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The name jordan_brouwer matches the theorem's classical name and its conclusion (separation into two connected components), consistent with naming a result after its classical statement."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "There is no module docstring and no docstring on the public theorem jordan_brouwer explaining the statement, hypotheses, or significance, despite this being the main exported result."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a single direct `exact` application of an already-proved lemma with matching arguments, with no brittle rewriting chains, `change`/`show` tricks, or hidden defeq reliance."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The core logic and proof are clean and appropriately delegated, but the file lacks any documentation for its main theorem, which the rubric requires for public/main results."
+  },
+  "summary": "A clean, minimal wrapper theorem with a sound direct proof, but it needs a docstring explaining the statement since it is the main exported result."
+}

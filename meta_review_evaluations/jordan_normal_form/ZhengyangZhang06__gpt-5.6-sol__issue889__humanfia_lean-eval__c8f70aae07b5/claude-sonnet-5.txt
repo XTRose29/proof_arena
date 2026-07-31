@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The theorem is a thin wrapper that simply invokes `Helpers.jordanChainBasis f` with an identical statement, adding no new content beyond re-exporting the helper lemma under a different name."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "`jordan_normal_form` accurately describes the conclusion (existence of a Jordan chain basis) and no notation is introduced, though it merely restates the name of the underlying `Helpers` lemma."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "There is no module docstring for this file and no docstring on the `jordan_normal_form` theorem explaining what it asserts or why it exists as a separate wrapper."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "The one-line proof directly applies an existing lemma with matching signature, so it is simple and non-brittle, though its sole purpose is to forward `Helpers.jordanChainBasis`."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The declaration is an undocumented thin wrapper around an existing helper theorem, which duplicates content and misses documentation requirements even though the proof itself is trivially correct."
+  },
+  "summary": "A minimal, undocumented wrapper around `Helpers.jordanChainBasis` that adds no new mathematical content and lacks the required docstrings."
+}

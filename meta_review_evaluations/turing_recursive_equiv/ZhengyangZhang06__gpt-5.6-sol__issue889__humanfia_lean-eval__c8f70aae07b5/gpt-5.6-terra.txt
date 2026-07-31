@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "`turing_recursive_equiv` is a thin public wrapper that merely combines `Helpers.Forward.tm2_of_computable` and `Helpers.Machine.computable_of_tm2` into an iff; the source shows no additional construction or API use justifying the parallel declaration."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The theorem name identifies an equivalence concerning Turing computability and does not overstate the iff conclusion. No new notation is introduced."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The supplied source contains no module docstring and the public theorem `turing_recursive_equiv` has no docstring."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is short and direct: it constructs each implication using the imported forward and reverse lemmas, without brittle rewriting or undocumented definitional-equality manipulation."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The implementation is clean, but it adds an undocumented public iff wrapper over two existing imported results without visible justification for the duplicate API."
+  },
+  "summary": "A concise proof, but the public wrapper should be justified or avoided and documented."
+}

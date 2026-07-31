@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The theorem body is a bare one-line application `nash_equilibrium_exists_aux u`, i.e. a thin wrapper around an already-proved auxiliary lemma from the same import; without evidence that the wrapper adds a generalization or new hypotheses, this looks like exactly the 'unnecessary thin wrapper' pattern the rubric flags."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "`nash_equilibrium_exists` accurately reads off its conclusion (`∃ σ, IsNashEquilibrium u σ`) and matches the vocabulary of the imported `IsNashEquilibrium` predicate, with no notation introduced."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "There is no module docstring for the file and no docstring on the public theorem `nash_equilibrium_exists`, despite it being the file's main declaration."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "The proof is a single clean term-mode application with no `change`/`show` tricks or brittle rewrite chains, though its triviality reinforces that it may just be re-exposing `nash_equilibrium_exists_aux` rather than doing independent work."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The file's only content is an undocumented thin wrapper delegating to `nash_equilibrium_exists_aux`, which raises duplication and documentation concerns even though naming and proof style are fine."
+  },
+  "summary": "A minimal, clean-looking wrapper theorem that likely duplicates an existing aux lemma and lacks any documentation."
+}

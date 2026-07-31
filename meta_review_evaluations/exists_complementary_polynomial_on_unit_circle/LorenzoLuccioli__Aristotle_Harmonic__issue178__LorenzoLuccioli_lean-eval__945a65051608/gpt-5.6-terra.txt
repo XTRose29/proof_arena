@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The sole public theorem is a thin wrapper around `Submission.Helpers.exists_complementary_core P hP` with the same arguments and elaborated conclusion. Unless this wrapper has a documented API purpose, callers can use `Submission.Helpers.exists_complementary_core` directly."
+  },
+  "naming": {
+    "verdict": "strong",
+    "reason": "The name describes the existential conclusion and its `Circle`-restricted setting, without overstating uniqueness or equivalence."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The source has no module docstring, and the public theorem has no docstring explaining the complementary-polynomial result or why this exported wrapper is needed."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a direct invocation of an existing helper and contains no brittle rewrite chain, undocumented definitional-equality manipulation, or unnecessary intermediate steps."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "Although the proof is concise and robust, the file exports an undocumented thin wrapper of an existing helper and lacks the requested documentation."
+  },
+  "summary": "A clean one-line proof, but the public wrapper should be justified or removed and documented."
+}

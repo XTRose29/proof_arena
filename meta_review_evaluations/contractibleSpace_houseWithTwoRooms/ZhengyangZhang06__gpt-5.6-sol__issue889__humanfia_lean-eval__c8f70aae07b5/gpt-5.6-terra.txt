@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The sole public theorem is an exact thin wrapper around `Helpers.contractibleSpace_houseWithTwoRooms` with the identical conclusion. The existing helper can be used directly, so this declaration duplicates API without adding specialization or new content."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The name states the conclusion and follows the visible naming of the reused helper. No notation is introduced."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The source contains no module docstring and the public theorem has no docstring. Even though the theorem is short, it exports a substantive result about `HouseWithTwoRooms` without documentation."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "The proof is transparent and robust: `exact Helpers.contractibleSpace_houseWithTwoRooms` directly identifies the reused theorem. However, the wrapper itself should be removed under the reuse criterion."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The file adds only a duplicate public wrapper of an existing helper and provides no documentation. Prefer using `Helpers.contractibleSpace_houseWithTwoRooms` directly."
+  },
+  "summary": "A clear one-line proof, but it should not introduce a duplicate theorem and lacks required documentation."
+}

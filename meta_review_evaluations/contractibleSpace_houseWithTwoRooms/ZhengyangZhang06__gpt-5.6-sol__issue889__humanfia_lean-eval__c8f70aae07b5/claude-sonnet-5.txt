@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "The theorem simply delegates to Helpers.contractibleSpace_houseWithTwoRooms, which is part of the submission's own helper module rather than an external Mathlib/TauCeti lemma, so it does not duplicate outside material, though it adds no content beyond forwarding."
+  },
+  "naming": {
+    "verdict": "strong",
+    "reason": "The name contractibleSpace_houseWithTwoRooms directly matches the conclusion ContractibleSpace HouseWithTwoRooms, following the predicate-first Mathlib convention."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "There is no module docstring explaining the file's purpose and no docstring on the theorem itself, despite it being the main declaration of the file."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The single-line `exact` proof directly closes the goal with an existing lemma, with no brittle rewrite chains, defeq tricks, or unjustified tactics."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The proof and naming are fine, but the complete absence of documentation on a public top-level theorem is a clear rubric violation."
+  },
+  "summary": "A clean, minimal wrapper theorem with good naming and a trivial correct proof, but it lacks any module or declaration documentation."
+}

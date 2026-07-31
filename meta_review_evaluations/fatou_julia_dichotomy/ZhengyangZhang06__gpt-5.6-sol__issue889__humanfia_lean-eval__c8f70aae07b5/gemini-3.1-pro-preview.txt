@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The theorem `julia_cantor_dichotomy` is an unnecessary `∧`-bundle of two existing lemmas (`Connected.isConnected_filledJulia_of_mem_mandelbrot` and `Escaping.homeomorph_cantor_of_not_mem_mandelbrot`), which violates the guideline against bundling existing lemmas."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The name captures the intent of the dichotomy, though standard Mathlib naming might typically prefer describing the structure of the conjunction."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The public theorem `julia_cantor_dichotomy` is missing a docstring explaining its statement."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "The proof is a direct, robust application of `exact` using the two component lemmas."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The PR introduces an undocumented `∧`-bundle of existing lemmas without adding fundamentally new standalone material."
+  },
+  "summary": "The public theorem lacks a docstring and merely bundles two previously proven lemmas into a single conjunction."
+}

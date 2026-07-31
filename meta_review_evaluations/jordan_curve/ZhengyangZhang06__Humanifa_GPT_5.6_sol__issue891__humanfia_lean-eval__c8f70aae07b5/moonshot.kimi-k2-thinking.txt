@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "Theorem is a thin wrapper that directly duplicates `Transport.jordan_curve_euclidean` with identical arguments and proof."
+  },
+  "naming": {
+    "verdict": "needs_work",
+    "reason": "Name `jordan_curve` is generic and inconsistent with the existing `jordan_curve_euclidean`; does not describe the conclusion."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "Public theorem `jordan_curve` lacks a docstring."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "Proof uses a single `exact` tactic correctly, though the theorem itself is unnecessary duplication."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "Unnecessary duplication within the same codebase; should be removed or merged with `Transport.jordan_curve_euclidean`."
+  },
+  "summary": "Avoid duplication: theorem is identical to existing `jordan_curve_euclidean`."
+}

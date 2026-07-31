@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "Proof appropriately delegates to a helper lemma, avoiding duplication in the visible code."
+  },
+  "naming": {
+    "verdict": "strong",
+    "reason": "Name uses standard terminology and matches the conclusion's strength."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "Public theorem `jordan_normal_form` lacks a required docstring."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "Proof is concise, robust, and directly applies a helper lemma."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "Missing documentation for the main theorem is a blocking issue."
+  },
+  "summary": "Missing documentation for major theorem."
+}

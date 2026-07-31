@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "strong",
+    "reason": "Effectively reuses existing helper lemmas for both directions of the equivalence without duplicating logic."
+  },
+  "naming": {
+    "verdict": "needs_work",
+    "reason": "The name `turing_recursive_equiv` does not match the statement's components. Following Mathlib conventions, it should describe the conclusion, such as `computable_iff_tm2Computable`."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The public main theorem lacks a docstring. A brief explanation of the equivalence being established must be added."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is concise, readable, and properly delegates to the helper modules."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The code structure and proofs are good, but the main theorem needs to be renamed for consistency and documented."
+  },
+  "summary": "Rename the theorem to match Mathlib conventions and add a missing docstring."
+}

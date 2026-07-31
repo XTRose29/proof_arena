@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The theorem is a thin wrapper that directly delegates to Helpers.contractibleSpace_houseWithTwoRooms with no added value, constituting unnecessary duplication."
+  },
+  "naming": {
+    "verdict": "strong",
+    "reason": "The name contractibleSpace_houseWithTwoRooms follows standard Mathlib conventions, describing the conclusion using consistent terminology."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "Missing module docstring and theorem docstring despite being a public declaration in a substantive file."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "The proof is a single exact tactic that is robust, though the wrapper's existence itself is questionable design."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "Unnecessary thin wrapper around an existing result with inadequate documentation."
+  },
+  "summary": "Unnecessary duplication via thin wrapper; lacks required documentation."
+}

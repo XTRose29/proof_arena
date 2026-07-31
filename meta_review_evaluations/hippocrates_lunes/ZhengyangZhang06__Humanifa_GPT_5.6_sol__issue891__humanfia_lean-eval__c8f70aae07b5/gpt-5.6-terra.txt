@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "strong",
+    "reason": "The theorem is a thin submission-level entry point that directly reuses `Helpers.hippocrates_lunes_measure` rather than reproving the result."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "`hippocrates_lunes` is concise and matches the imported `HippocratesLunes` context, though the conclusion specifically concerns volumes of the two lunes and a right triangle."
+  },
+  "documentation": {
+    "verdict": "adequate",
+    "reason": "The source is a very small wrapper file with no new definitions or proof development; no misleading documentation is present. There is no module or theorem docstring, but the visible declaration is straightforward."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a single explicit application of the helper theorem, with all parameters and positivity hypotheses passed directly; it avoids brittle rewriting or definitional-equality manipulation."
+  },
+  "overall": {
+    "verdict": "strong",
+    "reason": "This is a minimal, readable wrapper that delegates entirely to an existing helper result and introduces no observable proof complexity."
+  },
+  "summary": "A concise submission theorem that cleanly reuses the provided Hippocrates lunes measure result."
+}

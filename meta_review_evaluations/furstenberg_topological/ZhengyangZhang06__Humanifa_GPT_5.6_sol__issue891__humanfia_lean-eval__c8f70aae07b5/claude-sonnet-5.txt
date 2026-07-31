@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "The theorem is a thin wrapper delegating directly to Helpers.exists_multiply_recurrent_of_continuous, but this is the top-level statement being proved and no evidence of duplicating an existing Mathlib/TauCeti lemma with the same content is visible."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "furstenberg_topological_recurrence describes the conclusion (existence of a multiply recurrent point) using the IsMultiplyRecurrent terminology already established in Helpers, consistent with its usage."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The file has no module docstring and the theorem itself carries no docstring explaining the recurrence result, despite being the main public declaration of a substantive file."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "The proof is a single concise simpa only unfolding IsMultiplyRecurrent to apply the helper lemma, which is robust and not a brittle rewrite chain."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The proof and naming are sound and reuse the helper appropriately, but the complete absence of module and theorem documentation is a clear gap."
+  },
+  "summary": "A concise, correctly-named wrapper theorem with a robust proof, but it lacks any documentation."
+}

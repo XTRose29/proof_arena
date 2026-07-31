@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The theorem appears to be a thin wrapper around `Helpers.hippocrates_lunes_measure`; if that lemma is publicly accessible, this duplicates existing API."
+  },
+  "naming": {
+    "verdict": "needs_work",
+    "reason": "The name `hippocrates_lunes` does not describe the equality conclusion in standard Mathlib terminology; it should reflect the volume equality."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The file lacks a module docstring and the theorem has no docstring, failing to explain its purpose."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a single robust `exact` application with no fragile automation or hidden steps."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The submission introduces a thin wrapper with naming and documentation issues; verify if duplication can be eliminated."
+  },
+  "summary": "Thin wrapper theorem lacks documentation and has nonstandard naming; consider removal or improvement."
+}

@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "`Submission.mergelyan` is an unnecessary thin public wrapper around `Helpers.exists_mergelyan_polynomial`: its statement is instantiated directly by that declaration and its proof is only `exact` application. Call `Helpers.exists_mergelyan_polynomial` at use sites, or provide a substantive API distinction."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The name `mergelyan` is concise and corresponds to the approximation conclusion. No new notation is introduced."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The public theorem `mergelyan` has no docstring, and the file contains no module docstring describing the exported result."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a clear one-step application of the underlying theorem, with no brittle rewriting, definitional-equality manipulation, or unnecessary intermediate steps."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "Although the proof is clean, the declaration duplicates `Helpers.exists_mergelyan_polynomial` as a public wrapper and lacks documentation."
+  },
+  "summary": "Remove or justify the thin wrapper and document any retained public API."
+}

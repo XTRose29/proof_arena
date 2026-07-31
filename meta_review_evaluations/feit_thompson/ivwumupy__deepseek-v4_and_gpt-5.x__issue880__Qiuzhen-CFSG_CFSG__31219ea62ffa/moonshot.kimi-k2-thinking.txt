@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The theorem `feit_thompson` is a thin wrapper around `odd_order_theorem`; the same result is already available, so this declaration duplicates existing functionality."
+  },
+  "naming": {
+    "verdict": "needs_work",
+    "reason": "The name `feit_thompson` uses a proper name rather than describing the conclusion (e.g., `IsSolvable G`), which violates Mathlib's convention of avoiding eponymous theorem names."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The main public theorem lacks a docstring; every public theorem should have a docstring that describes the result, not the proof."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is concise and robust, using a single `apply` followed by `exact` with no brittle chains or undocumented definitional steps."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The PR introduces a duplicate theorem with nonstandard naming and missing documentation; these issues should be resolved before merging."
+  },
+  "summary": "Thin wrapper over existing theorem with nonstandard naming and missing doc."
+}

@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "`Submission.pick` has exactly the same parameters, hypotheses, and conclusion as `InductiveSolution.pick`, and its body is only `InductiveSolution.pick hn v hsimple`. This is an unnecessary public thin wrapper around the imported declaration."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The theorem is named `pick`, matching the imported theorem it forwards to, and no new notation is introduced."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The public theorem has no docstring, and the supplied source contains no module docstring explaining the file's purpose."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a direct qualified application of the imported theorem, with no brittle rewriting, undocumented definitional-equality manipulation, or unnecessary intermediate steps."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "Although the proof is clean, the file only republishes `InductiveSolution.pick` under a new public name and provides no documentation."
+  },
+  "summary": "Clean forwarding proof, but it should reuse the imported theorem directly rather than add an undocumented duplicate wrapper."
+}

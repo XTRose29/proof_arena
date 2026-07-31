@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "strong",
+    "reason": "The theorem is a thin, appropriately named submission-facing wrapper around `Helpers.jordanChainBasis f`; the code visibly reuses that existing helper rather than reproving the result."
+  },
+  "naming": {
+    "verdict": "strong",
+    "reason": "`jordan_normal_form` concisely describes the existence conclusion involving `JordanChainBasis f`, and no new notation is introduced."
+  },
+  "documentation": {
+    "verdict": "adequate",
+    "reason": "This is a very small wrapper-only file with no substantive new definition or proof structure. It contains no module or declaration docstring, but the declaration's purpose is apparent from its statement and direct delegation."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a direct application of `Helpers.jordanChainBasis f`, with no brittle rewrite chains, definitional-equality manipulation, or duplicated reasoning."
+  },
+  "overall": {
+    "verdict": "strong",
+    "reason": "The source is minimal and readable, exposing the requested theorem by directly reusing the available helper."
+  },
+  "summary": "A concise wrapper theorem that cleanly delegates to the existing Jordan-chain-basis result."
+}

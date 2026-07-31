@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The new theorem is a thin wrapper around `BurnsideCharacter.isSolvable_of_card_dvd_prime_pow_mul_prime_pow`: its proof only applies that theorem and rewrites `hcard` to obtain the required divisibility. The equality-specialized declaration adds no visible reasoning or API beyond the existing divisibility result."
+  },
+  "naming": {
+    "verdict": "strong",
+    "reason": "The name accurately describes the assumptions and conclusion visible in the statement: a finite group's solvability follows when its cardinality equals a product of two prime powers."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The source contains neither a module docstring nor a docstring for the public theorem, so the purpose of this exported equality-specialized result is undocumented."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "The proof is short and directly reuses the imported theorem rather than reconstructing its argument. However, the explicitly named `_hpq : p ≠ q` hypothesis is unused by the proof, which makes the statement carry a visibly redundant assumption."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "Although the proof is concise and the name is descriptive, the declaration is a minimal wrapper over an existing theorem and lacks documentation."
+  },
+  "summary": "A concise wrapper with clear naming, but it should justify its separate API or rely on the existing divisibility theorem and add documentation."
+}

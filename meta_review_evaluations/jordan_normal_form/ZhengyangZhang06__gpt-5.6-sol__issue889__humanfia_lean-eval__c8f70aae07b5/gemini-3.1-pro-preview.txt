@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "The code effectively delegates the main result to an existing helper lemma rather than duplicating logic."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The theorem name `jordan_normal_form` accurately describes the conclusion and follows standard conventions."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The file is missing a module docstring, and the main public theorem `jordan_normal_form` is completely undocumented."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "The proof is a concise and robust one-liner that correctly delegates to a factored helper."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The code is structurally sound and clean, but fails to meet documentation requirements for files and public theorems."
+  },
+  "summary": "Clean delegation to a helper lemma, but missing all required documentation."
+}

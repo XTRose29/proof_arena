@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "This is a thin wrapper that immediately delegates to Helpers.jordanChainBasis. As a standard result about Jordan normal form existence, it very likely duplicates Mathlib content. Search Mathlib for existing Jordan normal form theorems to verify."
+  },
+  "naming": {
+    "verdict": "strong",
+    "reason": "The name jordan_normal_form clearly describes the conclusion using standard mathematical terminology, matching the statement's claim about existence of a Jordan chain basis."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The theorem jordan_normal_form is a public main theorem but lacks a docstring describing the result, which is required by Mathlib conventions."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a single, robust tactic application (Helpers.jordanChainBasis f) that factors all substantial reasoning into a reusable helper lemma, avoiding brittle chains."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The theorem is well-named and cleanly factored but lacks required documentation and likely duplicates existing Mathlib results for this standard linear algebra theorem."
+  },
+  "summary": "An undocumented thin wrapper that may duplicate Mathlib's Jordan normal form theorem despite clean factoring."
+}

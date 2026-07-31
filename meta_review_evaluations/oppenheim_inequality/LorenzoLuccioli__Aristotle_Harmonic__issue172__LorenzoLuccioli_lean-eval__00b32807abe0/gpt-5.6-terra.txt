@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "The theorem is a direct forwarding wrapper around `Submission.Helpers.oppenheim_general`; the source makes the dependency explicit. No evidence in the supplied code establishes whether this public alias has independent consumers or is an unnecessary duplicate."
+  },
+  "naming": {
+    "verdict": "strong",
+    "reason": "`oppenheim_inequality` describes the stated determinant inequality and is placed in the `Submission` namespace. No new notation is introduced."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The new public theorem has no docstring. The file fragment also contains no module docstring describing the material it provides."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a single direct application of the existing helper theorem, with no brittle rewriting, definitional-equality manipulation, or duplicated proof steps."
+  },
+  "overall": {
+    "verdict": "adequate",
+    "reason": "The implementation is concise and clearly reuses an existing result, but the exposed public theorem and file lack documentation; the wrapper's necessity is not demonstrated by the supplied source."
+  },
+  "summary": "A minimal, readable wrapper proof, but public documentation is missing and the value of the extra alias is unclear from the code."
+}

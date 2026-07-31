@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The theorem is a thin wrapper around Transport.jordan_curve_euclidean with identical arguments, creating unnecessary API duplication without adaptation."
+  },
+  "naming": {
+    "verdict": "needs_work",
+    "reason": "The name jordan_curve is vague and nonstandard; it fails to describe the conclusion (exactly two connected components) and is inconsistent with the underlying lemma."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "Missing both module docstring and theorem docstring; a major result like the Jordan curve theorem requires clear documentation."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is concise and robust, using a single exact tactic to directly apply the existing theorem without brittle chains."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "Unnecessary duplication of existing API combined with lack of documentation and nonstandard naming."
+  },
+  "summary": "Unnecessary wrapper theorem lacking documentation"
+}

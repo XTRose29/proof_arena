@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "The proof reduces to `tverberg_succ` via a case split on r, delegating the substantive work to an existing lemma rather than reproving it, which is appropriate reuse."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "`tverberg_theorem` names the classical named result being formalized rather than literally describing `HasTverbergPartition`, which is standard practice for canonical named theorems (cf. Mathlib's `wilsons_lemma`-style naming) rather than an overstatement or mismatch with the conclusion."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "There is no module docstring and no docstring on `tverberg_theorem` explaining what Tverberg's theorem states, despite it being the file's main public result."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is short, uses `omega` to dispatch the impossible zero case and a single targeted `simpa only [...]` to align indices before invoking `tverberg_succ`, avoiding brittle lemma chains or undocumented defeq tricks."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The proof itself is clean and reuses existing infrastructure well, but the complete absence of documentation on this main theorem is a clear gap."
+  },
+  "summary": "A concise, well-automated wrapper around `tverberg_succ`, but it lacks any docstring for the main theorem or module."
+}

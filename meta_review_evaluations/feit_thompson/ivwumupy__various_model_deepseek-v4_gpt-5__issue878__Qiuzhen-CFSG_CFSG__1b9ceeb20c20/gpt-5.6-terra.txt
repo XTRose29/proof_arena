@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "`feit_thompson` is a thin public wrapper around `odd_order_theorem`: its proof applies that theorem and supplies exactly `h`. Call `odd_order_theorem h` directly rather than introducing a duplicate declaration."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The name refers to the standard Feit--Thompson result and does not overstate the conclusion. However, the directly used existing theorem is named `odd_order_theorem`, which is more descriptive of the stated hypothesis."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The public theorem `feit_thompson` has no docstring. No module docstring is visible in the supplied source either."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is short, explicit, and uses the existing `odd_order_theorem` directly, without brittle rewriting or undocumented definitional-equality steps."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "Although the proof is clean, the declaration duplicates `odd_order_theorem` as an unnecessary wrapper and lacks documentation."
+  },
+  "summary": "Use the existing `odd_order_theorem` directly and document public material if a separate declaration is retained."
+}

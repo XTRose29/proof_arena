@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The equivalence between Turing computability and general computability is a standard result that likely exists in Mathlib; the trivial proof structure suggests this is unnecessary duplication."
+  },
+  "naming": {
+    "verdict": "needs_work",
+    "reason": "Uses outdated terminology 'recursive' instead of standard 'computable'; name does not follow Mathlib's conclusion-first convention."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "Public theorem lacks a docstring explaining the result and its context."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "Proof is concise and robust, using direct tactics without brittle chains or undocumented defeq."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "Naming and documentation issues, plus likely duplication of standard Mathlib results."
+  },
+  "summary": "Nonstandard naming and missing documentation; appears to duplicate existing Mathlib material."
+}

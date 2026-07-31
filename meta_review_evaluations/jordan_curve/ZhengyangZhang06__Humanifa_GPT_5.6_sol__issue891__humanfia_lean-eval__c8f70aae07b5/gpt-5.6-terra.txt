@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "`Submission.jordan_curve` is a public thin wrapper whose conclusion and hypotheses are discharged directly by `Transport.jordan_curve_euclidean r _hcont _hinj`; the existing theorem is the direct replacement."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The name `jordan_curve` broadly describes the stated connected-components conclusion and no notation is introduced. However, the wrapper adds no distinct API beyond the more specific existing theorem."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The file has no module docstring, and the new public theorem `jordan_curve` has no docstring."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a direct, readable application of `Transport.jordan_curve_euclidean` and contains no brittle rewriting or undocumented definitional-equality manipulation."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "Although the proof is clean, the declaration merely re-exports an existing theorem under a less specific name and lacks required documentation."
+  },
+  "summary": "Remove the redundant wrapper or justify a distinct API, and add module and theorem documentation."
+}

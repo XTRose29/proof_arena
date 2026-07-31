@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "adequate",
+    "reason": "Proof directly reuses existing lemmas from imported files, but we cannot verify if the theorem statement itself duplicates existing material without full codebase context."
+  },
+  "naming": {
+    "verdict": "strong",
+    "reason": "Theorem name `nonlinear_three_manifold_group` clearly describes its conclusion using standard Mathlib terminology and does not overstate."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "Missing module docstring for this substantive file and no docstring on the public theorem explaining its purpose."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "Proof is a single robust `exact` application without brittle chains, undocumented definitional equality, or unnecessary steps."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "Core proof is solid and well-named, but documentation requirements are not met."
+  },
+  "summary": "Missing module and theorem docstrings; otherwise concise and well-structured."
+}

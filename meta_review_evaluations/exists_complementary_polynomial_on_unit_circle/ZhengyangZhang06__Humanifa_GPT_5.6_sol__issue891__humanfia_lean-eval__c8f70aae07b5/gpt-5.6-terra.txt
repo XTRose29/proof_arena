@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The theorem is an unnecessary public thin wrapper: its entire statement is discharged directly by `Helpers.complementary_polynomial P hP`, which is the observable replacement."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "`exists_complementary_polynomial_on_unit_circle` describes the existential conclusion and its unit-circle domain without overstating the result."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The new public theorem has no docstring, and the file contains no module docstring explaining the exported result."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is a direct application of the existing helper theorem, with no brittle rewriting, definitional-equality manipulation, or unnecessary intermediate steps."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "Although the proof cleanly reuses `Helpers.complementary_polynomial`, the new declaration merely duplicates that existing API and is undocumented."
+  },
+  "summary": "Clean one-line reuse, but it should not introduce an undocumented duplicate wrapper."
+}

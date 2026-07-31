@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "strong",
+    "reason": "The proof effectively reuses the existing helpers for both directions instead of duplicating logic."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "The name reflects the mathematical namesake of the theorem and matches its significance."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "The file is missing a module docstring, and the main public theorem lacks a docstring explaining its mathematical significance."
+  },
+  "proof_quality": {
+    "verdict": "strong",
+    "reason": "The proof is concise and cleanly delegates the two directions of the equivalence to appropriate helper lemmas."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The code is logically well-structured but requires documentation for its main theorem and the module itself."
+  },
+  "summary": "Clean and well-structured proof, but requires the addition of a module docstring and a docstring for the main theorem."
+}

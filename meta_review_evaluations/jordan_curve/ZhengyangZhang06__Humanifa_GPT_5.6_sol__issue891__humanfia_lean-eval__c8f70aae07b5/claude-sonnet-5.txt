@@ -1,0 +1,23 @@
+{
+  "reuse": {
+    "verdict": "needs_work",
+    "reason": "The body is exactly `Transport.jordan_curve_euclidean r _hcont _hinj`, restating the same statement and arguments as the existing lemma in `Submission.Transport`; this is a thin wrapper that duplicates an existing declaration rather than adding new content."
+  },
+  "naming": {
+    "verdict": "adequate",
+    "reason": "`jordan_curve` matches standard mathematical terminology for the theorem being proved and does not overstate the statement, though it duplicates the name space already covered by `jordan_curve_euclidean`."
+  },
+  "documentation": {
+    "verdict": "needs_work",
+    "reason": "There is no module docstring for the file and no docstring on the public theorem `jordan_curve` explaining what it states or why the wrapper exists."
+  },
+  "proof_quality": {
+    "verdict": "adequate",
+    "reason": "The one-line `exact` proof is simple and robust, but it exists solely to re-expose `Transport.jordan_curve_euclidean` verbatim, giving the proof no independent content to assess beyond that call."
+  },
+  "overall": {
+    "verdict": "needs_work",
+    "reason": "The theorem is a near-verbatim wrapper around `Transport.jordan_curve_euclidean` with identical hypotheses and conclusion, and lacks any documentation explaining its purpose as a distinct entry point."
+  },
+  "summary": "This file adds a thin, undocumented wrapper around an existing theorem rather than new material."
+}
