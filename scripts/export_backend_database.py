@@ -19,7 +19,18 @@ from app.database import engine
 DEFAULT_OUTPUT_DIR = Path("backend_database_export")
 SENSITIVE_FIELDS = {
     "auth_tokens": {"token"},
-    "users": {"password_hash", "password_salt"},
+    "meta_review_drafts": {"reason"},
+    "meta_review_sessions": {"selection_reason"},
+    "meta_review_votes": {"reason"},
+    "preference_evaluations": {"evaluator_display_name", "general_comment"},
+    "users": {
+        "affiliation",
+        "display_name",
+        "email",
+        "experience_level",
+        "password_hash",
+        "password_salt",
+    },
 }
 PREFERRED_TABLE_ORDER = [
     "questions",

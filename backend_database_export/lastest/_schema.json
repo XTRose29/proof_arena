@@ -1,0 +1,1011 @@
+{
+  "questions": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "INTEGER",
+        "nullable": false,
+        "default": "nextval('questions_id_seq'::regclass)",
+        "primary_key": false
+      },
+      {
+        "name": "canonical_key",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "title",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "slug",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "created_at",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      }
+    ],
+    "primary_key": [
+      "id"
+    ],
+    "foreign_keys": [],
+    "indexes": [
+      {
+        "name": "questions_canonical_key_key",
+        "unique": true,
+        "column_names": [
+          "canonical_key"
+        ],
+        "duplicates_constraint": "questions_canonical_key_key",
+        "include_columns": [],
+        "dialect_options": {
+          "postgresql_include": []
+        }
+      },
+      {
+        "name": "questions_slug_key",
+        "unique": true,
+        "column_names": [
+          "slug"
+        ],
+        "duplicates_constraint": "questions_slug_key",
+        "include_columns": [],
+        "dialect_options": {
+          "postgresql_include": []
+        }
+      }
+    ]
+  },
+  "proofs": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "INTEGER",
+        "nullable": false,
+        "default": "nextval('proofs_id_seq'::regclass)",
+        "primary_key": false
+      },
+      {
+        "name": "question_id",
+        "type": "INTEGER",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "title",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "label",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "author",
+        "type": "TEXT",
+        "nullable": true,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "source_path",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "content",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "line_count",
+        "type": "INTEGER",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "created_at",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      }
+    ],
+    "primary_key": [
+      "id"
+    ],
+    "foreign_keys": [
+      {
+        "name": "proofs_question_id_fkey",
+        "constrained_columns": [
+          "question_id"
+        ],
+        "referred_schema": null,
+        "referred_table": "questions",
+        "referred_columns": [
+          "id"
+        ],
+        "options": {
+          "ondelete": "CASCADE"
+        },
+        "comment": null
+      }
+    ],
+    "indexes": [
+      {
+        "name": "idx_proofs_question_id",
+        "unique": false,
+        "column_names": [
+          "question_id"
+        ],
+        "include_columns": [],
+        "dialect_options": {
+          "postgresql_include": []
+        }
+      },
+      {
+        "name": "proofs_source_path_key",
+        "unique": true,
+        "column_names": [
+          "source_path"
+        ],
+        "duplicates_constraint": "proofs_source_path_key",
+        "include_columns": [],
+        "dialect_options": {
+          "postgresql_include": []
+        }
+      }
+    ]
+  },
+  "preference_evaluations": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "INTEGER",
+        "nullable": false,
+        "default": "nextval('preference_evaluations_id_seq'::regclass)",
+        "primary_key": false
+      },
+      {
+        "name": "user_id",
+        "type": "INTEGER",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "entity_a_proof_id",
+        "type": "INTEGER",
+        "nullable": true,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "entity_b_proof_id",
+        "type": "INTEGER",
+        "nullable": true,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "evaluator_display_name",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "general_comment",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "created_at",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      }
+    ],
+    "primary_key": [
+      "id"
+    ],
+    "foreign_keys": [
+      {
+        "name": "preference_evaluations_entity_a_proof_id_fkey",
+        "constrained_columns": [
+          "entity_a_proof_id"
+        ],
+        "referred_schema": null,
+        "referred_table": "proofs",
+        "referred_columns": [
+          "id"
+        ],
+        "options": {
+          "ondelete": "SET NULL"
+        },
+        "comment": null
+      },
+      {
+        "name": "preference_evaluations_entity_b_proof_id_fkey",
+        "constrained_columns": [
+          "entity_b_proof_id"
+        ],
+        "referred_schema": null,
+        "referred_table": "proofs",
+        "referred_columns": [
+          "id"
+        ],
+        "options": {
+          "ondelete": "SET NULL"
+        },
+        "comment": null
+      },
+      {
+        "name": "preference_evaluations_user_id_fkey",
+        "constrained_columns": [
+          "user_id"
+        ],
+        "referred_schema": null,
+        "referred_table": "users",
+        "referred_columns": [
+          "id"
+        ],
+        "options": {
+          "ondelete": "CASCADE"
+        },
+        "comment": null
+      }
+    ],
+    "indexes": [
+      {
+        "name": "idx_preference_evaluations_user_id",
+        "unique": false,
+        "column_names": [
+          "user_id"
+        ],
+        "include_columns": [],
+        "dialect_options": {
+          "postgresql_include": []
+        }
+      }
+    ]
+  },
+  "preference_votes": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "INTEGER",
+        "nullable": false,
+        "default": "nextval('preference_votes_id_seq'::regclass)",
+        "primary_key": false
+      },
+      {
+        "name": "evaluation_id",
+        "type": "INTEGER",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "criterion",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "preference",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "created_at",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      }
+    ],
+    "primary_key": [
+      "id"
+    ],
+    "foreign_keys": [
+      {
+        "name": "preference_votes_evaluation_id_fkey",
+        "constrained_columns": [
+          "evaluation_id"
+        ],
+        "referred_schema": null,
+        "referred_table": "preference_evaluations",
+        "referred_columns": [
+          "id"
+        ],
+        "options": {
+          "ondelete": "CASCADE"
+        },
+        "comment": null
+      }
+    ],
+    "indexes": [
+      {
+        "name": "idx_preference_votes_evaluation_id",
+        "unique": false,
+        "column_names": [
+          "evaluation_id"
+        ],
+        "include_columns": [],
+        "dialect_options": {
+          "postgresql_include": []
+        }
+      }
+    ]
+  },
+  "users": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "INTEGER",
+        "nullable": false,
+        "default": "nextval('users_id_seq'::regclass)",
+        "primary_key": false
+      },
+      {
+        "name": "email",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "display_name",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "password_hash",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "password_salt",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "created_at",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "affiliation",
+        "type": "TEXT",
+        "nullable": false,
+        "default": "''::text",
+        "primary_key": false
+      },
+      {
+        "name": "experience_level",
+        "type": "TEXT",
+        "nullable": false,
+        "default": "''::text",
+        "primary_key": false
+      }
+    ],
+    "primary_key": [
+      "id"
+    ],
+    "foreign_keys": [],
+    "indexes": [
+      {
+        "name": "users_email_key",
+        "unique": true,
+        "column_names": [
+          "email"
+        ],
+        "duplicates_constraint": "users_email_key",
+        "include_columns": [],
+        "dialect_options": {
+          "postgresql_include": []
+        }
+      }
+    ]
+  },
+  "auth_tokens": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "INTEGER",
+        "nullable": false,
+        "default": "nextval('auth_tokens_id_seq'::regclass)",
+        "primary_key": false
+      },
+      {
+        "name": "user_id",
+        "type": "INTEGER",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "token",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "created_at",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      }
+    ],
+    "primary_key": [
+      "id"
+    ],
+    "foreign_keys": [
+      {
+        "name": "auth_tokens_user_id_fkey",
+        "constrained_columns": [
+          "user_id"
+        ],
+        "referred_schema": null,
+        "referred_table": "users",
+        "referred_columns": [
+          "id"
+        ],
+        "options": {
+          "ondelete": "CASCADE"
+        },
+        "comment": null
+      }
+    ],
+    "indexes": [
+      {
+        "name": "auth_tokens_token_key",
+        "unique": true,
+        "column_names": [
+          "token"
+        ],
+        "duplicates_constraint": "auth_tokens_token_key",
+        "include_columns": [],
+        "dialect_options": {
+          "postgresql_include": []
+        }
+      }
+    ]
+  },
+  "meta_review_criterion_votes": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "INTEGER",
+        "nullable": false,
+        "default": "nextval('meta_review_criterion_votes_id_seq'::regclass)",
+        "primary_key": false
+      },
+      {
+        "name": "vote_id",
+        "type": "INTEGER",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "criterion",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "choice",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "created_at",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      }
+    ],
+    "primary_key": [
+      "id"
+    ],
+    "foreign_keys": [
+      {
+        "name": "meta_review_criterion_votes_vote_id_fkey",
+        "constrained_columns": [
+          "vote_id"
+        ],
+        "referred_schema": null,
+        "referred_table": "meta_review_votes",
+        "referred_columns": [
+          "id"
+        ],
+        "options": {
+          "ondelete": "CASCADE"
+        },
+        "comment": null
+      }
+    ],
+    "indexes": [
+      {
+        "name": "idx_meta_review_criterion_votes_vote_id",
+        "unique": false,
+        "column_names": [
+          "vote_id"
+        ],
+        "include_columns": [],
+        "dialect_options": {
+          "postgresql_include": []
+        }
+      },
+      {
+        "name": "uq_meta_review_criterion_vote",
+        "unique": true,
+        "column_names": [
+          "vote_id",
+          "criterion"
+        ],
+        "duplicates_constraint": "uq_meta_review_criterion_vote",
+        "include_columns": [],
+        "dialect_options": {
+          "postgresql_include": []
+        }
+      }
+    ]
+  },
+  "meta_review_drafts": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "INTEGER",
+        "nullable": false,
+        "default": "nextval('meta_review_drafts_id_seq'::regclass)",
+        "primary_key": false
+      },
+      {
+        "name": "session_id",
+        "type": "INTEGER",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "user_id",
+        "type": "INTEGER",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "choices_json",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "reason",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "updated_at",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      }
+    ],
+    "primary_key": [
+      "id"
+    ],
+    "foreign_keys": [
+      {
+        "name": "meta_review_drafts_session_id_fkey",
+        "constrained_columns": [
+          "session_id"
+        ],
+        "referred_schema": null,
+        "referred_table": "meta_review_sessions",
+        "referred_columns": [
+          "id"
+        ],
+        "options": {
+          "ondelete": "CASCADE"
+        },
+        "comment": null
+      },
+      {
+        "name": "meta_review_drafts_user_id_fkey",
+        "constrained_columns": [
+          "user_id"
+        ],
+        "referred_schema": null,
+        "referred_table": "users",
+        "referred_columns": [
+          "id"
+        ],
+        "options": {
+          "ondelete": "CASCADE"
+        },
+        "comment": null
+      }
+    ],
+    "indexes": [
+      {
+        "name": "idx_meta_review_drafts_session_id",
+        "unique": false,
+        "column_names": [
+          "session_id"
+        ],
+        "include_columns": [],
+        "dialect_options": {
+          "postgresql_include": []
+        }
+      },
+      {
+        "name": "idx_meta_review_drafts_user_id",
+        "unique": false,
+        "column_names": [
+          "user_id"
+        ],
+        "include_columns": [],
+        "dialect_options": {
+          "postgresql_include": []
+        }
+      },
+      {
+        "name": "uq_meta_review_drafts_session_user",
+        "unique": true,
+        "column_names": [
+          "session_id",
+          "user_id"
+        ],
+        "duplicates_constraint": "uq_meta_review_drafts_session_user",
+        "include_columns": [],
+        "dialect_options": {
+          "postgresql_include": []
+        }
+      }
+    ]
+  },
+  "meta_review_sessions": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "INTEGER",
+        "nullable": false,
+        "default": "nextval('meta_review_sessions_id_seq'::regclass)",
+        "primary_key": false
+      },
+      {
+        "name": "user_id",
+        "type": "INTEGER",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "source_proof_id",
+        "type": "INTEGER",
+        "nullable": true,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "source_kind",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "source_title",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "proof_content",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "rubric_text",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "evaluation_a",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "evaluation_b",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "model_a",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "model_b",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "is_featured",
+        "type": "BOOLEAN",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "selected_evaluation",
+        "type": "TEXT",
+        "nullable": true,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "selection_reason",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "created_at",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "selected_at",
+        "type": "TEXT",
+        "nullable": true,
+        "default": null,
+        "primary_key": false
+      }
+    ],
+    "primary_key": [
+      "id"
+    ],
+    "foreign_keys": [
+      {
+        "name": "meta_review_sessions_source_proof_id_fkey",
+        "constrained_columns": [
+          "source_proof_id"
+        ],
+        "referred_schema": null,
+        "referred_table": "proofs",
+        "referred_columns": [
+          "id"
+        ],
+        "options": {
+          "ondelete": "SET NULL"
+        },
+        "comment": null
+      },
+      {
+        "name": "meta_review_sessions_user_id_fkey",
+        "constrained_columns": [
+          "user_id"
+        ],
+        "referred_schema": null,
+        "referred_table": "users",
+        "referred_columns": [
+          "id"
+        ],
+        "options": {
+          "ondelete": "CASCADE"
+        },
+        "comment": null
+      }
+    ],
+    "indexes": [
+      {
+        "name": "idx_meta_review_sessions_featured",
+        "unique": false,
+        "column_names": [
+          "is_featured"
+        ],
+        "include_columns": [],
+        "dialect_options": {
+          "postgresql_include": []
+        }
+      },
+      {
+        "name": "idx_meta_review_sessions_user_id",
+        "unique": false,
+        "column_names": [
+          "user_id"
+        ],
+        "include_columns": [],
+        "dialect_options": {
+          "postgresql_include": []
+        }
+      }
+    ]
+  },
+  "meta_review_votes": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "INTEGER",
+        "nullable": false,
+        "default": "nextval('meta_review_votes_id_seq'::regclass)",
+        "primary_key": false
+      },
+      {
+        "name": "session_id",
+        "type": "INTEGER",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "user_id",
+        "type": "INTEGER",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "choice",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "reason",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "name": "created_at",
+        "type": "TEXT",
+        "nullable": false,
+        "default": null,
+        "primary_key": false
+      }
+    ],
+    "primary_key": [
+      "id"
+    ],
+    "foreign_keys": [
+      {
+        "name": "meta_review_votes_session_id_fkey",
+        "constrained_columns": [
+          "session_id"
+        ],
+        "referred_schema": null,
+        "referred_table": "meta_review_sessions",
+        "referred_columns": [
+          "id"
+        ],
+        "options": {
+          "ondelete": "CASCADE"
+        },
+        "comment": null
+      },
+      {
+        "name": "meta_review_votes_user_id_fkey",
+        "constrained_columns": [
+          "user_id"
+        ],
+        "referred_schema": null,
+        "referred_table": "users",
+        "referred_columns": [
+          "id"
+        ],
+        "options": {
+          "ondelete": "CASCADE"
+        },
+        "comment": null
+      }
+    ],
+    "indexes": [
+      {
+        "name": "idx_meta_review_votes_session_id",
+        "unique": false,
+        "column_names": [
+          "session_id"
+        ],
+        "include_columns": [],
+        "dialect_options": {
+          "postgresql_include": []
+        }
+      },
+      {
+        "name": "idx_meta_review_votes_user_id",
+        "unique": false,
+        "column_names": [
+          "user_id"
+        ],
+        "include_columns": [],
+        "dialect_options": {
+          "postgresql_include": []
+        }
+      },
+      {
+        "name": "uq_meta_review_votes_session_user",
+        "unique": true,
+        "column_names": [
+          "session_id",
+          "user_id"
+        ],
+        "duplicates_constraint": "uq_meta_review_votes_session_user",
+        "include_columns": [],
+        "dialect_options": {
+          "postgresql_include": []
+        }
+      }
+    ]
+  }
+}

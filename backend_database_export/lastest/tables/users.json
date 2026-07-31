@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "email": "[REDACTED]",
+    "display_name": "[REDACTED]",
+    "password_hash": "[REDACTED]",
+    "password_salt": "[REDACTED]",
+    "created_at": "2026-05-02T20:41:37.165393+00:00",
+    "affiliation": "[REDACTED]",
+    "experience_level": "[REDACTED]"
+  },
+  {
+    "id": 2,
+    "email": "[REDACTED]",
+    "display_name": "[REDACTED]",
+    "password_hash": "[REDACTED]",
+    "password_salt": "[REDACTED]",
+    "created_at": "2026-05-02T20:54:32.012555+00:00",
+    "affiliation": "[REDACTED]",
+    "experience_level": "[REDACTED]"
+  },
+  {
+    "id": 3,
+    "email": "[REDACTED]",
+    "display_name": "[REDACTED]",
+    "password_hash": "[REDACTED]",
+    "password_salt": "[REDACTED]",
+    "created_at": "2026-05-07T14:16:37.715914+00:00",
+    "affiliation": "[REDACTED]",
+    "experience_level": "[REDACTED]"
+  },
+  {
+    "id": 4,
+    "email": "[REDACTED]",
+    "display_name": "[REDACTED]",
+    "password_hash": "[REDACTED]",
+    "password_salt": "[REDACTED]",
+    "created_at": "2026-05-16T13:43:53.822445+00:00",
+    "affiliation": "[REDACTED]",
+    "experience_level": "[REDACTED]"
+  },
+  {
+    "id": 5,
+    "email": "[REDACTED]",
+    "display_name": "[REDACTED]",
+    "password_hash": "[REDACTED]",
+    "password_salt": "[REDACTED]",
+    "created_at": "2026-05-27T19:21:46.203514+00:00",
+    "affiliation": "[REDACTED]",
+    "experience_level": "[REDACTED]"
+  },
+  {
+    "id": 6,
+    "email": "[REDACTED]",
+    "display_name": "[REDACTED]",
+    "password_hash": "[REDACTED]",
+    "password_salt": "[REDACTED]",
+    "created_at": "2026-07-16T20:43:07.040965+00:00",
+    "affiliation": "[REDACTED]",
+    "experience_level": "[REDACTED]"
+  }
+]

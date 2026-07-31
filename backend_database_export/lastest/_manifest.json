@@ -1,0 +1,44 @@
+{
+  "exported_at": "2026-07-31T21:43:26.570320+00:00",
+  "database_dialect": "postgresql",
+  "output_dir": "backend_database_export/lastest",
+  "include_sensitive": false,
+  "redacted_fields": {
+    "auth_tokens": [
+      "token"
+    ],
+    "meta_review_drafts": [
+      "reason"
+    ],
+    "meta_review_sessions": [
+      "selection_reason"
+    ],
+    "meta_review_votes": [
+      "reason"
+    ],
+    "preference_evaluations": [
+      "evaluator_display_name",
+      "general_comment"
+    ],
+    "users": [
+      "affiliation",
+      "display_name",
+      "email",
+      "experience_level",
+      "password_hash",
+      "password_salt"
+    ]
+  },
+  "tables": {
+    "questions": 131,
+    "proofs": 497,
+    "preference_evaluations": 1,
+    "preference_votes": 4,
+    "users": 6,
+    "auth_tokens": 9,
+    "meta_review_criterion_votes": 0,
+    "meta_review_drafts": 7,
+    "meta_review_sessions": 8,
+    "meta_review_votes": 1
+  }
+}

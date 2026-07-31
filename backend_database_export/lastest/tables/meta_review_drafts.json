@@ -1,0 +1,58 @@
+[
+  {
+    "id": 1,
+    "session_id": 2,
+    "user_id": 1,
+    "choices_json": "{}",
+    "reason": "[REDACTED]",
+    "updated_at": "2026-07-30T20:04:48.777790+00:00"
+  },
+  {
+    "id": 2,
+    "session_id": 3,
+    "user_id": 1,
+    "choices_json": "{}",
+    "reason": "[REDACTED]",
+    "updated_at": "2026-07-30T20:04:52.769528+00:00"
+  },
+  {
+    "id": 3,
+    "session_id": 4,
+    "user_id": 1,
+    "choices_json": "{}",
+    "reason": "[REDACTED]",
+    "updated_at": "2026-07-31T20:55:17.332656+00:00"
+  },
+  {
+    "id": 4,
+    "session_id": 5,
+    "user_id": 3,
+    "choices_json": "{}",
+    "reason": "[REDACTED]",
+    "updated_at": "2026-07-30T20:35:31.526492+00:00"
+  },
+  {
+    "id": 5,
+    "session_id": 6,
+    "user_id": 1,
+    "choices_json": "{}",
+    "reason": "[REDACTED]",
+    "updated_at": "2026-07-31T20:55:18.507539+00:00"
+  },
+  {
+    "id": 6,
+    "session_id": 7,
+    "user_id": 1,
+    "choices_json": "{}",
+    "reason": "[REDACTED]",
+    "updated_at": "2026-07-31T20:55:19.541786+00:00"
+  },
+  {
+    "id": 7,
+    "session_id": 8,
+    "user_id": 1,
+    "choices_json": "{}",
+    "reason": "[REDACTED]",
+    "updated_at": "2026-07-31T20:55:19.749660+00:00"
+  }
+]

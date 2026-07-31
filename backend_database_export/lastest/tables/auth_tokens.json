@@ -1,0 +1,56 @@
+[
+  {
+    "id": 1,
+    "user_id": 1,
+    "token": "[REDACTED]",
+    "created_at": "2026-05-02T20:41:37.180635+00:00"
+  },
+  {
+    "id": 2,
+    "user_id": 1,
+    "token": "[REDACTED]",
+    "created_at": "2026-05-02T20:41:52.329125+00:00"
+  },
+  {
+    "id": 3,
+    "user_id": 2,
+    "token": "[REDACTED]",
+    "created_at": "2026-05-02T20:54:32.017283+00:00"
+  },
+  {
+    "id": 4,
+    "user_id": 3,
+    "token": "[REDACTED]",
+    "created_at": "2026-05-07T14:16:37.732526+00:00"
+  },
+  {
+    "id": 5,
+    "user_id": 4,
+    "token": "[REDACTED]",
+    "created_at": "2026-05-16T13:43:53.833990+00:00"
+  },
+  {
+    "id": 6,
+    "user_id": 1,
+    "token": "[REDACTED]",
+    "created_at": "2026-05-23T23:45:50.943144+00:00"
+  },
+  {
+    "id": 7,
+    "user_id": 5,
+    "token": "[REDACTED]",
+    "created_at": "2026-05-27T19:21:46.214857+00:00"
+  },
+  {
+    "id": 8,
+    "user_id": 1,
+    "token": "[REDACTED]",
+    "created_at": "2026-06-04T16:51:38.115841+00:00"
+  },
+  {
+    "id": 9,
+    "user_id": 3,
+    "token": "[REDACTED]",
+    "created_at": "2026-06-08T17:33:59.326924+00:00"
+  }
+]
